@@ -1,0 +1,13 @@
+{
+  "React PAGE getServerSideProps": {
+    "prefix": "ks-c-big",
+    "body": [
+      "",
+      "/////////////////////////////////////////////////////////",
+      "// ${1:comment}",
+      "/////////////////////////////////////////////////////////",
+      "",
+    ],
+    "description": "Big commentaire section",
+  },
+}

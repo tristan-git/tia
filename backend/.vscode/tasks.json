@@ -1,0 +1,91 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    // ///////////////////////////////////////////////////
+    // Git terminal
+    // ///////////////////////////////////////////////////
+    {
+      "label": "GIT",
+      "type": "shell",
+      "command": "zsh",
+      "isBackground": true,
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "detail": "Terminal pour les commandes Git",
+      "icon": {
+        "id": "github",
+        "color": "terminal.ansiRed" // Couleur de l'icône
+      }
+    },
+    // ///////////////////////////////////////////////////
+    // execute test
+    // ///////////////////////////////////////////////////
+    {
+      "label": "TEST",
+      "type": "npm",
+      "script": "test",
+      "isBackground": true,
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "detail": "Terminal pour exécuter les tests",
+      "icon": {
+        "id": "beaker",
+        "color": "terminal.ansiYellow"
+      }
+    },
+    // ///////////////////////////////////////////////////
+    // deploy contract
+    // ///////////////////////////////////////////////////
+    {
+      "label": "DEPLOY",
+      "type": "npm",
+      "script": "deploy",
+      "isBackground": true,
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "detail": "Terminal pour déployer les contrats",
+      "icon": {
+        "id": "cloud-upload",
+        "color": "terminal.ansiGreen"
+      }
+    },
+
+    // //////////////////////////////////////////////////////////////////////
+    // COMPILE
+    // //////////////////////////////////////////////////////////////////////
+    {
+      "label": "COMPILE",
+      "type": "npm",
+      "script": "compile", // Remplacez ceci par le script de compilation que vous utilisez, par exemple "hardhat compile"
+      "isBackground": true,
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "detail": "Compiler les contrats",
+      "icon": {
+        "id": "file-code",
+        "color": "terminal.ansiCyan"
+      }
+    },
+    // ///////////////////////////////////////////////////
+    // hardhat Node
+    // ///////////////////////////////////////////////////
+    {
+      "label": "NODE",
+      "type": "npm",
+      "script": "hardhatNode",
+      "isBackground": true,
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "detail": "Lancer le nœud Hardhat",
+      "icon": {
+        "id": "server",
+        "color": "terminal.ansiBlue"
+      }
+    }
+  ]
+}

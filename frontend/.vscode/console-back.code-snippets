@@ -1,0 +1,7 @@
+{
+  "React PAGE getServerSideProps": {
+    "prefix": "ks-console-back",
+    "body": ["console.log(JSON.stringify(${1:logIci}, null, 2))"],
+    "description": "console log back",
+  },
+}

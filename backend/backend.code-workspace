@@ -1,0 +1,51 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"terminal.integrated.defaultProfile.linux": "zsh", // ou "bash" selon environnement
+		"files.exclude": {
+			// /////////////////////////////////////////
+			// VISIBLE / HIDDEN
+			// /////////////////////////////////////////
+
+			"**/.DS_Store": false,
+			"**/.vscode": false,
+			"**/artifacts": false,
+			"**/cache": false,
+			"**/node_modules": false,
+			"**/typechain-types": false,
+			"package-lock.json": false,
+			"**/.gitignore": false,
+			"**/.git": false,
+			".prettierignore": false,
+			".prettierrc": false,
+			"**/coverage": false,
+			"tsconfig.json": false
+
+			// /////////////////////////////////////////
+			// ALL VISIBLE
+			// /////////////////////////////////////////
+
+			// "**/.DS_Store": false,
+			// "**/.vscode": false,
+			// "**/artifacts": false,
+			// "**/cache": false,
+			// "**/node_modules": false,
+			// "**/typechain-types": false,
+			// "package-lock.json": false,
+			// "**/.gitignore": false,
+			// "**/.git": false,
+			// ".prettierignore": false,
+			// ".prettierrc": false,
+			// "**/coverage": false,
+			// "tsconfig.json": false
+		},
+		"cSpell.words": ["Alyra", "Digimo", "Reentrancy", "Reentrency", "sepolia", "Skale"]
+	}
+	// "extensions": {
+	//   "recommendations": ["editorconfig.editorconfig", "dbaeumer.vscode-eslint"]
+	// },
+}

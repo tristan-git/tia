@@ -1,0 +1,21 @@
+{
+  "scripts": {
+    "hardhatNode": "npx hardhat node",
+    "compile": "node --experimental-modules scripts/compile/index.mjs",
+    "deploy": "node --experimental-modules scripts/deploy/index.mjs",
+    "test": "node --experimental-modules scripts/test/index.mjs",
+    "clean": "npx hardhat clean",
+    "coverage": "npx hardhat coverage"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^7.0.0",
+    "@openzeppelin/contracts": "^5.1.0",
+    "inquirer": "^12.0.0",
+    "solidity-coverage": "^0.8.13"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "dotenv": "^16.4.5",
+    "hardhat": "^2.22.13"
+  }
+}

@@ -178,22 +178,20 @@ describe('Building Manager Contracts', function () {
 			await RealEstateNFT.connect(manager).assignModuleRole(1, 'InterventionManager', manager.address, 2)
 
 			// Ajouter une intervention
-			const details = 'Reparation plomberie'
-			const provider = manager.address
-
-			const data = ethers.AbiCoder.defaultAbiCoder().encode(['string', 'address'], [details, provider])
+			const title = 'Reparation plomberie'
+			const interventionType = 'Plomberie'
+			const data = ethers.AbiCoder.defaultAbiCoder().encode(['string', 'string'], [title, interventionType])
 
 			await RealEstateNFT.connect(manager).executeModule('InterventionManager', 1, 'addIntervention', data)
 
 			// Ajouter un document à l'intervention
 			const name = 'Plumbing Report'
-			const url = 'https://example.com/report.pdf'
+			const documentType = 'Facture'
 			const hash = '0xabc123'
-			const restricted = true
 			const interventionIndex = 0
 			const dataDocument = ethers.AbiCoder.defaultAbiCoder().encode(
-				['uint256', 'string', 'string', 'string', 'bool'],
-				[interventionIndex, name, url, hash, restricted]
+				['uint256', 'string', 'string', 'string'],
+				[interventionIndex, name, documentType, hash]
 			)
 
 			await RealEstateNFT.connect(manager).executeModule('InterventionManager', 1, 'addDocument', dataDocument)
@@ -203,7 +201,6 @@ describe('Building Manager Contracts', function () {
 			console.log(interventions)
 
 			expect(interventions.length).to.equal(1)
-			expect(interventions[0].details).to.equal(details)
 			expect(interventions[0].documents.length).to.equal(1)
 			expect(interventions[0].documents[0].name).to.equal(name)
 		})

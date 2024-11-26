@@ -30,33 +30,3 @@ contract ModuleManager is Ownable(msg.sender) {
 		return modules[name];
 	}
 }
-
-// contract ModuleRegistry is Ownable(msg.sender) {
-// 	mapping(string => address) private modules;
-
-// 	event ModuleRegistered(string name, address moduleAddress);
-// 	event ModuleUpdated(string name, address moduleAddress);
-// 	event ModuleRemoved(string name);
-
-// 	function registerModule(string calldata name, address moduleAddress) external onlyOwner {
-// 		require(moduleAddress != address(0), 'Invalid address');
-// 		modules[name] = moduleAddress;
-// 		emit ModuleRegistered(name, moduleAddress);
-// 	}
-
-// 	function updateModule(string calldata name, address moduleAddress) external onlyOwner {
-// 		require(modules[name] != address(0), 'Module not found');
-// 		modules[name] = moduleAddress;
-// 		emit ModuleUpdated(name, moduleAddress);
-// 	}
-
-// 	function removeModule(string calldata name) external onlyOwner {
-// 		require(modules[name] != address(0), 'Module not found');
-// 		delete modules[name];
-// 		emit ModuleRemoved(name);
-// 	}
-
-// 	function getModule(string calldata name) external view returns (address) {
-// 		return modules[name];
-// 	}
-// }

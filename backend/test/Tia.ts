@@ -97,7 +97,7 @@ describe('Building Manager Contracts', function () {
 	})
 
 	describe('Functionality', function () {
-		it.only('Should allow assigning and revoking roles for modules', async function () {
+		it('Should allow assigning and revoking roles for modules', async function () {
 			const { RealEstateNFT, manager, account2 } = await loadFixture(deployBuildingManagerFixture)
 
 			// Assigner un rôle pour le module InterventionManager
@@ -169,11 +169,13 @@ describe('Building Manager Contracts', function () {
 			expect(await RealEstateNFT.ownerOf(1)).to.equal(manager.address)
 		})
 
-		it('Should interact with InterventionManager through RealEstateNFT', async function () {
+		it.only('Should interact with InterventionManager through RealEstateNFT', async function () {
 			const { RealEstateNFT, InterventionManager, tiaAdmin, manager } = await loadFixture(deployBuildingManagerFixture)
 
 			// Mint un NFT
 			await RealEstateNFT.connect(manager).mintNFT(manager.address, 1, 'vervelBlob')
+
+			await RealEstateNFT.connect(manager).assignModuleRole(1, 'InterventionManager', manager.address, 2)
 
 			// Ajouter une intervention
 			const details = 'Reparation plomberie'
@@ -196,7 +198,9 @@ describe('Building Manager Contracts', function () {
 
 			await RealEstateNFT.connect(manager).executeModule('InterventionManager', 1, 'addDocument', dataDocument)
 
-			const interventions = await InterventionManager.getInterventions(1)
+			const interventions = await InterventionManager.getInterventions(1, manager.address)
+
+			console.log(interventions)
 
 			expect(interventions.length).to.equal(1)
 			expect(interventions[0].details).to.equal(details)

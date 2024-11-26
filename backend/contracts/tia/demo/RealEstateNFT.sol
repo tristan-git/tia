@@ -8,7 +8,7 @@ import 'hardhat/console.sol';
 
 interface IModule {
 	// Interface pour les modules exécutables
-	function execute(uint256 tokenId, string calldata fnName, bytes calldata data) external;
+	function execute(uint256 tokenId, string calldata fnName, bytes calldata data, address user) external;
 }
 
 interface IModuleRegistry {
@@ -24,7 +24,8 @@ contract RealEstateNFT is ERC721URIStorage, AccessControl {
 	// TODO enum des role et essayer den mettre le max qui couvre tout les cas
 	// TODO verifier les import inutile dans les contrat
 	// TODO variable multiproperty ex immeuble avec plusieur appart !!! nft 1 par defaut gere lensemble des appartement
-	// TODO plusieur manager peuvent travailler separement 
+	// TODO plusieur manager peuvent travailler separement
+	// TODO interface IModuleRegistry et IModule dans dautre fichier ?
 
 	// Rôle pour gérer les fonctionnalités de manager
 	bytes32 public constant MANAGER_ROLE = keccak256('MANAGER_ROLE');
@@ -200,7 +201,7 @@ contract RealEstateNFT is ERC721URIStorage, AccessControl {
 		require(module != address(0), 'Module not found');
 
 		// Appeler la fonction `execute` sur le module
-		IModule(module).execute(tokenId, fnName, data);
+		IModule(module).execute(tokenId, fnName, data, msg.sender);
 	}
 
 	// ////////////////////////////////////////////////////////////////////
@@ -216,126 +217,3 @@ contract RealEstateNFT is ERC721URIStorage, AccessControl {
 		return super.supportsInterface(interfaceId);
 	}
 }
-
-// pragma solidity 0.8.28;
-
-// import '@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol';
-// import '@openzeppelin/contracts/access/Ownable.sol';
-// import {AccessControl} from '@openzeppelin/contracts/access/AccessControl.sol';
-
-// import 'hardhat/console.sol';
-
-// interface IModule {
-// 	function execute(uint256 tokenId, string calldata fnName, bytes calldata data) external;
-// }
-
-// interface IModuleRegistry {
-// 	function getModule(string calldata name) external view returns (address);
-// }
-
-// contract RealEstateNFT is ERC721URIStorage, AccessControl {
-// 	bytes32 public constant MANAGER_ROLE = keccak256('MANAGER_ROLE');
-
-// 	address private moduleManager;
-
-// 	mapping(uint256 => string) private metadataURIs; // Stockage des URI de métadonnées
-
-// 	struct ModuleAccess {
-// 		bool isAuthorized; // Indique si l'adresse est autorisée
-// 		uint256 accessLevel; // Niveau d'accès ou rôle -> Niveau 1 : Lecture seule | Niveau  : Lecture et écriture.
-// 	}
-
-// 	// Structure pour gérer les autorisations spécifiques par module et token
-// 	mapping(uint256 => mapping(string => mapping(address => ModuleAccess))) private tokenModuleRoles; // tokenId -> moduleName -> authorizedAddress -> ModuleAccess
-
-// 	event ModuleManagerUpdated(address indexed oldManager, address indexed newManager);
-// 	event MetadataUpdated(uint256 indexed tokenId, string newMetadataURI);
-// 	event ModuleRoleAssigned(uint256 indexed tokenId, string indexed moduleName, address indexed authorizedAddress);
-
-// 	constructor(address _admin, address _manager) ERC721('RealEstateNFT', 'REALESTATE') {
-// 		_grantRole(DEFAULT_ADMIN_ROLE, _admin);
-// 		_grantRole(MANAGER_ROLE, _manager);
-// 	}
-
-// 	// ////////////////////////////////////////////////////////////////////
-// 	// NFT
-// 	// ////////////////////////////////////////////////////////////////////
-
-// 	function mintNFT(address to, uint256 tokenId, string calldata initialURI) public onlyRole(MANAGER_ROLE) {
-// 		_mint(to, tokenId);
-// 		_setTokenURI(tokenId, initialURI); // Définit l'URI initial
-// 		metadataURIs[tokenId] = initialURI;
-// 	}
-
-// 	function updateMetadata(uint256 tokenId, string calldata newMetadataURI) external onlyRole(MANAGER_ROLE) {
-// 		// require(_tokenExists(tokenId), 'NFT does not exist'); TODO a faire
-// 		metadataURIs[tokenId] = newMetadataURI;
-// 		_setTokenURI(tokenId, newMetadataURI);
-// 		emit MetadataUpdated(tokenId, newMetadataURI);
-// 	}
-
-// 	function getMetadataURI(uint256 tokenId) external view returns (string memory) {
-// 		return metadataURIs[tokenId];
-// 	}
-
-// 	// ////////////////////////////////////////////////////////////////////
-// 	// MODULE ROLES
-// 	// ////////////////////////////////////////////////////////////////////
-
-// 	// Assigner un rôle pour un module spécifique sur un token
-// 	function assignModuleRole(
-// 		uint256 tokenId,
-// 		string calldata moduleName,
-// 		address authorizedAddress
-// 	) external onlyRole(MANAGER_ROLE) {
-// 		require(authorizedAddress != address(0), 'Invalid authorized address');
-// 		tokenModuleRoles[tokenId][moduleName] = authorizedAddress;
-// 		emit ModuleRoleAssigned(tokenId, moduleName, authorizedAddress);
-// 	}
-
-// 	// Récupérer l'adresse autorisée pour un module et un token
-// 	function getModuleRole(uint256 tokenId, string calldata moduleName) external view returns (address) {
-// 		return tokenModuleRoles[tokenId][moduleName];
-// 	}
-
-// 	// ////////////////////////////////////////////////////////////////////
-// 	// MODULE MANAGER
-// 	// ////////////////////////////////////////////////////////////////////
-
-// 	function updateModuleManager(address _newManager) external onlyRole(DEFAULT_ADMIN_ROLE) {
-// 		require(_newManager != address(0), 'Invalid module manager address');
-// 		moduleManager = _newManager;
-// 		emit ModuleManagerUpdated(moduleManager, _newManager);
-// 	}
-
-// 	// ////////////////////////////////////////////////////////////////////
-// 	// MODULE
-// 	// ////////////////////////////////////////////////////////////////////
-
-// 	function executeModule(string calldata moduleName, uint256 tokenId, string calldata fnName, bytes calldata data) public {
-// 		// TODO verifier que moduleManager existe
-
-// 		// Vérifiez que moduleManager est configuré
-// 		require(moduleManager != address(0), 'ModuleManager not set');
-
-// 		// Récupérez l'adresse autorisée pour ce module et ce token
-// 		address authorizedAddress = tokenModuleRoles[tokenId][moduleName];
-// 		require(authorizedAddress == msg.sender, 'Unauthorized for this module and token');
-
-// 		// Récupérez l'adresse du module via IModuleRegistry
-// 		address module = IModuleRegistry(moduleManager).getModule(moduleName);
-// 		require(module != address(0), 'Module not found');
-
-// 		// Appeler la fonction `execute` avec `fnName` et les autres paramètres
-// 		IModule(module).execute(tokenId, fnName, data);
-// 	}
-
-// 	// ////////////////////////////////////////////////////////////////////
-// 	// conflit
-// 	// ////////////////////////////////////////////////////////////////////
-
-// 	// Résolution du conflit pour supportsInterface
-// 	function supportsInterface(bytes4 interfaceId) public view override(ERC721URIStorage, AccessControl) returns (bool) {
-// 		return super.supportsInterface(interfaceId);
-// 	}
-// }

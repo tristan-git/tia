@@ -7,6 +7,8 @@ export async function POST(req) {
 		const body = await req.json()
 		const { message, signature, address, tokenId, contractAddress } = body
 
+		console.log('🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡')
+
 		const provider = new ethers.JsonRpcProvider('https://testnet.skalenodes.com/v1/giant-half-dual-testnet')
 		// const network = await provider.getNetwork()
 

@@ -6,6 +6,8 @@ import { artifactMyNFTWithRoles } from '@/constants/artifacts/MyNFTWithRoles'
 import MintPage from './MintPage'
 import TestAPI from './TestApi'
 import GenerateSignature from './GenerateSignature'
+import AvatarUploadPage from './AvatarUploadPage'
+import BlobPage from './BlobPage'
 
 const contractAddress = '0x5E5ACcadbC61562eB6f2b8Abdb67B3AD845c93F1'
 
@@ -55,6 +57,10 @@ export default function VotesPage() {
 			<MintPage />
 			{/* <TestAPI /> */}
 			<GenerateSignature />
+
+			<AvatarUploadPage />
+
+			<BlobPage />
 		</>
 	)
 }

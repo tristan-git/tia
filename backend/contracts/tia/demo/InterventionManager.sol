@@ -52,6 +52,10 @@ contract InterventionManager {
 		}
 	}
 
+	// ////////////////////////////////////////////////////////////////////
+	// EXECUTE FUNCTION
+	// ////////////////////////////////////////////////////////////////////
+
 	// Ajouter une intervention
 	function _addIntervention(uint256 _tokenId, address _from, bytes calldata _data) internal {
 		bytes32 _interventionHash = abi.decode(_data, (bytes32));

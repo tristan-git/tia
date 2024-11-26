@@ -169,79 +169,38 @@ describe('Building Manager Contracts', function () {
 			expect(await RealEstateNFT.ownerOf(1)).to.equal(manager.address)
 		})
 
-		it('Should interact with InterventionManager through RealEstateNFT', async function () {
+		it.only('Should interact with InterventionManager through RealEstateNFT', async function () {
 			const { RealEstateNFT, InterventionManager, tiaAdmin, manager } = await loadFixture(deployBuildingManagerFixture)
 
 			// Mint un NFT
 			await RealEstateNFT.connect(manager).mintNFT(manager.address, 1, 'vervelBlob')
 
+			// Assigner un rôle d'accès en écriture au manager pour le module "InterventionManager"
 			await RealEstateNFT.connect(manager).assignModuleRole(1, 'InterventionManager', manager.address, 2)
 
 			// Ajouter une intervention
-			const title = 'Reparation plomberie'
-			const interventionType = 'Plomberie'
-			const data = ethers.AbiCoder.defaultAbiCoder().encode(['string', 'string'], [title, interventionType])
+			const interventionHash = ethers.keccak256(ethers.toUtf8Bytes('Reparation plomberie:Plomberie'))
+			const dataIntervention = ethers.AbiCoder.defaultAbiCoder().encode(['bytes32'], [interventionHash])
 
-			await RealEstateNFT.connect(manager).executeModule('InterventionManager', 1, 'addIntervention', data)
+			await RealEstateNFT.connect(manager).executeModule('InterventionManager', 1, 'addIntervention', dataIntervention)
 
 			// Ajouter un document à l'intervention
-			const name = 'Plumbing Report'
-			const documentType = 'Facture'
-			const hash = '0xabc123'
+			const documentHash = ethers.keccak256(ethers.toUtf8Bytes('Plumbing Report:Facture:0xabc123'))
 			const interventionIndex = 0
-			const dataDocument = ethers.AbiCoder.defaultAbiCoder().encode(
-				['uint256', 'string', 'string', 'string'],
-				[interventionIndex, name, documentType, hash]
-			)
+			const dataDocument = ethers.AbiCoder.defaultAbiCoder().encode(['uint256', 'bytes32'], [interventionIndex, documentHash])
 
 			await RealEstateNFT.connect(manager).executeModule('InterventionManager', 1, 'addDocument', dataDocument)
 
+			// Récupérer les interventions associées
 			const interventions = await InterventionManager.getInterventions(1, manager.address)
 
 			console.log(interventions)
 
-			expect(interventions.length).to.equal(1)
-			expect(interventions[0].documents.length).to.equal(1)
-			expect(interventions[0].documents[0].name).to.equal(name)
-		})
-
-
-
-
-		it.only('Should interact with InterventionManager through RealEstateNFT', async function () {
-			const { RealEstateNFT, InterventionManager, tiaAdmin, manager } = await loadFixture(deployBuildingManagerFixture);
-		
-			// Mint un NFT
-			await RealEstateNFT.connect(manager).mintNFT(manager.address, 1, 'vervelBlob');
-		
-			// Assigner un rôle d'accès en écriture au manager pour le module "InterventionManager"
-			await RealEstateNFT.connect(manager).assignModuleRole(1, 'InterventionManager', manager.address, 2);
-		
-			// Ajouter une intervention
-			const interventionHash = ethers.keccak256(ethers.toUtf8Bytes('Reparation plomberie:Plomberie'));
-			const dataIntervention = ethers.AbiCoder.defaultAbiCoder().encode(['bytes32'], [interventionHash]);
-		
-			await RealEstateNFT.connect(manager).executeModule('InterventionManager', 1, 'addIntervention', dataIntervention);
-		
-			// Ajouter un document à l'intervention
-			const documentHash = ethers.keccak256(ethers.toUtf8Bytes('Plumbing Report:Facture:0xabc123'));
-			const interventionIndex = 0;
-			const dataDocument = ethers.AbiCoder.defaultAbiCoder().encode(['uint256', 'bytes32'], [interventionIndex, documentHash]);
-		
-			await RealEstateNFT.connect(manager).executeModule('InterventionManager', 1, 'addDocument', dataDocument);
-		
-			// Récupérer les interventions associées
-			const interventions = await InterventionManager.getInterventions(1, manager.address);
-		
-			console.log(interventions);
-		
 			// Vérifications
-			expect(interventions.length).to.equal(1);
-			expect(interventions[0].interventionHash).to.equal(interventionHash);
-			expect(interventions[0].documents.length).to.equal(1);
-			expect(interventions[0].documents[0].documentHash).to.equal(documentHash);
-		});
-		
-
+			expect(interventions.length).to.equal(1)
+			expect(interventions[0].interventionHash).to.equal(interventionHash)
+			expect(interventions[0].documents.length).to.equal(1)
+			expect(interventions[0].documents[0].documentHash).to.equal(documentHash)
+		})
 	})
 })

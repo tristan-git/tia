@@ -71,12 +71,12 @@ contract RealEstateNFT is ERC721URIStorage, AccessControl {
 	// ////////////////////////////////////////////////////////////////////
 
 	/**
-	 * @dev Permet au manager de minter un nouveau NFT.
+	 * @dev Permet au admin de minter un nouveau NFT.
 	 * @param to Adresse du bénéficiaire.
 	 * @param tokenId ID unique du token.
 	 * @param initialURI URI initial du token.
 	 */
-	function mintNFT(address to, uint256 tokenId, string calldata initialURI) public onlyRole(MANAGER_ROLE) {
+	function mintNFT(address to, uint256 tokenId, string calldata initialURI) public onlyRole(DEFAULT_ADMIN_ROLE) {
 		_mint(to, tokenId);
 		_setTokenURI(tokenId, initialURI); // Définit l'URI initial
 	}
@@ -86,7 +86,7 @@ contract RealEstateNFT is ERC721URIStorage, AccessControl {
 	 * @param tokenId ID du token à mettre à jour.
 	 * @param newMetadataURI Nouvelle URI des métadonnées.
 	 */
-	function updateMetadata(uint256 tokenId, string calldata newMetadataURI) external onlyRole(MANAGER_ROLE) {
+	function updateMetadata(uint256 tokenId, string calldata newMetadataURI) external onlyRole(DEFAULT_ADMIN_ROLE) {
 		// require(_exists(tokenId), 'NFT does not exist');
 		_setTokenURI(tokenId, newMetadataURI);
 		emit MetadataUpdated(tokenId, newMetadataURI);
@@ -133,7 +133,7 @@ contract RealEstateNFT is ERC721URIStorage, AccessControl {
 		string calldata moduleName,
 		address authorizedAddress,
 		uint256 accessLevel
-	) external onlyRole(MANAGER_ROLE) {
+	) external onlyRole(DEFAULT_ADMIN_ROLE) {
 		require(authorizedAddress != address(0), 'Invalid authorized address');
 		require(accessLevel > 0, 'Invalid access level');
 
@@ -152,7 +152,7 @@ contract RealEstateNFT is ERC721URIStorage, AccessControl {
 		uint256 tokenId,
 		string calldata moduleName,
 		address authorizedAddress
-	) external onlyRole(MANAGER_ROLE) {
+	) external onlyRole(DEFAULT_ADMIN_ROLE) {
 		require(tokenModuleRoles[tokenId][moduleName][authorizedAddress].isAuthorized, 'Address not authorized');
 
 		delete tokenModuleRoles[tokenId][moduleName][authorizedAddress];

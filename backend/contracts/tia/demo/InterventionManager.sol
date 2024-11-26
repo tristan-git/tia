@@ -7,7 +7,7 @@ import '@openzeppelin/contracts/utils/Strings.sol';
 contract InterventionManager {
 	// TODO realEstateNFT renommer en plus parlant
 	// TODO isValidate by onwer ?? le propreaitire valide que interventiona bien eu lieu
-	// TODO update seulement si owner na pas valider intervention
+	// TODO address from from c'est parlant ??
 
 	address private realEstateNFT;
 
@@ -18,12 +18,14 @@ contract InterventionManager {
 	struct Intervention {
 		bytes32 interventionHash;
 		Document[] documents;
+		bool isValidatedByOwner; // Indique si le propriétaire a validé l'intervention
 	}
 
 	mapping(uint256 => mapping(address => Intervention[])) private interventions; // Interventions par tokenId -> address -> [interventions]
 
 	event InterventionAdded(uint256 indexed tokenId, bytes32 interventionHash, uint256 timestamp, address from);
 	event DocumentAdded(uint256 indexed tokenId, uint256 interventionIndex, bytes32 documentHash, address from);
+	event InterventionValidated(uint256 indexed tokenId, uint256 interventionIndex, address owner);
 
 	constructor(address _realEstateNFT) {
 		require(_realEstateNFT != address(0), 'Invalid RealEstateNFT address');
@@ -43,6 +45,8 @@ contract InterventionManager {
 			_addIntervention(tokenId, user, data);
 		} else if (Strings.equal(fnName, 'addDocument')) {
 			_addDocument(tokenId, user, data);
+		} else if (Strings.equal(fnName, 'validateIntervention')) {
+			_validateIntervention(tokenId, user, data);
 		} else {
 			revert('Invalid function name');
 		}
@@ -64,10 +68,23 @@ contract InterventionManager {
 		(uint256 _interventionIndex, bytes32 _documentHash) = abi.decode(_data, (uint256, bytes32));
 
 		require(_interventionIndex < interventions[_tokenId][_from].length, 'Invalid intervention index');
+		require(!interventions[_tokenId][_from][_interventionIndex].isValidatedByOwner, 'Intervention already validated');
 
 		interventions[_tokenId][_from][_interventionIndex].documents.push(Document({documentHash: _documentHash}));
 
 		emit DocumentAdded(_tokenId, _interventionIndex, _documentHash, _from);
+	}
+
+	// Valider une intervention par le propriétaire
+	function _validateIntervention(uint256 _tokenId, address _owner, bytes calldata _data) internal {
+		uint256 _interventionIndex = abi.decode(_data, (uint256));
+
+		require(_interventionIndex < interventions[_tokenId][_owner].length, 'Invalid intervention index');
+		require(interventions[_tokenId][_owner][_interventionIndex].isValidatedByOwner == false, 'Already validated');
+
+		interventions[_tokenId][_owner][_interventionIndex].isValidatedByOwner = true;
+
+		emit InterventionValidated(_tokenId, _interventionIndex, _owner);
 	}
 
 	// ////////////////////////////////////////////////////////////////////

@@ -17,6 +17,7 @@ interface IModuleRegistry {
 }
 
 contract RealEstateNFT is ERC721URIStorage, AccessControl {
+	// TODO licence des contrats
 	// TODO ajouter une constante initialiser dans constructeur pour le code RNB
 	// TODO modifier les nom de varaible des address en to ou from ?
 	// TODO hash dans bytes et pas string

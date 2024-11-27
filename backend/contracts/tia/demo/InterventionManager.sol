@@ -74,6 +74,8 @@ contract InterventionManager {
 	function _addIntervention(uint256 _tokenId, address _from, bytes calldata _data) internal {
 		bytes32 _interventionHash = abi.decode(_data, (bytes32));
 
+		require(_interventionHash != bytes32(0), "Hash d'intervention invalide");
+
 		interventions[_tokenId][_from].push();
 		uint256 newIndex = interventions[_tokenId][_from].length - 1;
 		interventions[_tokenId][_from][newIndex].interventionHash = _interventionHash;
@@ -84,6 +86,8 @@ contract InterventionManager {
 	// Ajouter un document à une intervention spécifique
 	function _addDocument(uint256 _tokenId, address _from, bytes calldata _data) internal {
 		(uint256 _interventionIndex, bytes32 _documentHash) = abi.decode(_data, (uint256, bytes32));
+
+		require(_documentHash != bytes32(0), 'Hash document invalide');
 
 		require(_interventionIndex < interventions[_tokenId][_from].length, 'Invalid intervention index');
 		require(!interventions[_tokenId][_from][_interventionIndex].isValidated, 'Intervention already validated');

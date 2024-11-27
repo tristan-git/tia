@@ -9,19 +9,6 @@ import 'hardhat/console.sol';
 interface IModule {
 	// Interface pour les modules exécutables
 	function execute(uint256 tokenId, string calldata fnName, bytes calldata data, address user) external;
-
-	// Interface pour les modules de lecture
-	function read(
-		uint256 tokenId,
-		string calldata fnName,
-		bytes calldata data,
-		address user
-	) external view returns (bytes memory);
-}
-
-interface IModuleRegistry {
-	// Interface pour le registre de modules
-	function getModule(string calldata name) external view returns (address);
 }
 
 contract RealEstateNFT is ERC721URIStorage, AccessControl {
@@ -29,20 +16,15 @@ contract RealEstateNFT is ERC721URIStorage, AccessControl {
 	// TODO ajouter une constante initialiser dans constructeur pour le code RNB
 	// TODO modifier les nom de varaible des address en to ou from ?
 	// TODO hash dans bytes et pas string
-	// TODO deployer automatiquement au constructeur moduleManager address
-	// TODO contrat pausable
-	// TODO enum des role et essayer den mettre le max qui couvre tout les cas
 	// TODO verifier les import inutile dans les contrat
-	// TODO variable multiproperty ex immeuble avec plusieur appart !!! nft 1 par defaut gere lensemble des appartement
-	// TODO plusieur manager peuvent travailler separement
 	// TODO interface IModuleRegistry et IModule dans dautre fichier ?
 	// TODO renomer MANAGER_ROLE plus explicite c'est le propietaire du bien / ou celui qui l'administire
 
 	// Rôle pour gérer les fonctionnalités de manager
 	bytes32 public constant MANAGER_ROLE = keccak256('MANAGER_ROLE');
 
-	// Adresse du gestionnaire de modules
-	address private moduleManager;
+	// Mapping des modules par leur nom
+	mapping(string => address) private modules;
 
 	// Structure pour gérer les autorisations spécifiques par module et token
 	struct ModuleAccess {
@@ -53,8 +35,7 @@ contract RealEstateNFT is ERC721URIStorage, AccessControl {
 	// Mapping des autorisations : tokenId -> moduleName -> authorizedAddress -> ModuleAccess
 	mapping(uint256 => mapping(string => mapping(address => ModuleAccess))) private tokenModuleRoles; // TODO nommer en tokenModuleWriteAccess
 
-	// Événements pour tracer les changements
-	event ModuleManagerUpdated(address indexed oldManager, address indexed newManager);
+	// Événements
 	event MetadataUpdated(uint256 indexed tokenId, string newMetadataURI);
 	event ModuleRoleAssigned(
 		uint256 indexed tokenId,
@@ -63,6 +44,8 @@ contract RealEstateNFT is ERC721URIStorage, AccessControl {
 		uint256 accessLevel
 	);
 	event ModuleRoleRevoked(uint256 indexed tokenId, string indexed moduleName, address indexed authorizedAddress);
+	event ModuleRegistered(string indexed name, address indexed moduleAddress);
+	event ModuleUpdated(string indexed name, address indexed oldAddress, address indexed newAddress);
 
 	/**
 	 * @dev Constructeur : initialise les rôles admin et manager.
@@ -111,18 +94,28 @@ contract RealEstateNFT is ERC721URIStorage, AccessControl {
 	}
 
 	// ////////////////////////////////////////////////////////////////////
-	// MODULE MANAGER
+	// MODULE MANAGEMENT
 	// ////////////////////////////////////////////////////////////////////
 
-	/**
-	 * @dev Met à jour le gestionnaire de modules (moduleManager).
-	 * @param _newManager Adresse du nouveau gestionnaire de modules.
-	 */
-	function updateModuleManager(address _newManager) external onlyRole(DEFAULT_ADMIN_ROLE) {
-		require(_newManager != address(0), 'Invalid module manager address');
-		address oldManager = moduleManager;
-		moduleManager = _newManager;
-		emit ModuleManagerUpdated(oldManager, _newManager);
+	function registerModule(string calldata name, address moduleAddress) external onlyRole(DEFAULT_ADMIN_ROLE) {
+		require(moduleAddress != address(0), 'Invalid module address');
+		require(modules[name] == address(0), 'Module already exists');
+
+		modules[name] = moduleAddress;
+		emit ModuleRegistered(name, moduleAddress);
+	}
+
+	function updateModule(string calldata name, address newModuleAddress) external onlyRole(DEFAULT_ADMIN_ROLE) {
+		require(newModuleAddress != address(0), 'Invalid module address');
+		require(modules[name] != address(0), 'Module not found');
+
+		address oldAddress = modules[name];
+		modules[name] = newModuleAddress;
+		emit ModuleUpdated(name, oldAddress, newModuleAddress);
+	}
+
+	function getModule(string calldata name) external view returns (address) {
+		return modules[name];
 	}
 
 	// ////////////////////////////////////////////////////////////////////
@@ -197,21 +190,12 @@ contract RealEstateNFT is ERC721URIStorage, AccessControl {
 	 * @param data Données encodées pour l'exécution.
 	 */
 	function executeModule(string calldata moduleName, uint256 tokenId, string calldata fnName, bytes calldata data) public {
-		// Vérifiez que moduleManager est configuré
-		require(moduleManager != address(0), 'ModuleManager not set');
+		require(modules[moduleName] != address(0), 'Module not found');
 
-		// Récupérez les permissions pour msg.sender
 		ModuleAccess memory access = tokenModuleRoles[tokenId][moduleName][msg.sender];
-
-		// Valider les permissions
 		require(access.isAuthorized && access.accessLevel == 2, 'Not authorized for this module and token');
 
-		// Récupérer l'adresse du module via le gestionnaire de modules
-		address module = IModuleRegistry(moduleManager).getModule(moduleName);
-		require(module != address(0), 'Module not found');
-
-		// Appeler la fonction `execute` sur le module
-		IModule(module).execute(tokenId, fnName, data, msg.sender);
+		IModule(modules[moduleName]).execute(tokenId, fnName, data, msg.sender);
 	}
 
 	// ////////////////////////////////////////////////////////////////////

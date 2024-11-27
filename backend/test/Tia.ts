@@ -53,31 +53,22 @@ describe('Building Manager Contracts', function () {
 
 		// 1. Déployer RealEstateNFT
 		const RealEstateNFTFactory = await ethers.getContractFactory('RealEstateNFT')
-		const realEstateNFT = await RealEstateNFTFactory.deploy(tiaAdmin, manager)
+		const realEstateNFT = await RealEstateNFTFactory.deploy(tiaAdmin.address, manager.address)
 		await realEstateNFT.waitForDeployment()
 
-		// 2. Déployer ModuleManager
-		const ModuleManagerFactory = await ethers.getContractFactory('ModuleManager')
-		const ModuleManager = await ModuleManagerFactory.deploy()
-		await ModuleManager.waitForDeployment()
-
-		// 3. Déployer InterventionManager
+		// 2. Déployer InterventionManager
 		const InterventionManagerFactory = await ethers.getContractFactory('InterventionManager')
 		const interventionManager = await InterventionManagerFactory.deploy(realEstateNFT.getAddress()) // _realEstateNFT
 		await interventionManager.waitForDeployment()
 
-		// 4. Enregistrer le module InterventionManager dans ModuleManager
-		await ModuleManager.registerModule('InterventionManager', await interventionManager.getAddress())
-
-		// 5. on ajoute le address de module manager
-		await realEstateNFT.connect(tiaAdmin).updateModuleManager(ModuleManager.getAddress())
+		// 3. Enregistrer le module InterventionManager dans RealEstateNFT
+		await realEstateNFT.connect(tiaAdmin).registerModule('InterventionManager', interventionManager.getAddress())
 
 		return {
 			tiaAdmin,
 			manager,
 			account2,
 			account3,
-			ModuleManager: ModuleManager,
 			RealEstateNFT: realEstateNFT,
 			InterventionManager: interventionManager,
 		}

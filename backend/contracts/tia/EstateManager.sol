@@ -17,7 +17,6 @@ contract EstateManager is ERC721URIStorage, AccessControl {
 	// TODO hash dans bytes et pas string
 	// TODO verifier les import inutile dans les contrat
 	// TODO interface IModuleRegistry et IModule dans dautre fichier ?
-	// TODO renomer MANAGER_ROLE plus explicite c'est le propietaire du bien / ou celui qui l'administire
 
 	bytes32 public immutable rnbCode;
 	bytes32 public constant ESTATE_MANAGER_ROLE = keccak256('ESTATE_MANAGER_ROLE');

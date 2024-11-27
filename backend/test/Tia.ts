@@ -173,10 +173,10 @@ describe('Building Manager Contracts', function () {
 			const { RealEstateNFT, InterventionManager, tiaAdmin, manager } = await loadFixture(deployBuildingManagerFixture)
 
 			// Mint un NFT
-			await RealEstateNFT.connect(manager).mintNFT(manager.address, 1, 'vervelBlob')
+			await RealEstateNFT.connect(tiaAdmin).mintNFT(tiaAdmin.address, 1, 'vervelBlob')
 
 			// Assigner un rôle d'accès en écriture au manager pour le module "InterventionManager"
-			await RealEstateNFT.connect(manager).assignModuleRole(1, 'InterventionManager', manager.address, 2)
+			await RealEstateNFT.connect(tiaAdmin).assignModuleRole(1, 'InterventionManager', manager.address, 2)
 
 			// Ajouter une intervention
 			const interventionHash = ethers.keccak256(ethers.toUtf8Bytes('Reparation plomberie:Plomberie'))
@@ -194,6 +194,7 @@ describe('Building Manager Contracts', function () {
 			// Récupérer les interventions associées
 			const interventions = await InterventionManager.getInterventions(1, manager.address)
 
+			console.log('interventions llall')
 			console.log(interventions)
 
 			// Vérifications
@@ -201,6 +202,15 @@ describe('Building Manager Contracts', function () {
 			expect(interventions[0].interventionHash).to.equal(interventionHash)
 			expect(interventions[0].documents.length).to.equal(1)
 			expect(interventions[0].documents[0].documentHash).to.equal(documentHash)
+
+			// Validate the intervention
+			const dataValidate = ethers.AbiCoder.defaultAbiCoder().encode(['uint256'], [0])
+			await RealEstateNFT.connect(manager).executeModule('InterventionManager', 1, 'validateIntervention', dataValidate)
+
+			// Verify intervention validation
+			const validatedIntervention = await InterventionManager.getInterventions(1, manager.address)
+
+			expect(validatedIntervention[0].isValidatedByOwner).to.be.true
 		})
 	})
 })

@@ -9,6 +9,14 @@ import 'hardhat/console.sol';
 interface IModule {
 	// Interface pour les modules exécutables
 	function execute(uint256 tokenId, string calldata fnName, bytes calldata data, address user) external;
+
+	// Interface pour les modules de lecture
+	function read(
+		uint256 tokenId,
+		string calldata fnName,
+		bytes calldata data,
+		address user
+	) external view returns (bytes memory);
 }
 
 interface IModuleRegistry {
@@ -28,6 +36,7 @@ contract RealEstateNFT is ERC721URIStorage, AccessControl {
 	// TODO variable multiproperty ex immeuble avec plusieur appart !!! nft 1 par defaut gere lensemble des appartement
 	// TODO plusieur manager peuvent travailler separement
 	// TODO interface IModuleRegistry et IModule dans dautre fichier ?
+	// TODO renomer MANAGER_ROLE plus explicite c'est le propietaire du bien / ou celui qui l'administire
 
 	// Rôle pour gérer les fonctionnalités de manager
 	bytes32 public constant MANAGER_ROLE = keccak256('MANAGER_ROLE');
@@ -41,9 +50,8 @@ contract RealEstateNFT is ERC721URIStorage, AccessControl {
 		uint256 accessLevel; // Niveau d'accès : 1 (lecture), 2 (écriture)
 	}
 
-	// TODO rennomer en tokenModuleRolesAccessPermission ou autre chose ?
 	// Mapping des autorisations : tokenId -> moduleName -> authorizedAddress -> ModuleAccess
-	mapping(uint256 => mapping(string => mapping(address => ModuleAccess))) private tokenModuleRoles;
+	mapping(uint256 => mapping(string => mapping(address => ModuleAccess))) private tokenModuleRoles; // TODO nommer en tokenModuleWriteAccess
 
 	// Événements pour tracer les changements
 	event ModuleManagerUpdated(address indexed oldManager, address indexed newManager);

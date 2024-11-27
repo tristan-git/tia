@@ -11,31 +11,23 @@ interface IModule {
 	function execute(uint256 tokenId, string calldata fnName, bytes calldata data, address user) external;
 }
 
-contract RealEstateNFT is ERC721URIStorage, AccessControl {
+contract EstateManager is ERC721URIStorage, AccessControl {
 	// TODO licence des contrats
-	// TODO ajouter une constante initialiser dans constructeur pour le code RNB
 	// TODO modifier les nom de varaible des address en to ou from ?
 	// TODO hash dans bytes et pas string
 	// TODO verifier les import inutile dans les contrat
 	// TODO interface IModuleRegistry et IModule dans dautre fichier ?
 	// TODO renomer MANAGER_ROLE plus explicite c'est le propietaire du bien / ou celui qui l'administire
 
-	// Rôle pour gérer les fonctionnalités de manager
-	bytes32 public constant MANAGER_ROLE = keccak256('MANAGER_ROLE');
+	bytes32 public immutable rnbCode;
+	bytes32 public constant ESTATE_MANAGER_ROLE = keccak256('ESTATE_MANAGER_ROLE');
 
 	// Mapping des modules par leur nom
 	mapping(string => address) private modules;
 
-	// Structure pour gérer les autorisations spécifiques par module et token
-	struct ModuleAccess {
-		bool isAuthorized; // Indique si l'adresse est autorisée
-		uint256 accessLevel; // Niveau d'accès : 1 (lecture), 2 (écriture)
-	}
+	// Mapping des autorisations : tokenId -> moduleName -> authorizedAddress -> boolean
+	mapping(uint256 => mapping(string => mapping(address => bool))) private tokenExecuteModuleAccess;
 
-	// Mapping des autorisations : tokenId -> moduleName -> authorizedAddress -> ModuleAccess
-	mapping(uint256 => mapping(string => mapping(address => ModuleAccess))) private tokenModuleRoles; // TODO nommer en tokenModuleWriteAccess
-
-	// Événements
 	event MetadataUpdated(uint256 indexed tokenId, string newMetadataURI);
 	event ModuleRoleAssigned(
 		uint256 indexed tokenId,
@@ -48,15 +40,24 @@ contract RealEstateNFT is ERC721URIStorage, AccessControl {
 	event ModuleUpdated(string indexed name, address indexed oldAddress, address indexed newAddress);
 
 	/**
-	 * @dev Constructeur : initialise les rôles admin et manager.
+	 * @dev Constructeur : initialise les rôles admin et manager, et associe le code RNB.
 	 * @param _admin Adresse avec le rôle admin.
 	 * @param _manager Adresse avec le rôle manager.
+	 * @param _rnbCode Code RNB pour identifier le bâtiment ou la maison.
 	 */
-	constructor(address _admin, address _manager) ERC721('RealEstateNFT', 'REALESTATE') {
-		_grantRole(DEFAULT_ADMIN_ROLE, _admin);
-		_grantRole(MANAGER_ROLE, _manager);
-	}
+	constructor(
+		address _admin,
+		address _manager,
+		string memory _rnbCode
+	) ERC721(string(abi.encodePacked('REALESTATE-', _rnbCode)), 'REALESTATE') {
+		require(bytes(_rnbCode).length > 0, 'RNB code is required');
+		require(bytes(_rnbCode).length <= 32, 'RNB code must be <= 32 characters');
 
+		rnbCode = bytes32(abi.encodePacked(_rnbCode));
+
+		_grantRole(DEFAULT_ADMIN_ROLE, _admin);
+		_grantRole(ESTATE_MANAGER_ROLE, _manager);
+	}
 	// ////////////////////////////////////////////////////////////////////
 	// NFT MANAGEMENT
 	// ////////////////////////////////////////////////////////////////////
@@ -123,59 +124,50 @@ contract RealEstateNFT is ERC721URIStorage, AccessControl {
 	// ////////////////////////////////////////////////////////////////////
 
 	/**
-	 * @dev Assigne un rôle pour un module spécifique sur un token.
+	 * @dev Attribue une autorisation d'exécution pour un module spécifique sur un token.
 	 * @param tokenId ID du token.
 	 * @param moduleName Nom du module (ex: "InterventionManager").
 	 * @param authorizedAddress Adresse autorisée.
-	 * @param accessLevel Niveau d'accès (1: lecture, 2: écriture).
 	 */
-	function assignModuleRole(
-		uint256 tokenId,
-		string calldata moduleName,
-		address authorizedAddress,
-		uint256 accessLevel
-	) external onlyRole(DEFAULT_ADMIN_ROLE) {
-		require(authorizedAddress != address(0), 'Invalid authorized address');
-		require(accessLevel > 0, 'Invalid access level');
-
-		tokenModuleRoles[tokenId][moduleName][authorizedAddress] = ModuleAccess({isAuthorized: true, accessLevel: accessLevel});
-
-		emit ModuleRoleAssigned(tokenId, moduleName, authorizedAddress, accessLevel);
-	}
-
-	/**
-	 * @dev Révoque un rôle pour un module spécifique sur un token.
-	 * @param tokenId ID du token.
-	 * @param moduleName Nom du module (ex: "InterventionManager").
-	 * @param authorizedAddress Adresse à révoquer.
-	 */
-	function revokeModuleRole(
+	function grantExecuteModuleAccess(
 		uint256 tokenId,
 		string calldata moduleName,
 		address authorizedAddress
 	) external onlyRole(DEFAULT_ADMIN_ROLE) {
-		require(tokenModuleRoles[tokenId][moduleName][authorizedAddress].isAuthorized, 'Address not authorized');
+		require(authorizedAddress != address(0), 'Invalid authorized address');
 
-		delete tokenModuleRoles[tokenId][moduleName][authorizedAddress];
+		tokenExecuteModuleAccess[tokenId][moduleName][authorizedAddress] = true;
+
+		emit ModuleRoleAssigned(tokenId, moduleName, authorizedAddress, 2);
+	}
+
+	/**
+	 * @dev Révoque une autorisation d'exécution pour un module spécifique sur un token.
+	 * @param tokenId ID du token.
+	 * @param moduleName Nom du module (ex: "InterventionManager").
+	 * @param authorizedAddress Adresse à révoquer.
+	 */
+	function revokeExecuteModuleAccess(
+		uint256 tokenId,
+		string calldata moduleName,
+		address authorizedAddress
+	) external onlyRole(DEFAULT_ADMIN_ROLE) {
+		require(tokenExecuteModuleAccess[tokenId][moduleName][authorizedAddress], 'Address not authorized');
+
+		tokenExecuteModuleAccess[tokenId][moduleName][authorizedAddress] = false;
 
 		emit ModuleRoleRevoked(tokenId, moduleName, authorizedAddress);
 	}
 
 	/**
-	 * @dev Récupère les informations d'accès pour une adresse.
+	 * @dev Vérifie si une adresse est autorisée à exécuter un module spécifique sur un token.
 	 * @param tokenId ID du token.
 	 * @param moduleName Nom du module.
-	 * @param authorizedAddress Adresse à vérifier.
-	 * @return bool Indique si l'adresse est autorisée.
-	 * @return uint256 Niveau d'accès de l'adresse.
+	 * @param user Adresse à vérifier.
+	 * @return bool Indique si l'utilisateur est autorisé.
 	 */
-	function getModuleAccess(
-		uint256 tokenId,
-		string calldata moduleName,
-		address authorizedAddress
-	) external view returns (bool, uint256) {
-		ModuleAccess memory access = tokenModuleRoles[tokenId][moduleName][authorizedAddress];
-		return (access.isAuthorized, access.accessLevel);
+	function hasExecuteModuleAccess(uint256 tokenId, string calldata moduleName, address user) external view returns (bool) {
+		return tokenExecuteModuleAccess[tokenId][moduleName][user];
 	}
 
 	// ////////////////////////////////////////////////////////////////////
@@ -192,10 +184,20 @@ contract RealEstateNFT is ERC721URIStorage, AccessControl {
 	function executeModule(string calldata moduleName, uint256 tokenId, string calldata fnName, bytes calldata data) public {
 		require(modules[moduleName] != address(0), 'Module not found');
 
-		ModuleAccess memory access = tokenModuleRoles[tokenId][moduleName][msg.sender];
-		require(access.isAuthorized && access.accessLevel == 2, 'Not authorized for this module and token');
+		require(tokenExecuteModuleAccess[tokenId][moduleName][msg.sender], 'Not authorized for this module and token');
 
 		IModule(modules[moduleName]).execute(tokenId, fnName, data, msg.sender);
+	}
+
+	// ////////////////////////////////////////////////////////////////////
+	// SUPPORTS INTERFACE
+	// ////////////////////////////////////////////////////////////////////
+	/**
+	 * @dev Retourne le code RNB du bâtiment ou de la maison.
+	 * @return string Code RNB.
+	 */
+	function getRnbCode() external view returns (string memory) {
+		return string(abi.encodePacked(rnbCode));
 	}
 
 	// ////////////////////////////////////////////////////////////////////

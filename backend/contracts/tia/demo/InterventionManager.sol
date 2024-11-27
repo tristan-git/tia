@@ -6,8 +6,8 @@ import '@openzeppelin/contracts/utils/Strings.sol';
 import '@openzeppelin/contracts/access/IAccessControl.sol';
 
 contract InterventionManager {
-	address private immutable realEstateNFTContract;
-	bytes32 public constant MANAGER_ROLE = keccak256('MANAGER_ROLE');
+	address private immutable estateManagerContract;
+	bytes32 public constant ESTATE_MANAGER_ROLE = keccak256('ESTATE_MANAGER_ROLE');
 
 	struct Document {
 		bytes32 documentHash;
@@ -24,7 +24,7 @@ contract InterventionManager {
 	// Mapping pour contrôler l'accès (tokenId -> interventionIndex -> _account -> isAuthorized)
 	mapping(uint256 => mapping(uint256 => mapping(address => bool))) private interventionAccess;
 
-	event InterventionManagerInitialized(address indexed realEstateNFTContract, uint256 timestamp);
+	event InterventionManagerInitialized(address indexed estateManagerContract, uint256 timestamp);
 	event InterventionAdded(uint256 indexed tokenId, bytes32 interventionHash, uint256 timestamp, address from);
 	event DocumentAdded(uint256 indexed tokenId, uint256 interventionIndex, bytes32 documentHash, address from);
 	event InterventionValidated(uint256 indexed tokenId, uint256 interventionIndex, address owner);
@@ -37,8 +37,8 @@ contract InterventionManager {
 	);
 
 	constructor(address _realEstateNFTContract) {
-		require(_realEstateNFTContract != address(0), 'Invalid realEstateNFTContract address');
-		realEstateNFTContract = _realEstateNFTContract;
+		require(_realEstateNFTContract != address(0), 'Invalid estateManagerContract address');
+		estateManagerContract = _realEstateNFTContract;
 
 		emit InterventionManagerInitialized(_realEstateNFTContract, block.timestamp);
 	}
@@ -49,7 +49,7 @@ contract InterventionManager {
 
 	// Choisir une fonction à exécuter en fonction de fnName
 	function execute(uint256 _tokenId, string calldata _fnName, bytes calldata _data, address _from) external {
-		require(msg.sender == realEstateNFTContract, 'Unauthorized caller');
+		require(msg.sender == estateManagerContract, 'Unauthorized caller');
 
 		if (Strings.equal(_fnName, 'addIntervention')) {
 			_addIntervention(_tokenId, _from, _data);
@@ -99,8 +99,8 @@ contract InterventionManager {
 
 	// Valider une intervention par le propriétaire
 	function _validateIntervention(uint256 _tokenId, address _from, bytes calldata _data) internal {
-		// Vérifie si l'utilisateur a MANAGER_ROLE dans realEstateNFTContract
-		require(IAccessControl(realEstateNFTContract).hasRole(MANAGER_ROLE, _from), 'Only a manager can validate');
+		// Vérifie si l'utilisateur a MANAGER_ROLE dans estateManagerContract
+		require(IAccessControl(estateManagerContract).hasRole(ESTATE_MANAGER_ROLE, _from), 'Only a manager can validate');
 
 		uint256 _interventionIndex = abi.decode(_data, (uint256));
 
@@ -115,7 +115,7 @@ contract InterventionManager {
 	function _grantInterventionAccess(uint256 _tokenId, address _from, bytes calldata _data) internal {
 		(uint256 _interventionIndex, address _account) = abi.decode(_data, (uint256, address));
 
-		require(IAccessControl(realEstateNFTContract).hasRole(MANAGER_ROLE, _from), 'Only a manager can validate');
+		require(IAccessControl(estateManagerContract).hasRole(ESTATE_MANAGER_ROLE, _from), 'Only a manager can validate');
 
 		interventionAccess[_tokenId][_interventionIndex][_account] = true;
 
@@ -125,7 +125,7 @@ contract InterventionManager {
 	function _revokeInterventionAccess(uint256 _tokenId, address _from, bytes calldata _data) internal {
 		(uint256 _interventionIndex, address _account) = abi.decode(_data, (uint256, address));
 
-		require(IAccessControl(realEstateNFTContract).hasRole(MANAGER_ROLE, _from), 'Only a manager can validate');
+		require(IAccessControl(estateManagerContract).hasRole(ESTATE_MANAGER_ROLE, _from), 'Only a manager can validate');
 
 		interventionAccess[_tokenId][_interventionIndex][_account] = false;
 

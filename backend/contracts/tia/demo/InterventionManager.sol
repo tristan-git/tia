@@ -6,11 +6,7 @@ import '@openzeppelin/contracts/utils/Strings.sol';
 import '@openzeppelin/contracts/access/IAccessControl.sol';
 
 contract InterventionManager {
-	// TODO realEstateNFT renommer en plus parlant
-	// TODO isValidate by onwer ?? le propreaitire valide que interventiona bien eu lieu
-	// TODO address from from c'est parlant ??
-
-	address private realEstateNFT;
+	address private immutable realEstateNFTContract;
 	bytes32 public constant MANAGER_ROLE = keccak256('MANAGER_ROLE');
 
 	struct Document {
@@ -20,24 +16,31 @@ contract InterventionManager {
 	struct Intervention {
 		bytes32 interventionHash;
 		Document[] documents;
-		bool isValidatedByOwner; // Indique si le propriétaire a validé l'intervention
+		bool isValidated;
 	}
 
 	mapping(uint256 => mapping(address => Intervention[])) private interventions; // Interventions par tokenId -> address -> [interventions]
 
-	// Mapping pour stocker les permissions (tokenId -> indexIntervention -> user -> isAuthorized)
-	mapping(uint256 => mapping(uint256 => mapping(address => bool))) private permissions;
+	// Mapping pour contrôler l'accès (tokenId -> interventionIndex -> _account -> isAuthorized)
+	mapping(uint256 => mapping(uint256 => mapping(address => bool))) private interventionAccess;
 
+	event InterventionManagerInitialized(address indexed realEstateNFTContract, uint256 timestamp);
 	event InterventionAdded(uint256 indexed tokenId, bytes32 interventionHash, uint256 timestamp, address from);
 	event DocumentAdded(uint256 indexed tokenId, uint256 interventionIndex, bytes32 documentHash, address from);
 	event InterventionValidated(uint256 indexed tokenId, uint256 interventionIndex, address owner);
+	event InterventionAccessChanged(
+		uint256 indexed tokenId,
+		uint256 indexed interventionIndex,
+		address indexed account,
+		address from,
+		bool granted
+	);
 
-	event AccessGranted(uint256 indexed tokenId, uint256 indexed interventionIndex, address indexed user);
-	event AccessRevoked(uint256 indexed tokenId, uint256 indexed interventionIndex, address indexed user);
+	constructor(address _realEstateNFTContract) {
+		require(_realEstateNFTContract != address(0), 'Invalid realEstateNFTContract address');
+		realEstateNFTContract = _realEstateNFTContract;
 
-	constructor(address _realEstateNFT) {
-		require(_realEstateNFT != address(0), 'Invalid RealEstateNFT address');
-		realEstateNFT = _realEstateNFT;
+		emit InterventionManagerInitialized(_realEstateNFTContract, block.timestamp);
 	}
 
 	// ////////////////////////////////////////////////////////////////////
@@ -45,16 +48,19 @@ contract InterventionManager {
 	// ////////////////////////////////////////////////////////////////////
 
 	// Choisir une fonction à exécuter en fonction de fnName
-	function execute(uint256 tokenId, string calldata fnName, bytes calldata data, address user) external {
-		// Vérifie que seul le RealEstateNFT peut appeler cette fonction
-		require(msg.sender == realEstateNFT, 'Unauthorized caller');
+	function execute(uint256 _tokenId, string calldata _fnName, bytes calldata _data, address _from) external {
+		require(msg.sender == realEstateNFTContract, 'Unauthorized caller');
 
-		if (Strings.equal(fnName, 'addIntervention')) {
-			_addIntervention(tokenId, user, data);
-		} else if (Strings.equal(fnName, 'addDocument')) {
-			_addDocument(tokenId, user, data);
-		} else if (Strings.equal(fnName, 'validateIntervention')) {
-			_validateIntervention(tokenId, user, data);
+		if (Strings.equal(_fnName, 'addIntervention')) {
+			_addIntervention(_tokenId, _from, _data);
+		} else if (Strings.equal(_fnName, 'addDocument')) {
+			_addDocument(_tokenId, _from, _data);
+		} else if (Strings.equal(_fnName, 'validateIntervention')) {
+			_validateIntervention(_tokenId, _from, _data);
+		} else if (Strings.equal(_fnName, 'grantInterventionAccess')) {
+			_grantInterventionAccess(_tokenId, _from, _data);
+		} else if (Strings.equal(_fnName, 'revokeInterventionAccess')) {
+			_revokeInterventionAccess(_tokenId, _from, _data);
 		} else {
 			revert('Invalid function name');
 		}
@@ -80,7 +86,7 @@ contract InterventionManager {
 		(uint256 _interventionIndex, bytes32 _documentHash) = abi.decode(_data, (uint256, bytes32));
 
 		require(_interventionIndex < interventions[_tokenId][_from].length, 'Invalid intervention index');
-		require(!interventions[_tokenId][_from][_interventionIndex].isValidatedByOwner, 'Intervention already validated');
+		require(!interventions[_tokenId][_from][_interventionIndex].isValidated, 'Intervention already validated');
 
 		interventions[_tokenId][_from][_interventionIndex].documents.push(Document({documentHash: _documentHash}));
 
@@ -89,17 +95,37 @@ contract InterventionManager {
 
 	// Valider une intervention par le propriétaire
 	function _validateIntervention(uint256 _tokenId, address _from, bytes calldata _data) internal {
-		// Vérifie si l'utilisateur a MANAGER_ROLE dans RealEstateNFT
-		require(IAccessControl(realEstateNFT).hasRole(MANAGER_ROLE, _from), 'Only a manager can validate');
+		// Vérifie si l'utilisateur a MANAGER_ROLE dans realEstateNFTContract
+		require(IAccessControl(realEstateNFTContract).hasRole(MANAGER_ROLE, _from), 'Only a manager can validate');
 
 		uint256 _interventionIndex = abi.decode(_data, (uint256));
 
 		require(_interventionIndex < interventions[_tokenId][_from].length, 'Invalid intervention index');
-		require(interventions[_tokenId][_from][_interventionIndex].isValidatedByOwner == false, 'Already validated');
+		require(interventions[_tokenId][_from][_interventionIndex].isValidated == false, 'Already validated');
 
-		interventions[_tokenId][_from][_interventionIndex].isValidatedByOwner = true;
+		interventions[_tokenId][_from][_interventionIndex].isValidated = true;
 
 		emit InterventionValidated(_tokenId, _interventionIndex, _from);
+	}
+
+	function _grantInterventionAccess(uint256 _tokenId, address _from, bytes calldata _data) internal {
+		(uint256 _interventionIndex, address _account) = abi.decode(_data, (uint256, address));
+
+		require(IAccessControl(realEstateNFTContract).hasRole(MANAGER_ROLE, _from), 'Only a manager can validate');
+
+		interventionAccess[_tokenId][_interventionIndex][_account] = true;
+
+		emit InterventionAccessChanged(_tokenId, _interventionIndex, _account, _from, true);
+	}
+
+	function _revokeInterventionAccess(uint256 _tokenId, address _from, bytes calldata _data) internal {
+		(uint256 _interventionIndex, address _account) = abi.decode(_data, (uint256, address));
+
+		require(IAccessControl(realEstateNFTContract).hasRole(MANAGER_ROLE, _from), 'Only a manager can validate');
+
+		interventionAccess[_tokenId][_interventionIndex][_account] = false;
+
+		emit InterventionAccessChanged(_tokenId, _interventionIndex, _account, _from, false);
 	}
 
 	// ////////////////////////////////////////////////////////////////////
@@ -107,58 +133,21 @@ contract InterventionManager {
 	// ////////////////////////////////////////////////////////////////////
 
 	// Récupérer les interventions associées à un tokenId
-	function getInterventions(uint256 tokenId, address user) external view returns (Intervention[] memory) {
-		return interventions[tokenId][user];
+	function getInterventions(uint256 _tokenId, address _account) external view returns (Intervention[] memory) {
+		return interventions[_tokenId][_account];
 	}
 
 	// Récupérer les documents d'une intervention
-	function getDocuments(uint256 tokenId, uint256 interventionIndex, address user) external view returns (Document[] memory) {
-		require(interventionIndex < interventions[tokenId][user].length, 'Invalid intervention index');
-		return interventions[tokenId][user][interventionIndex].documents;
+	function getDocuments(
+		uint256 _tokenId,
+		uint256 _interventionIndex,
+		address _account
+	) external view returns (Document[] memory) {
+		require(_interventionIndex < interventions[_tokenId][_account].length, 'Invalid intervention index');
+		return interventions[_tokenId][_account][_interventionIndex].documents;
 	}
 
-	// ////////////////////////////////////////////////////////////////////
-	// PERMISSIONS MANAGEMENT
-	// ////////////////////////////////////////////////////////////////////
-
-	/**
-	 * @dev Attribue l'accès à une intervention spécifique pour un utilisateur.
-	 * @param tokenId ID du token immobilier concerné.
-	 * @param _interventionIndex Index de l'intervention à laquelle l'accès est accordé.
-	 * @param user Adresse de l'utilisateur à qui l'accès est attribué.
-	 */
-	function grantAccess(uint256 tokenId, uint256 _interventionIndex, address user) external {
-		// Vérifie que seul le MANAGER_ROLE peut attribuer des permissions
-		require(IAccessControl(realEstateNFT).hasRole(MANAGER_ROLE, msg.sender), 'Only managers can grant access');
-
-		permissions[tokenId][_interventionIndex][user] = true;
-
-		emit AccessGranted(tokenId, _interventionIndex, user);
-	}
-
-	/**
-	 * @dev Révoque l'accès à une intervention spécifique pour un utilisateur.
-	 * @param tokenId ID du token immobilier concerné.
-	 * @param _interventionIndex Index de l'intervention pour laquelle l'accès est révoqué.
-	 * @param user Adresse de l'utilisateur dont l'accès est révoqué.
-	 */
-	function revokeAccess(uint256 tokenId, uint256 _interventionIndex, address user) external {
-		// Vérifie que seul le MANAGER_ROLE peut révoquer des permissions
-		require(IAccessControl(realEstateNFT).hasRole(MANAGER_ROLE, msg.sender), 'Only managers can revoke access');
-
-		permissions[tokenId][_interventionIndex][user] = false;
-
-		emit AccessRevoked(tokenId, _interventionIndex, user);
-	}
-
-	/**
-	 * @dev Vérifie si un utilisateur est autorisé à accéder à une intervention spécifique.
-	 * @param tokenId ID du token immobilier concerné.
-	 * @param _interventionIndex Index de l'intervention à vérifier.
-	 * @param user Adresse de l'utilisateur dont l'autorisation est vérifiée.
-	 * @return bool Indique si l'utilisateur est autorisé ou non.
-	 */
-	function isAuthorized(uint256 tokenId, uint256 _interventionIndex, address user) public view returns (bool) {
-		return permissions[tokenId][_interventionIndex][user];
+	function hasInterventionAccess(uint256 _tokenId, uint256 _interventionIndex, address _account) public view returns (bool) {
+		return interventionAccess[_tokenId][_interventionIndex][_account];
 	}
 }

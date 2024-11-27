@@ -210,7 +210,7 @@ describe('Building Manager Contracts', function () {
 			// Verify intervention validation
 			const validatedIntervention = await InterventionManager.getInterventions(1, manager.address)
 
-			expect(validatedIntervention[0].isValidatedByOwner).to.be.true
+			expect(validatedIntervention[0].isValidated).to.be.true
 		})
 	})
 })

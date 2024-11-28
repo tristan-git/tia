@@ -7,6 +7,7 @@ export const users = onchainTable("users", (t) => ({
 
 export const usersRelations = relations(users, ({ many }) => ({
   interventions: many(interventions),
+  userInterventionAccess: many(userInterventionAccess),
   // documents: many(documents),
   // accessChanges: many(interventionAccessChanges),
 }));
@@ -85,6 +86,21 @@ export const documents = onchainTable(
 // Relations pour les documents
 export const documentsRelations = relations(documents, ({ one }) => ({
   intervention: one(interventions, { fields: [documents.interventionId], references: [interventions.id] }),
+}));
+
+export const userInterventionAccess = onchainTable(
+  "userInterventionAccess",
+  (t) => ({
+    id: t.bigint(),
+    interventionId: t.bigint().notNull(), // Identifiant de l'intervention
+    moduleId: t.hex().notNull(), // Adresse du module
+    userId: t.hex().notNull(), // Adresse de l'utilisateur ayant accès
+  }),
+  (table) => ({ pk: primaryKey({ columns: [table.id, table.interventionId, table.userId] }) })
+);
+
+export const userInterventionAccessRelations = relations(userInterventionAccess, ({ one }) => ({
+  user: one(users, { fields: [userInterventionAccess.userId], references: [users.id] }), // Relation avec les utilisateurs
 }));
 
 // Table pour les changements d'accès aux interventions

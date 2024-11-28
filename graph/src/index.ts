@@ -11,6 +11,7 @@ import {
   documentsRelations,
   interventionAccessChanges,
   interventionAccessChangesRelations,
+  userInterventionAccess,
 } from "../ponder.schema";
 import { eq, sql } from "@ponder/core";
 
@@ -119,75 +120,35 @@ ponder.on("InterventionManager:InterventionValidated", async ({ event, context }
 });
 
 // Event: InterventionAccessChanged
-ponder.on("InterventionManager:InterventionAccessChanged", async ({ event }) => {
+ponder.on("InterventionManager:InterventionAccessChanged", async ({ event, context }) => {
   const { tokenId, interventionIndex, account, from, granted } = event.args;
   console.log(
     `Access ${
       granted ? "granted" : "revoked"
     } for intervention: ${interventionIndex}, account: ${account}, tokenId: ${tokenId},  from: ${from}`
   );
+
+  // Enregistrer le changement d'accès dans la base
+  await context.db.insert(interventionAccessChanges).values({
+    id: BigInt(interventionIndex), // Utilisez interventionIndex comme ID
+    interventionId: BigInt(interventionIndex), // Associez à l'intervention
+    moduleId: event.log.address, // Adresse du module émettant l'événement
+    account, // Adresse de l'utilisateur concerné
+    granted, // Booléen indiquant si l'accès est accordé ou révoqué
+    changedAtTimestamp: BigInt(event.block.timestamp), // Timestamp du changement
+    changedBy: from, // Adresse de l'utilisateur ayant effectué le changement
+  });
+
+  console.log("🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡");
+
+  // Ajoutez l'accès
+  await context.db.insert(userInterventionAccess).values({
+    id: BigInt(interventionIndex),
+    interventionId: BigInt(interventionIndex),
+    moduleId: event.log.address,
+    userId: account,
+  });
 });
-
-// ponder.on("EstateManagerFactory:FactoryDeployed", async ({ event }) => {
-//   console.log("000🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡");
-//   const { factoryAddress } = event.args;
-
-//   console.log(factoryAddress);
-// });
-
-// ponder.on("EstateManagerFactory:EstateManagerCreated", async ({ event }) => {
-//   console.log("000🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡");
-//   const { admin, estateManager, manager, rnbCode } = event.args;
-
-//   console.log({ admin, estateManager, manager, rnbCode });
-
-//   // {
-//   //   admin: '0x734cEf8774dEB4FD18DFe57f010b842941012BBB',
-//   //   estateManager: '0xAE588422Fac9589f8cb67BB6D9850F33d6E23966',
-//   //   manager: '0x0BeC14837e54F84C4815574967F802a8c3a64d7b',
-//   //   rnbCode: '0x726e62636f6465636f6465000000000000000000000000000000000000000000'
-//   // }
-// });
-
-// ponder.on("EstateManager:ModuleRegistered", async ({ event }) => {
-//   console.log("1🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡");
-//   const { name, moduleAddress } = event.args;
-
-//   // const nameBytes32 = event.args.name; // Ceci est un `bytes32`
-//   // const name = ethers.utils.parseBytes32String(nameBytes32); // Convertir en `string`
-
-//   console.log(`Module registered: ${name} at ${moduleAddress}`);
-//   // Module registered: 0x42835906525e4bffdf05466e6cbede9f0520445696482acfb6c196b1b064e3a1 at 0xf80Ee59AabB11638917555E23d7c88Df80026712
-
-//   if (name === "InterventionManager") {
-//     console.log(`Registering new InterventionManager: ${moduleAddress}`);
-//     registeredModules.add(moduleAddress);
-//   } else {
-//     console.log(`Other module (${name}) registered.`);
-//   }
-// });
-
-// // Traiter uniquement les événements provenant des modules enregistrés
-// ponder.on("InterventionManager:InterventionAdded", async ({ event }) => {
-//   console.log("2🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡");
-//   console.log(event);
-
-//   // args: {
-//   //   tokenId: 1n,
-//   //   interventionHash: '0x7364667364667364667364660000000000000000000000000000000000000000',
-//   //   timestamp: 1732803895n,
-//   //   from: '0x734cEf8774dEB4FD18DFe57f010b842941012BBB'
-//   // },
-
-//   if (registeredModules.has(event.log.address)) {
-//     console.log("Intervention added from a tracked module:", event.args);
-//   }
-// });
-
-// ponder.on("InterventionManager:DocumentAdded", async ({ event }) => {
-//   console.log("3🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡");
-//   console.log("Document added:", event.args);
-// });
 
 // // //////////////////////////////////////////////////////////////////////////////
 // // DEBUG -> console.log("🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡");

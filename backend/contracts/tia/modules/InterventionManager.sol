@@ -22,6 +22,7 @@ contract InterventionManager {
 	mapping(uint256 => mapping(address => Intervention[])) private interventions; // Interventions par tokenId -> address -> [interventions]
 
 	// Mapping pour contrôler l'accès (tokenId -> interventionIndex -> _account -> isAuthorized)
+	// permet detre utiliser comme role d'acces sur la dapp pour savoir qui peut voir lintervention et ses document
 	mapping(uint256 => mapping(uint256 => mapping(address => bool))) private interventionAccess;
 
 	event InterventionManagerInitialized(address indexed estateManagerContract, address indexed from, uint256 timestamp);
@@ -86,6 +87,10 @@ contract InterventionManager {
 		uint256 newIndex = interventions[_tokenId][_from].length - 1;
 		interventions[_tokenId][_from][newIndex].interventionHash = _interventionHash;
 
+		// celui qui creer l'intervention a access a lintervention
+		interventionAccess[_tokenId][newIndex][_from] = true;
+
+		emit InterventionAccessChanged(_tokenId, newIndex, _from, _from, true);
 		emit InterventionAdded(_tokenId, _interventionHash, block.timestamp, _from, newIndex);
 	}
 

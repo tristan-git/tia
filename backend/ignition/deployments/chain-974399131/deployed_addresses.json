@@ -1,3 +1,5 @@
 {
-  "myNftWithRolesModule#MyNFTWithRoles": "0x5E5ACcadbC61562eB6f2b8Abdb67B3AD845c93F1"
+  "myNftWithRolesModule#MyNFTWithRoles": "0x5E5ACcadbC61562eB6f2b8Abdb67B3AD845c93F1",
+  "TiaModule#EstateManagerFactory": "0x662872d50e70ad3e9d61118Af727676791df70F9",
+  "InterventionManagerModule#InterventionManager": "0x585f2834a2C2924Ad30ED057D8f1caA83D1BdaDc"
 }

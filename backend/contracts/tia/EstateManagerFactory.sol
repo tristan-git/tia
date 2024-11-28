@@ -4,9 +4,14 @@ pragma solidity 0.8.28;
 import './EstateManager.sol';
 
 contract EstateManagerFactory {
+	address[] public deployedManagers;
+
+	event FactoryDeployed(address factoryAddress);
 	event EstateManagerCreated(address indexed admin, address indexed manager, address estateManager, bytes32 rnbCode);
 
-	address[] public deployedManagers;
+	constructor() {
+		emit FactoryDeployed(address(this));
+	}
 
 	function createEstateManager(address admin, address manager, string memory rnbCode) external returns (address) {
 		// Déployer une nouvelle instance d'EstateManager

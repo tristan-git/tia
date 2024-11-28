@@ -1,5 +1,11 @@
 {
   "myNftWithRolesModule#MyNFTWithRoles": "0x5E5ACcadbC61562eB6f2b8Abdb67B3AD845c93F1",
   "TiaModule#EstateManagerFactory": "0x662872d50e70ad3e9d61118Af727676791df70F9",
-  "InterventionManagerModule#InterventionManager": "0x585f2834a2C2924Ad30ED057D8f1caA83D1BdaDc"
+  "InterventionManagerModule#InterventionManager": "0x585f2834a2C2924Ad30ED057D8f1caA83D1BdaDc",
+  "TiaModule#EstateManagerFactoryV1": "0xce916888Bc25a33c55c51c5aEFa7013f304b26e0",
+  "InterventionManagerModule#InterventionManagerModuleV1": "0x01dd4B22a3E7b5F8e1d3AC1916E505B4B830c110",
+  "TiaModule#EstateManagerFactoryV2": "0xF7a380EB841d015AA70E8f4626E4B9384584e0C6",
+  "InterventionManagerModule#InterventionManagerModuleV2": "0xf80Ee59AabB11638917555E23d7c88Df80026712",
+  "TiaModule#EstateManagerFactoryV3": "0x306253B640cB46eBef3DCCE9C05359aD6055869b",
+  "InterventionManagerModule#InterventionManagerModuleV3": "0xF599EE109cedDDA5a44C94f0303f41f2c071014F"
 }

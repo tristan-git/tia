@@ -13,6 +13,8 @@ export default createConfig({
   //   connectionString: process.env.DATABASE_URL,
   // },
 
+  
+
   networks: {
     skale: {
       chainId: 974399131,
@@ -23,31 +25,33 @@ export default createConfig({
     EstateManagerFactory: {
       abi: EstateManagerFactoryAbi,
       network: "skale",
-      address: "0x662872d50e70ad3e9d61118Af727676791df70F9",
-      startBlock: 2634860,
+      address: "0x306253B640cB46eBef3DCCE9C05359aD6055869b",
+      startBlock: 2637077,
     },
     EstateManager: {
       abi: EstateManagerAbi,
       network: "skale",
       factory: {
-        address: "0x662872d50e70ad3e9d61118Af727676791df70F9",
+        address: "0x306253B640cB46eBef3DCCE9C05359aD6055869b",
         event: parseAbiItem(
           "event EstateManagerCreated(address indexed admin, address indexed manager, address estateManager, bytes32 rnbCode)"
         ),
         parameter: "estateManager",
       },
-      startBlock: 2634860,
+      startBlock: 2637077,
     },
 
     InterventionManager: {
       abi: InterventionManagerAbi,
       network: "skale",
       factory: {
-        address: "0x662872d50e70ad3e9d61118Af727676791df70F9",
-        event: parseAbiItem("event ModuleRegistered(string indexed name, address indexed moduleAddress)"),
+        address: "0x306253B640cB46eBef3DCCE9C05359aD6055869b",
+        event: parseAbiItem(
+          "event ModuleRegisteredInManager(address indexed estateManager, string name, address moduleAddress)"
+        ),
         parameter: "moduleAddress",
       },
-      startBlock: 2634860,
+      startBlock: 2637077,
     },
   },
 });

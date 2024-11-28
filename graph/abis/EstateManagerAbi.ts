@@ -12,6 +12,11 @@ export const EstateManagerAbi = [
         type: "address",
       },
       {
+        internalType: "address",
+        name: "_estateManagerFactoryContract",
+        type: "address",
+      },
+      {
         internalType: "string",
         name: "_rnbCode",
         type: "string",
@@ -251,7 +256,7 @@ export const EstateManagerAbi = [
       {
         indexed: true,
         internalType: "string",
-        name: "name",
+        name: "moduleName",
         type: "string",
       },
       {
@@ -326,7 +331,7 @@ export const EstateManagerAbi = [
       {
         indexed: true,
         internalType: "string",
-        name: "name",
+        name: "moduleName",
         type: "string",
       },
       {
@@ -578,7 +583,7 @@ export const EstateManagerAbi = [
     inputs: [
       {
         internalType: "string",
-        name: "name",
+        name: "_moduleName",
         type: "string",
       },
     ],
@@ -802,7 +807,7 @@ export const EstateManagerAbi = [
     inputs: [
       {
         internalType: "string",
-        name: "name",
+        name: "_moduleName",
         type: "string",
       },
       {
@@ -1053,7 +1058,7 @@ export const EstateManagerAbi = [
     inputs: [
       {
         internalType: "string",
-        name: "name",
+        name: "_moduleName",
         type: "string",
       },
       {

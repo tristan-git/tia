@@ -51,29 +51,68 @@ describe('Building Manager Contracts', function () {
 	async function deployBuildingManagerFixture() {
 		const [tiaAdmin, manager, account2, account3] = await ethers.getSigners()
 
-		// 1. Déployer EstateManager
-		const rnbCode = 'AB12345' // Exemple de code RNB
-		const ContractEstateManager = await ethers.getContractFactory('EstateManager')
-		const EstateManager = await ContractEstateManager.deploy(tiaAdmin.address, manager.address, rnbCode)
-		await EstateManager.waitForDeployment()
+		// 1. Déployer EstateManagerFactory
+		const ContractEstateManagerFactory = await ethers.getContractFactory('EstateManagerFactory')
+		const EstateManagerFactory = await ContractEstateManagerFactory.deploy()
+		await EstateManagerFactory.waitForDeployment()
 
-		// 2. Déployer InterventionManager
+		// 2. Déployer un EstateManager via la Factory
+		const rnbCode = 'AB12345' // Exemple de code RNB
+		const tx = await EstateManagerFactory.createEstateManager(tiaAdmin.address, manager.address, rnbCode)
+		await tx.wait()
+		const estateManagerAddress = await EstateManagerFactory.deployedManagers(0)
+
+		const ContractEstateManager = await ethers.getContractAt('EstateManager', estateManagerAddress)
+
+		// 3. Déployer InterventionManager
 		const ContractInterventionManager = await ethers.getContractFactory('InterventionManager')
-		const InterventionManager = await ContractInterventionManager.deploy(EstateManager.getAddress()) // `_realEstateNFT`
+		const InterventionManager = await ContractInterventionManager.deploy(estateManagerAddress)
 		await InterventionManager.waitForDeployment()
 
-		// 3. Enregistrer le module InterventionManager dans EstateManager
-		await EstateManager.connect(tiaAdmin).registerModule('InterventionManager', await InterventionManager.getAddress())
+		// 4. Enregistrer le module InterventionManager via la Factory
+		await EstateManagerFactory.connect(tiaAdmin).registerModuleInManager(
+			estateManagerAddress,
+			'InterventionManager',
+			InterventionManager.getAddress()
+		)
 
 		return {
 			tiaAdmin,
 			manager,
 			account2,
 			account3,
-			EstateManager,
+			EstateManagerFactory,
+			EstateManager: ContractEstateManager,
 			InterventionManager,
 		}
 	}
+
+	// async function deployBuildingManagerFixture() {
+	// 	const [tiaAdmin, manager, account2, account3] = await ethers.getSigners()
+
+	// 	// 1. Déployer EstateManager
+	// 	const rnbCode = 'AB12345' // Exemple de code RNB
+	// 	const ContractEstateManager = await ethers.getContractFactory('EstateManager')
+	// 	const EstateManager = await ContractEstateManager.deploy(tiaAdmin.address, manager.address, rnbCode)
+	// 	await EstateManager.waitForDeployment()
+
+	// 	// 2. Déployer InterventionManager
+	// 	const ContractInterventionManager = await ethers.getContractFactory('InterventionManager')
+	// 	const InterventionManager = await ContractInterventionManager.deploy(EstateManager.getAddress()) // `_realEstateNFT`
+	// 	await InterventionManager.waitForDeployment()
+
+	// 	// 3. Enregistrer le module InterventionManager dans EstateManager
+	// 	await EstateManager.connect(tiaAdmin).registerModule('InterventionManager', await InterventionManager.getAddress())
+
+	// 	return {
+	// 		tiaAdmin,
+	// 		manager,
+	// 		account2,
+	// 		account3,
+	// 		EstateManager,
+	// 		InterventionManager,
+	// 	}
+	// }
 
 	// ////////////////////////////////////////////////////////////////////
 	// Tests
@@ -197,6 +236,7 @@ describe('Building Manager Contracts', function () {
 
 			// Validate the intervention
 			const dataValidate = ethers.AbiCoder.defaultAbiCoder().encode(['uint256'], [0])
+			console.log(dataValidate)
 			await EstateManager.connect(manager).executeModule('InterventionManager', 1, 'validateIntervention', dataValidate)
 
 			// Verify intervention validation

@@ -49,6 +49,31 @@ export const EstateManagerFactoryAbi = [
     type: "event",
   },
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "estateManager",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "string",
+        name: "name",
+        type: "string",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "moduleAddress",
+        type: "address",
+      },
+    ],
+    name: "ModuleRegisteredInManager",
+    type: "event",
+  },
+  {
     inputs: [
       {
         internalType: "address",
@@ -107,6 +132,29 @@ export const EstateManagerFactoryAbi = [
       },
     ],
     stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "estateManager",
+        type: "address",
+      },
+      {
+        internalType: "string",
+        name: "moduleName",
+        type: "string",
+      },
+      {
+        internalType: "address",
+        name: "moduleAddress",
+        type: "address",
+      },
+    ],
+    name: "registerModuleInManager",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
 ] as const;

@@ -24,10 +24,16 @@ contract InterventionManager {
 	// Mapping pour contrôler l'accès (tokenId -> interventionIndex -> _account -> isAuthorized)
 	mapping(uint256 => mapping(uint256 => mapping(address => bool))) private interventionAccess;
 
-	event InterventionManagerInitialized(address indexed estateManagerContract, uint256 timestamp);
-	event InterventionAdded(uint256 indexed tokenId, bytes32 interventionHash, uint256 timestamp, address from);
+	event InterventionManagerInitialized(address indexed estateManagerContract, address indexed from, uint256 timestamp);
+	event InterventionAdded(
+		uint256 indexed tokenId,
+		bytes32 interventionHash,
+		uint256 timestamp,
+		address from,
+		uint256 interventionIndex
+	);
 	event DocumentAdded(uint256 indexed tokenId, uint256 interventionIndex, bytes32 documentHash, address from);
-	event InterventionValidated(uint256 indexed tokenId, uint256 interventionIndex, address owner);
+	event InterventionValidated(uint256 indexed tokenId, uint256 interventionIndex, address from);
 	event InterventionAccessChanged(
 		uint256 indexed tokenId,
 		uint256 indexed interventionIndex,
@@ -40,7 +46,7 @@ contract InterventionManager {
 		require(_realEstateNFTContract != address(0), 'Invalid estateManagerContract address');
 		estateManagerContract = _realEstateNFTContract;
 
-		emit InterventionManagerInitialized(_realEstateNFTContract, block.timestamp);
+		emit InterventionManagerInitialized(_realEstateNFTContract, msg.sender, block.timestamp);
 	}
 
 	// ////////////////////////////////////////////////////////////////////
@@ -80,7 +86,7 @@ contract InterventionManager {
 		uint256 newIndex = interventions[_tokenId][_from].length - 1;
 		interventions[_tokenId][_from][newIndex].interventionHash = _interventionHash;
 
-		emit InterventionAdded(_tokenId, _interventionHash, block.timestamp, _from);
+		emit InterventionAdded(_tokenId, _interventionHash, block.timestamp, _from, newIndex);
 	}
 
 	// Ajouter un document à une intervention spécifique

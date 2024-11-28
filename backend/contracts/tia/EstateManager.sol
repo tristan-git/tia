@@ -17,7 +17,7 @@ contract EstateManager is ERC721URIStorage, AccessControl {
 	// TODO hash dans bytes et pas string
 	// TODO verifier les import inutile dans les contrat
 	// TODO interface IModuleRegistry et IModule dans dautre fichier ?
-
+	address private immutable estateManagerFactoryContract;
 	bytes32 public immutable rnbCode;
 	bytes32 public constant ESTATE_MANAGER_ROLE = keccak256('ESTATE_MANAGER_ROLE');
 
@@ -35,8 +35,8 @@ contract EstateManager is ERC721URIStorage, AccessControl {
 		uint256 accessLevel
 	);
 	event ModuleRoleRevoked(uint256 indexed tokenId, string indexed moduleName, address indexed authorizedAddress);
-	event ModuleRegistered(string indexed name, address indexed moduleAddress);
-	event ModuleUpdated(string indexed name, address indexed oldAddress, address indexed newAddress);
+	event ModuleRegistered(string indexed moduleName, address indexed moduleAddress);
+	event ModuleUpdated(string indexed moduleName, address indexed oldAddress, address indexed newAddress);
 
 	/**
 	 * @dev Constructeur : initialise les rôles admin et manager, et associe le code RNB.
@@ -47,12 +47,14 @@ contract EstateManager is ERC721URIStorage, AccessControl {
 	constructor(
 		address _admin,
 		address _manager,
+		address _estateManagerFactoryContract,
 		string memory _rnbCode
 	) ERC721(string(abi.encodePacked('REALESTATE-', _rnbCode)), 'REALESTATE') {
 		require(bytes(_rnbCode).length > 0, 'RNB code is required');
 		require(bytes(_rnbCode).length <= 32, 'RNB code must be <= 32 characters');
 
 		rnbCode = bytes32(abi.encodePacked(_rnbCode));
+		estateManagerFactoryContract = _estateManagerFactoryContract;
 
 		_grantRole(DEFAULT_ADMIN_ROLE, _admin);
 		_grantRole(ESTATE_MANAGER_ROLE, _manager);
@@ -97,25 +99,27 @@ contract EstateManager is ERC721URIStorage, AccessControl {
 	// MODULE MANAGEMENT
 	// ////////////////////////////////////////////////////////////////////
 
-	function registerModule(string calldata name, address moduleAddress) external onlyRole(DEFAULT_ADMIN_ROLE) {
+	function registerModule(string calldata _moduleName, address moduleAddress) external {
+		require(msg.sender == estateManagerFactoryContract, 'Unauthorized caller');
 		require(moduleAddress != address(0), 'Invalid module address');
-		require(modules[name] == address(0), 'Module already exists');
+		require(modules[_moduleName] == address(0), 'Module already exists');
 
-		modules[name] = moduleAddress;
-		emit ModuleRegistered(name, moduleAddress);
+		modules[_moduleName] = moduleAddress;
+		emit ModuleRegistered(_moduleName, moduleAddress);
 	}
 
-	function updateModule(string calldata name, address newModuleAddress) external onlyRole(DEFAULT_ADMIN_ROLE) {
+	function updateModule(string calldata _moduleName, address newModuleAddress) external {
+		require(msg.sender == estateManagerFactoryContract, 'Unauthorized caller');
 		require(newModuleAddress != address(0), 'Invalid module address');
-		require(modules[name] != address(0), 'Module not found');
+		require(modules[_moduleName] != address(0), 'Module not found');
 
-		address oldAddress = modules[name];
-		modules[name] = newModuleAddress;
-		emit ModuleUpdated(name, oldAddress, newModuleAddress);
+		address oldAddress = modules[_moduleName];
+		modules[_moduleName] = newModuleAddress;
+		emit ModuleUpdated(_moduleName, oldAddress, newModuleAddress);
 	}
 
-	function getModule(string calldata name) external view returns (address) {
-		return modules[name];
+	function getModule(string calldata _moduleName) external view returns (address) {
+		return modules[_moduleName];
 	}
 
 	// ////////////////////////////////////////////////////////////////////

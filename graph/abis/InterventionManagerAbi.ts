@@ -105,6 +105,12 @@ export const InterventionManagerAbi = [
         name: "from",
         type: "address",
       },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "interventionIndex",
+        type: "uint256",
+      },
     ],
     name: "InterventionAdded",
     type: "event",
@@ -116,6 +122,12 @@ export const InterventionManagerAbi = [
         indexed: true,
         internalType: "address",
         name: "estateManagerContract",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "from",
         type: "address",
       },
       {
@@ -146,7 +158,7 @@ export const InterventionManagerAbi = [
       {
         indexed: false,
         internalType: "address",
-        name: "owner",
+        name: "from",
         type: "address",
       },
     ],

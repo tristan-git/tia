@@ -36,7 +36,7 @@ export const modules = onchainTable(
   "modules",
   (t) => ({
     id: t.hex(), // Adresse du module
-    name: t.text().notNull(), // Nom du module
+    moduleName: t.text().notNull(), // Nom du module
     estateManagerId: t.hex().notNull(), // Adresse du EstateManager
   }),
   (table) => ({ pk: primaryKey({ columns: [table.id, table.estateManagerId] }) })
@@ -57,10 +57,11 @@ export const interventions = onchainTable(
     tokenId: t.bigint().notNull(), // Identifiant du token concerné
     interventionHash: t.text().notNull(), // Hash de l'intervention
     isValidated: t.boolean().default(false), // Validation de l'intervention
+    validateFrom: t.hex(), // address de qui valide intervention
     createdAtTimestamp: t.bigint().notNull(), // Timestamp de création
     createdBy: t.hex().notNull(), // Adresse de l'utilisateur qui a créé l'intervention
   }),
-  (table) => ({ pk: primaryKey({ columns: [table.id, table.moduleId] }) })
+  (table) => ({ pk: primaryKey({ columns: [table.id, table.moduleId, table.tokenId] }) })
 );
 
 // Relations pour les interventions
@@ -94,9 +95,12 @@ export const userInterventionAccess = onchainTable(
     id: t.bigint(),
     interventionId: t.bigint().notNull(), // Identifiant de l'intervention
     moduleId: t.hex().notNull(), // Adresse du module
+    tokenId: t.bigint().notNull(),
     userId: t.hex().notNull(), // Adresse de l'utilisateur ayant accès
+    hasAccess: t.boolean().notNull(),
+    changedAtTimestamp: t.bigint().notNull(), // Timestamp du changement
   }),
-  (table) => ({ pk: primaryKey({ columns: [table.id, table.interventionId, table.userId] }) })
+  (table) => ({ pk: primaryKey({ columns: [table.id, table.interventionId, table.userId, table.tokenId] }) })
 );
 
 export const userInterventionAccessRelations = relations(userInterventionAccess, ({ one }) => ({
@@ -104,15 +108,20 @@ export const userInterventionAccessRelations = relations(userInterventionAccess,
 }));
 
 // Table pour les changements d'accès aux interventions
-export const interventionAccessChanges = onchainTable("interventionAccessChanges", (t) => ({
-  id: t.bigint().primaryKey(), // Identifiant unique du changement d'accès
-  interventionId: t.bigint().notNull(), // Identifiant de l'intervention
-  moduleId: t.hex().notNull(), // Adresse du module
-  account: t.hex().notNull(), // Adresse de l'utilisateur concerné
-  granted: t.boolean().notNull(), // Indique si l'accès est accordé ou révoqué
-  changedAtTimestamp: t.bigint().notNull(), // Timestamp du changement
-  changedBy: t.hex().notNull(), // Adresse de l'utilisateur qui a effectué le changement
-}));
+export const interventionAccessChanges = onchainTable(
+  "interventionAccessChanges",
+  (t) => ({
+    id: t.bigint(), // Identifiant unique du changement d'accès
+    interventionId: t.bigint().notNull(), // Identifiant de l'intervention
+    moduleId: t.hex().notNull(), // Adresse du module
+    tokenId: t.bigint().notNull(),
+    account: t.hex().notNull(), // Adresse de l'utilisateur concerné
+    hasAccess: t.boolean().notNull(), // Indique si l'accès est accordé ou révoqué
+    changedAtTimestamp: t.bigint().notNull(), // Timestamp du changement
+    changedBy: t.hex().notNull(), // Adresse de l'utilisateur qui a effectué le changement
+  }),
+  (table) => ({ pk: primaryKey({ columns: [table.id, table.interventionId, table.changedAtTimestamp] }) })
+);
 
 // Relations pour les changements d'accès aux interventions
 export const interventionAccessChangesRelations = relations(interventionAccessChanges, ({ one }) => ({
@@ -122,99 +131,20 @@ export const interventionAccessChangesRelations = relations(interventionAccessCh
   }),
 }));
 
-// /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// /////////////////////////////////////////////////////////////////////////////////////////////////////////
+export const UserModuleAccess = onchainTable(
+  "UserModuleAccess",
+  (t) => ({
+    id: t.hex(),
+    moduleName: t.text().notNull(), // Nom du module
+    authorizedAddress: t.hex().notNull(), // Adresse autorisée
+    tokenId: t.bigint().notNull(), // Identifiant du token concerné
+    assignedAtTimestamp: t.bigint().notNull(), // Timestamp de l'attribution
+    revokedAtTimestamp: t.bigint(), // Timestamp de la révocation (optionnel)
+  }),
+  (table) => ({ pk: primaryKey({ columns: [table.id, table.authorizedAddress, table.moduleName, table.tokenId] }) })
+);
 
-// // Table des utilisateurs
-// export const users = onchainTable("users", (t) => ({
-//   id: t.hex().primaryKey(), // Adresse de l'utilisateur comme clé primaire
-// }));
-
-// // Table des votings
-// export const votings = onchainTable("votings", (t) => ({
-//   id: t.hex().primaryKey(), // Adresse du contrat de vote comme clé primaire
-//   title: t.text().notNull(), // Titre du voting
-//   owner: t.hex().notNull(), // address owner du contrat
-//   workflowStatus: t.integer().notNull(), // État du workflow
-//   winningProposalID: t.bigint(), // ID de la proposition gagnante
-//   createdAtBlock: t.bigint().notNull(), // Bloc de création
-//   createdAtTransactionHash: t.text().notNull(), // Hash de la transaction
-//   createdAtTimestamp: t.bigint().notNull(),
-// }));
-
-// // Relations pour la table votings
-// export const votingRelations = relations(votings, ({ many }) => ({
-//   proposals: many(proposals),
-//   userVoters: many(userVoters),
-//   votes: many(votes),
-// }));
-
-// // Table des propositions
-// export const proposals = onchainTable(
-//   "proposals",
-//   (t) => ({
-//     id: t.bigint().notNull(),
-//     votingId: t.hex().notNull(),
-//     creatorId: t.hex().notNull(),
-//     voteCount: t.integer().default(0),
-//   }),
-//   (table) => ({ pk: primaryKey({ columns: [table.id, table.votingId] }) })
-// );
-
-// // Relations pour la table proposals
-// export const proposalsRelations = relations(proposals, ({ one, many }) => ({
-//   voting: one(votings, { fields: [proposals.votingId], references: [votings.id] }),
-//   creator: one(users, { fields: [proposals.creatorId], references: [users.id] }),
-//   votes: many(votes),
-// }));
-
-// // Table des votes
-// export const votes = onchainTable("votes", (t) => ({
-//   id: t.hex().primaryKey(),
-//   voterId: t.hex().notNull(),
-//   proposalId: t.bigint().notNull(),
-//   votingId: t.hex().notNull(),
-// }));
-
-// // Relations pour la table votes
-// export const votesRelations = relations(votes, ({ one }) => ({
-//   voter: one(users, { fields: [votes.voterId], references: [users.id] }),
-//   proposal: one(proposals, { fields: [votes.proposalId], references: [proposals.id] }),
-//   voting: one(votings, { fields: [votes.votingId], references: [votings.id] }),
-// }));
-
-// // Table de jointure pour relier les utilisateurs aux votings
-// export const userVoters = onchainTable(
-//   "user_votings",
-//   (t) => ({
-//     id: t.bigint().notNull(),
-//     userId: t.hex().notNull(),
-//     votingId: t.hex().notNull(),
-//   }),
-//   (table) => ({ pk: primaryKey({ columns: [table.id, table.userId, table.votingId] }) })
-// );
-
-// // Relations pour la table userVoters
-// export const userVotersRelations = relations(userVoters, ({ one }) => ({
-//   user: one(users, { fields: [userVoters.userId], references: [users.id] }),
-//   voting: one(votings, { fields: [userVoters.votingId], references: [votings.id] }),
-// }));
-
-// // Table pour l'historique des changements de WorkflowStatus
-// export const workflowStatusHistory = onchainTable("workflow_status_history", (t) => ({
-//   id: t.bigint().primaryKey(), // ID unique pour l'entrée de l'historique
-//   votingId: t.hex().notNull(), // Adresse du contrat de vote
-//   oldStatus: t.integer().notNull(), // Ancien état du workflow
-//   newStatus: t.integer().notNull(), // Nouvel état du workflow
-//   changedAtTimestamp: t.bigint().notNull(), // Timestamp du changement
-//   changedAtBlock: t.bigint().notNull(), // Bloc du changement
-// }));
-
-// // Relations pour la table workflowStatusHistory
-// export const workflowStatusHistoryRelations = relations(workflowStatusHistory, ({ one }) => ({
-//   voting: one(votings, { fields: [workflowStatusHistory.votingId], references: [votings.id] }),
-// }));
+// Relations pour les `UserModuleAccess`
+export const UserModuleAccessRelations = relations(UserModuleAccess, ({ one }) => ({
+  module: one(modules, { fields: [UserModuleAccess.moduleName], references: [modules.moduleName] }),
+}));

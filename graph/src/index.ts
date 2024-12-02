@@ -7,7 +7,8 @@ import {
   documents,
   interventionAccessChanges,
   userInterventionAccess,
-  UserModuleAccess,
+  userModuleAccess,
+  moduleInterventionManagers,
 } from "../ponder.schema";
 import { eq } from "@ponder/core";
 import { ethers } from "ethers";
@@ -16,18 +17,11 @@ import { ethers } from "ethers";
 const moduleNames = ["ModuleA", "ModuleB", "InterventionManager"];
 
 // Pré-calculer les hashes
-const moduleHashes = moduleNames.map((name) => ({
-  name,
-  hash: ethers.keccak256(ethers.toUtf8Bytes(name)),
-}));
-
-console.log("Pré-calcul des hashes des modules:");
-console.log(moduleHashes);
+const moduleHashes = moduleNames.map((name) => ({ name, hash: ethers.keccak256(ethers.toUtf8Bytes(name)) }));
 
 // Fonction pour retrouver le texte d'origine
-function findOriginalName(hash: string): string {
-  return moduleHashes.find((module) => module.hash === hash)?.name || "Unknown";
-}
+const findOriginalName = (hash: string): string =>
+  moduleHashes.find((module) => module.hash === hash)?.name || "Unknown";
 
 // // //////////////////////////////////////////////////////////////////////////////
 // // DEBUG -> console.log("🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡");
@@ -68,21 +62,24 @@ ponder.on("EstateManager:ModuleRegistered", async ({ event, context }) => {
 ponder.on("EstateManager:ModuleRoleAssigned", async ({ event, context }) => {
   const { moduleName, authorizedAddress, tokenId } = event.args;
 
-  await context.db.insert(UserModuleAccess).values({
-    id: event.log.address,
-    moduleName: findOriginalName(moduleName),
-    authorizedAddress,
-    tokenId: tokenId,
-    assignedAtTimestamp: event.block.timestamp,
-    revokedAtTimestamp: null,
-  });
+  await context.db
+    .insert(userModuleAccess)
+    .values({
+      id: event.log.address,
+      moduleName: findOriginalName(moduleName),
+      authorizedAddress,
+      tokenId: tokenId,
+      assignedAtTimestamp: event.block.timestamp,
+      revokedAtTimestamp: null,
+    })
+    .onConflictDoUpdate({ revokedAtTimestamp: null, assignedAtTimestamp: event.block.timestamp });
 });
 
 ponder.on("EstateManager:ModuleRoleRevoked", async ({ event, context }) => {
   const { moduleName, authorizedAddress, tokenId } = event.args;
 
   await context.db
-    .update(UserModuleAccess, {
+    .update(userModuleAccess, {
       id: event.log.address,
       authorizedAddress: authorizedAddress,
       moduleName: findOriginalName(moduleName),
@@ -92,9 +89,17 @@ ponder.on("EstateManager:ModuleRoleRevoked", async ({ event, context }) => {
 });
 
 // Event: InterventionManagerInitialized
-ponder.on("InterventionManager:InterventionManagerInitialized", async ({ event }) => {
-  const { estateManagerContract, timestamp } = event.args;
-  console.log(`InterventionManager initialized for: ${estateManagerContract} at ${timestamp}`);
+ponder.on("InterventionManager:InterventionManagerInitialized", async ({ event, context }) => {
+  const { estateManagerContract, timestamp, from } = event.args;
+
+  await context.db.insert(moduleInterventionManagers).values({
+    id: event.log.address, // Adresse du contrat InterventionManager
+    estateManagerId: estateManagerContract, // Lien avec le contrat EstateManager
+    admin: from,
+    initializedAtTimestamp: timestamp,
+    initializedAtBlock: BigInt(event.block.number),
+    initializedAtTransactionHash: event.transaction.hash,
+  });
 });
 
 // Event: InterventionAdded

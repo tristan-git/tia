@@ -8,6 +8,7 @@ export const users = onchainTable("users", (t) => ({
 export const usersRelations = relations(users, ({ many }) => ({
   interventions: many(interventions),
   userInterventionAccess: many(userInterventionAccess),
+  userModuleAccess: many(userModuleAccess),
   // documents: many(documents),
   // accessChanges: many(interventionAccessChanges),
 }));
@@ -28,7 +29,11 @@ export const estateManagers = onchainTable("estateManagers", (t) => ({
 export const estateManagersRelations = relations(estateManagers, ({ many, one }) => ({
   admin: one(users, { fields: [estateManagers.adminId], references: [users.id] }),
   manager: one(users, { fields: [estateManagers.managerId], references: [users.id] }),
-  modules: many(modules), // Relation vers les modules
+  modules: many(modules),
+  moduleInterventionManagers: one(moduleInterventionManagers, {
+    fields: [estateManagers.id],
+    references: [moduleInterventionManagers.estateManagerId],
+  }),
 }));
 
 // Table des modules enregistrés dans EstateManagers
@@ -46,6 +51,22 @@ export const modules = onchainTable(
 export const modulesRelations = relations(modules, ({ one, many }) => ({
   estateManager: one(estateManagers, { fields: [modules.estateManagerId], references: [estateManagers.id] }),
   interventions: many(interventions),
+}));
+
+export const moduleInterventionManagers = onchainTable("moduleInterventionManagers", (t) => ({
+  id: t.hex().primaryKey(), // Adresse du contrat InterventionManager
+  estateManagerId: t.hex().notNull(), // Adresse du contrat EstateManager parent
+  admin: t.hex().notNull(), // Adresse du manager
+  initializedAtTimestamp: t.bigint().notNull(), // Timestamp de l'initialisation
+  initializedAtBlock: t.bigint().notNull(), // Bloc de l'initialisation
+  initializedAtTransactionHash: t.text().notNull(), // Transaction de l'initialisation
+}));
+
+export const moduleInterventionManagersRelations = relations(moduleInterventionManagers, ({ one }) => ({
+  estateManager: one(estateManagers, {
+    fields: [moduleInterventionManagers.estateManagerId],
+    references: [estateManagers.id],
+  }),
 }));
 
 // Table des interventions dans les modules
@@ -104,7 +125,7 @@ export const userInterventionAccess = onchainTable(
 );
 
 export const userInterventionAccessRelations = relations(userInterventionAccess, ({ one }) => ({
-  user: one(users, { fields: [userInterventionAccess.userId], references: [users.id] }), // Relation avec les utilisateurs
+  user: one(users, { fields: [userInterventionAccess.userId], references: [users.id] }),
 }));
 
 // Table pour les changements d'accès aux interventions
@@ -131,8 +152,8 @@ export const interventionAccessChangesRelations = relations(interventionAccessCh
   }),
 }));
 
-export const UserModuleAccess = onchainTable(
-  "UserModuleAccess",
+export const userModuleAccess = onchainTable(
+  "userModuleAccess",
   (t) => ({
     id: t.hex(),
     moduleName: t.text().notNull(), // Nom du module
@@ -145,6 +166,7 @@ export const UserModuleAccess = onchainTable(
 );
 
 // Relations pour les `UserModuleAccess`
-export const UserModuleAccessRelations = relations(UserModuleAccess, ({ one }) => ({
-  module: one(modules, { fields: [UserModuleAccess.moduleName], references: [modules.moduleName] }),
+export const userModuleAccessRelations = relations(userModuleAccess, ({ one }) => ({
+  module: one(modules, { fields: [userModuleAccess.moduleName], references: [modules.moduleName] }),
+  user: one(users, { fields: [userModuleAccess.authorizedAddress], references: [users.id] }),
 }));

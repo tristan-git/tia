@@ -31,8 +31,7 @@ contract EstateManager is ERC721URIStorage, AccessControl {
 	event ModuleRoleAssigned(
 		uint256 indexed tokenId,
 		string indexed moduleName,
-		address indexed authorizedAddress,
-		uint256 accessLevel
+		address indexed authorizedAddress
 	);
 	event ModuleRoleRevoked(uint256 indexed tokenId, string indexed moduleName, address indexed authorizedAddress);
 	event ModuleRegistered(string indexed moduleName, address indexed moduleAddress);
@@ -141,7 +140,7 @@ contract EstateManager is ERC721URIStorage, AccessControl {
 
 		tokenExecuteModuleAccess[tokenId][moduleName][authorizedAddress] = true;
 
-		emit ModuleRoleAssigned(tokenId, moduleName, authorizedAddress, 2);
+		emit ModuleRoleAssigned(tokenId, moduleName, authorizedAddress);
 	}
 
 	/**

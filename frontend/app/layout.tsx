@@ -5,8 +5,8 @@ import CustomRainbowKitProvider from '@/components/provider/customRainbowKitProv
 import './globals.css'
 
 export const metadata: Metadata = {
-	title: 'Alyra vote',
-	description: 'Alyra vote',
+	title: 'Tia',
+	description: 'Tia',
 }
 
 export default async function RootLayout({

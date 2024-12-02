@@ -20,12 +20,11 @@ export async function POST(req) {
 			.leftJoin(accountRolesTable, eq(accountRolesTable.id, usersTable.accountRoleId))
 			.where(eq(usersTable.walletAddress, currentAccount))
 
-		if (usersWithRoles.length === 1) {
-			// Redirection côté serveur vers une page spécifique
-			return NextResponse.redirect(new URL('/not-found', req.url)) // Redirige vers la page /not-found
+		if (!usersWithRoles[0]?.roleName) {
+			return NextResponse.json({ data: [] }, { status: 200 })
 		}
 
-		return NextResponse.json({ data: usersWithRoles }, { status: 200 }) // Retourne les données filtrées
+		return NextResponse.json({ data: usersWithRoles }, { status: 200 })
 	} catch (error) {
 		console.error('Erreur de connexion au réseau:', error)
 		return NextResponse.json({ message: 'Erreur de connexion au réseau', error: error?.message }, { status: 500 })

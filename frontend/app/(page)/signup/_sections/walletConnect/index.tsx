@@ -41,7 +41,6 @@ const ButtonWalletConnect = ({}: nameProps) => {
 							}
 							return (
 								<div style={{ display: 'flex', gap: 12 }}>
-									connn
 									{/* <button onClick={openChainModal} style={{ display: 'flex', alignItems: 'center' }} type='button'>
 										{chain.hasIcon && (
 											<div

@@ -1,42 +1,14 @@
-"use client"
+'use client'
 
-
-import { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-
 import { cn } from '@/lib/utils'
-
 import { UserAuthForm } from './_sections/UserAuthForm'
 import { buttonVariants } from '@/components/ui/button'
-import { db } from '@/drizzle/db'
-import { eq } from 'drizzle-orm' // Import de la fonction d'égalité
-import { usersTable, accountRolesTable } from '@/drizzle/schema' // Assurez-vous que 'contracts' est le bon nom de votre table
 import { useAccount } from 'wagmi'
 
-// export const metadata: Metadata = {
-// 	title: 'Authentication',
-// 	description: 'Authentication forms built using the components.',
-// }
-
-export default  function AuthenticationPage() {
-	// const usersWithRoles = await db
-	// 	.select({
-	// 		userId: usersTable.id,
-	// 		firstName: usersTable.firstName,
-	// 		lastName: usersTable.lastName,
-	// 		walletAddress: usersTable.walletAddress,
-	// 		roleName: accountRolesTable.name,
-	// 	})
-	// 	.from(usersTable)
-	// 	.leftJoin(accountRolesTable, eq(accountRolesTable.id, usersTable.accountRoleId))
-
-  // console.log(usersWithRoles)
-  
+export default function SignUp() {
 	const { address: currentAccount, status, isConnecting, isDisconnected, isReconnecting } = useAccount()
-
-  console.log(currentAccount)
-
 
 	return (
 		<>

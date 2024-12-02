@@ -15,11 +15,32 @@ const dashboardConfig = {
 	Content: DashboardContent,
 	navConf: [
 		{
-			label: 'Voting management',
+			label: 'Management des bien',
+			roleAccess: 'manager',
 			navMain: [
 				{
-					title: 'Votes',
-					url: '/dashboard/votes',
+					title: 'Bien immobilier',
+					url: '/dashboard/manage-estate',
+					icon: SquareTerminal,
+					// subNav: [
+					// 	{ title: 'Votes', url: '/dashboard/votes' },
+					// 	{ title: 'subnav2', url: '#' },
+					// ],
+				},
+			],
+		},
+
+		/////////////////////////////////////////////////////////
+		// ADMIN
+		/////////////////////////////////////////////////////////
+
+		{
+			label: 'Administration',
+			roleAccess: 'admin',
+			navMain: [
+				{
+					title: 'utilisateurs',
+					url: '/dashboard/manage-users',
 					icon: SquareTerminal,
 					// subNav: [
 					// 	{ title: 'Votes', url: '/dashboard/votes' },

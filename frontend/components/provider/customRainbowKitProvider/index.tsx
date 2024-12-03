@@ -3,7 +3,7 @@
 import '@rainbow-me/rainbowkit/styles.css'
 import { getDefaultConfig, RainbowKitProvider } from '@rainbow-me/rainbowkit'
 import { WagmiProvider } from 'wagmi'
-import { sepolia, skaleCalypsoTestnet, hardhat } from 'wagmi/chains'
+import { skaleCalypsoTestnet } from 'wagmi/chains'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 import BlockchainProvider from '../blockchainProvider'
 // import { structuralSharing } from 'wagmi/query'
@@ -11,19 +11,11 @@ import BlockchainProvider from '../blockchainProvider'
 export const config = getDefaultConfig({
 	appName: 'Alyra	APP',
 	projectId: '65af7ffc03881e7982d909862c11aa59',
-	chains: [
-		skaleCalypsoTestnet,
-		//hardhat,
-		// sepolia,
-	],
+	chains: [skaleCalypsoTestnet],
 	ssr: true,
 })
 
-const queryClient = new QueryClient({
-	// defaultOptions: {
-	// 	queries: { structuralSharing },
-	// },
-})
+const queryClient = new QueryClient({})
 
 const CustomRainbowKitProvider = ({ children }: { children: React.ReactNode }) => {
 	return (

@@ -47,6 +47,15 @@ const dashboardConfig = {
 					// 	{ title: 'subnav2', url: '#' },
 					// ],
 				},
+				{
+					title: 'Assigner module',
+					url: '/dashboard/admin-manage-estate',
+					icon: SquareTerminal,
+					// subNav: [
+					// 	{ title: 'Votes', url: '/dashboard/votes' },
+					// 	{ title: 'subnav2', url: '#' },
+					// ],
+				},
 			],
 		},
 		// {

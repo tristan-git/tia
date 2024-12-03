@@ -3,7 +3,7 @@
 import { ColumnDef } from '@tanstack/react-table'
 
 import { Badge } from '@/components/ui/badge'
-import { AdminUsers } from './schema'
+import { Vote, voteSchema } from './schema'
 import OwnerCell from './cell/OwnerCell'
 import { statusVotes } from '@/constants/statusVotes'
 import CustomBadge from '@/components/shared/_ui/badge'
@@ -14,8 +14,8 @@ import WinnerDisplay from './cell/winnerDisplay'
 import { checksumAddress } from 'viem'
 import { Cross2Icon } from '@radix-ui/react-icons'
 import { DataTableColumnHeader } from '@/components/shared/dataTable/data-table-column-header'
-//
-export const columns: ColumnDef<AdminUsers>[] = [
+
+export const columns: ColumnDef<Vote>[] = [
 	// {
 	// 	id: 'select',
 	// 	header: ({ table }) => (
@@ -44,38 +44,37 @@ export const columns: ColumnDef<AdminUsers>[] = [
 
 	{
 		accessorKey: 'id',
-		header: ({ column }) => <DataTableColumnHeader column={column} title='id' />,
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Id' />,
 		cell: ({ row }) => {
-			return <div className='max-w-[150px] truncate text-xs'>{row.getValue('id')}</div>
+			return <div className=' text-xs'>{row.getValue('id')}</div>
 		},
 		enableSorting: false,
 		enableHiding: false,
 	},
 
 	{
-		accessorKey: 'firstName',
-		header: ({ column }) => <DataTableColumnHeader column={column} title='Prénom' />,
+		accessorKey: 'rnbCode',
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Code RNB' />,
 		cell: ({ row }) => {
-			// const data = voteSchema?.parse(row.original)
-			return <div className=' truncate text-xs'>{row.getValue('firstName')}</div>
+			return <div className=' text-xs'>{row.getValue('rnbCode')}</div>
 		},
 	},
 
 	{
-		accessorKey: 'lastName',
-		header: ({ column }) => <DataTableColumnHeader column={column} title='Nom' />,
+		accessorKey: 'manager',
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Manager' />,
 		cell: ({ row }) => {
-			// const data = voteSchema?.parse(row.original)
-			return <div className=' truncate text-xs'>{row.getValue('lastName')}</div>
+			return (
+				<div className=' text-xs'>{`${row.getValue('manager').firstName} ${row.getValue('manager').lastName}`}</div>
+			)
 		},
 	},
 
 	{
-		accessorKey: 'walletAddress',
-		header: ({ column }) => <DataTableColumnHeader column={column} title='Wallet' />,
+		accessorKey: 'admin',
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Admin' />,
 		cell: ({ row }) => {
-			// const data = voteSchema?.parse(row.original)
-			return <div className=' truncate text-xs'>{row.getValue('walletAddress')}</div>
+			return <div className=' text-xs'>{`${row.getValue('admin').firstName} ${row.getValue('admin').lastName}`}</div>
 		},
 	},
 

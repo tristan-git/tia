@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { getAdminUser } from '@/actions/admin/getAdminUser'
+import { getManagerUser } from '@/actions/manager/getManagerUser'
 
 export type TUsers = {
 	id: number
@@ -8,14 +8,14 @@ export type TUsers = {
 	walletAddress: string
 }
 
-export const useGetAdminUsers = () => {
+export const useGetManagersUsers = () => {
 	return useQuery<TUsers[]>({
 		queryKey: ['adminUsers'],
 		enabled: true,
 		// networkMode: "online",
 		// initialData,
 		queryFn: async () => {
-			const response = await getAdminUser()
+			const response = await getManagerUser()
 			return response
 		},
 		// staleTime: Number.POSITIVE_INFINITY,

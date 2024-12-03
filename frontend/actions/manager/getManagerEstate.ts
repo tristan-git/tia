@@ -5,8 +5,6 @@ import { estateManagersTable, usersTable } from '@/drizzle/schema'
 import { eq, or } from 'drizzle-orm'
 
 export async function getManagerEstate() {
-	console.log('Fetching estate managers...')
-
 	// Étape 1: Récupérer les estate managers
 	const estateManagers = await db
 		.select({
@@ -38,6 +36,7 @@ export async function getManagerEstate() {
 	// Associer les utilisateurs aux estate managers
 	const estateManagersWithUsers = estateManagers.map((manager) => ({
 		...manager,
+		createdAtBlock: manager.createdAtBlock.toString(),
 		admin: users.find((user) => user.id === manager.adminId),
 		manager: users.find((user) => user.id === manager.managerId),
 	}))

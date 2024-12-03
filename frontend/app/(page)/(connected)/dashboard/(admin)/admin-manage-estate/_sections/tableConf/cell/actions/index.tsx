@@ -1,0 +1,96 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { DotsHorizontalIcon } from '@radix-ui/react-icons'
+import { checksumAddress } from 'viem'
+import { Row } from '@tanstack/react-table'
+
+import { Button } from '@/components/ui/button'
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { voteSchema } from '@/app/(page)/(connected)/dashboard/votes/_sections/tableConf/schema'
+import { useAccount } from 'wagmi'
+import AddVoters from './addVoter'
+import UpdateStatus from './updateStatus'
+import AddProposal from './addProposal'
+import { WorkflowStatus } from '@/lib/enum'
+import Vote from './vote'
+
+interface DataTableRowActionsProps<TData> {
+	row: Row<TData>
+}
+
+export function RowActionsCell<TData>({ row }: DataTableRowActionsProps<TData>) {
+	const { address } = useAccount()
+	const data = voteSchema.parse(row.original)
+	const [selectedStatus, setSelectedStatus] = useState(data.workflowStatus)
+	const contractAddress = data.id as `0x${string}`
+	const isOwner = checksumAddress(address as `0x${string}`) == checksumAddress(data.owner as `0x${string}`)
+	const isVoter = data?.userVoters?.some(
+		({ userId }) => checksumAddress(userId as `0x${string}`) === checksumAddress(address as `0x${string}`)
+	)
+
+	useEffect(() => {
+		setSelectedStatus(data.workflowStatus)
+	}, [data.workflowStatus])
+
+	const [open, setOpen] = useState(false)
+
+	const handleOpenDialog = (e: React.MouseEvent) => {
+		e.preventDefault()
+		e.stopPropagation()
+		setOpen(true)
+	}
+
+	return (
+		<DropdownMenu open={open} onOpenChange={setOpen}>
+			<DropdownMenuTrigger asChild onClick={handleOpenDialog}>
+				<Button variant='ghost' className='flex h-8 w-8 p-0 data-[state=open]:bg-muted'>
+					<DotsHorizontalIcon className='h-4 w-4' />
+					<span className='sr-only'>Open menu</span>
+				</Button>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent align='end' className='w-[160px]'>
+				{isOwner && (
+					<AddVoters
+						setOpenMenu={setOpen}
+						contractAddress={contractAddress}
+						disabled={WorkflowStatus.RegisteringVoters !== selectedStatus}
+					/>
+				)}
+
+				<AddProposal
+					setOpenMenu={setOpen}
+					contractAddress={contractAddress}
+					disabled={WorkflowStatus.ProposalsRegistrationStarted !== selectedStatus || !isVoter}
+				/>
+
+				<Vote
+					setOpenMenu={setOpen}
+					disabled={WorkflowStatus.VotingSessionStarted !== selectedStatus || !isVoter || !data?.proposals?.length}
+					contractAddress={contractAddress}
+					dataVote={data}
+				/>
+
+				<DropdownMenuSeparator />
+
+				{isOwner && (
+					<UpdateStatus
+						setOpenMenu={setOpen}
+						selectedStatus={selectedStatus}
+						setSelectedStatus={setSelectedStatus}
+						contractAddress={contractAddress}
+					/>
+				)}
+
+				<DropdownMenuSeparator />
+				<DropdownMenuItem>Close</DropdownMenuItem>
+			</DropdownMenuContent>
+		</DropdownMenu>
+	)
+}

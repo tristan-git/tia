@@ -10,7 +10,7 @@ export type TUsers = {
 
 export const useGetAdminUsers = () => {
 	return useQuery<TUsers[]>({
-		queryKey: ['adminUsers'],
+		queryKey: ['getAdminUser'],
 		enabled: true,
 		// networkMode: "online",
 		// initialData,

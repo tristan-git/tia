@@ -3,7 +3,7 @@
 import { ColumnDef } from '@tanstack/react-table'
 
 import { Badge } from '@/components/ui/badge'
-import { AdminUsers, voteSchema } from './schema'
+import { AdminUsers } from './schema'
 import OwnerCell from './cell/OwnerCell'
 import { statusVotes } from '@/constants/statusVotes'
 import CustomBadge from '@/components/shared/_ui/badge'

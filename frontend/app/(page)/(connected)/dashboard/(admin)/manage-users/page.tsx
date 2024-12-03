@@ -25,33 +25,22 @@ const config = {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 export default function ManageUsers() {
-	const { address: currentAccount, status, isConnecting, isDisconnected, isReconnecting } = useAccount()
+	// const { address: currentAccount, status, isConnecting, isDisconnected, isReconnecting } = useAccount()
 	// const { data: dataVoting, status: statusQuery } = useVotingContracts(currentAccount)
-	const { data, failureReason } = useGetAdminUsers()
-
-	console.log('data')
-	console.log(data)
-
-	console.log('failureReason')
-	console.log(failureReason)
+	const { data } = useGetAdminUsers()
 
 	return (
 		<>
-			{/* <LastVotes votes={data} /> */}
-			{status == 'connected' ? (
-				<div className='container max-w-screen-xl overflow-hidden p-4'>
-					<div className='flex items-center justify-between mb-4'>
-						<div className='space-y-1'>
-							<h2 className='text-2xl font-semibold tracking-tight'>Les derniers utilisateur enregister</h2>
-							<p className='text-sm text-muted-foreground'>Donner acces au role utilisateur</p>
-						</div>
-						<CreateEstate />
+			<div className='container max-w-screen-xl overflow-hidden p-4'>
+				<div className='flex items-center justify-between mb-4'>
+					<div className='space-y-1'>
+						<h2 className='text-2xl font-semibold tracking-tight'>Les derniers utilisateur enregister</h2>
+						<p className='text-sm text-muted-foreground'>Donner acces au role utilisateur</p>
 					</div>
-					<DataTable data={data || []} columns={columns} config={config} />
+					{/* <CreateEstate /> */}
 				</div>
-			) : (
-				<p>need login & https://www.sfuelstation.com/</p>
-			)}
+				<DataTable data={data || []} columns={columns} config={config} />
+			</div>
 		</>
 	)
 }

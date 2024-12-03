@@ -1,0 +1,1 @@
+export const addressEstateFactory = '0x306253B640cB46eBef3DCCE9C05359aD6055869b'

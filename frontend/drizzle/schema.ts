@@ -94,14 +94,14 @@ export const userInterventionAccessTable = pgTable('user_intervention_access', {
 	id: bigint('id', { mode: 'bigint' }).primaryKey(),
 	interventionId: bigint('intervention_id', { mode: 'bigint' })
 		.notNull()
-		.references(() => interventionsTable.id), // Référence à `interventions`
+		.references(() => interventionsTable.id), 
 	moduleId: varchar({ length: 42 })
 		.notNull()
-		.references(() => modulesTable.id), // Référence à `modules`
+		.references(() => modulesTable.id), 
 	tokenId: bigint('token_id', { mode: 'bigint' }).notNull(),
 	userId: integer()
 		.notNull()
-		.references(() => usersTable.id), // Référence à `users`
+		.references(() => usersTable.id), 
 	hasAccess: boolean().notNull(),
 	changedAtTimestamp: timestamp().notNull(),
 })

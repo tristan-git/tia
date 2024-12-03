@@ -15,7 +15,11 @@ export const config = getDefaultConfig({
 	ssr: true,
 })
 
-const queryClient = new QueryClient({})
+const queryClient = new QueryClient({
+	defaultOptions: {
+		queries: {},
+	},
+})
 
 const CustomRainbowKitProvider = ({ children }: { children: React.ReactNode }) => {
 	return (

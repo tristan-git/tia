@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { getManagerEstate } from '@/actions/manager/getManagerEstate'
 
 export type TEstateManager = {
 	id: string
@@ -25,16 +24,11 @@ export type TEstateManager = {
 export const useGetManagerEstate = () => {
 	return useQuery({
 		queryKey: ['getManagerEstate'],
-		// enabled: false,
+		enabled: true,
 		queryFn: async () => {
-			try {
-				const response = await getManagerEstate()
-				return response
-			} catch (error) {
-				console.log(error)
-			}
+			const response = await fetch('/api/manager/get-manager-estate')
+			return response.json()
 		},
-
 		// staleTime: Number.POSITIVE_INFINITY,
 		// refetchInterval: 3_000,
 	})

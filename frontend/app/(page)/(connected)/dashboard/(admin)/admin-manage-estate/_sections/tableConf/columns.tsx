@@ -157,78 +157,26 @@ export const columns: ColumnDef<Vote>[] = [
 		accessorKey: 'createdAtTimestamp',
 		header: ({ column }) => <DataTableColumnHeader column={column} title='Creer le' />,
 		cell: ({ row }) => {
-			console.log(row.getValue('createdAtTimestamp'))
 			const date = new Date(row.getValue('createdAtTimestamp'))
 			return <div className='flex text-xs'>{date.toLocaleString()}</div>
 		},
 	},
 
-	// {
-	// 	accessorKey: 'workflowStatus',
-	// 	header: ({ column }) => <DataTableColumnHeader column={column} title='Status' />,
-	// 	cell: ({ row }) => {
-	// 		const statusIndex = row.getValue('workflowStatus') as WorkflowStatus
-	// 		return (
-	// 			<div className='flex  items-center'>
-	// 				<CustomBadge text={statusVotes[statusIndex].text} variant={statusVotes[statusIndex].variant} />
-	// 			</div>
-	// 		)
-	// 	},
-	// 	filterFn: (row, id, value) => {
-	// 		return value.includes(row.getValue(id))
-	// 	},
-	// },
+	{
+		accessorKey: 'modules',
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Modules' />,
+		cell: ({ row }) => {
+			const modules = row.getValue('modules')
+			console.log(modules)
+			return <div className='flex  items-center'>{modules?.moduleName && <CustomBadge text={modules?.moduleName} />}</div>
+		},
+		filterFn: (row, id, value) => {
+			return value.includes(row.getValue(id))
+		},
+	},
 
-	// {
-	// 	id: 'actions',
-	// 	cell: ({ row }) => <RowActionsCell row={row} />,
-	// },
-
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// TEST
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	// {
-	// 	accessorKey: 'priority',
-	// 	header: ({ column }) => <DataTableColumnHeader column={column} title='Priority' />,
-	// 	cell: ({ row }) => {
-	// 		const priority = priorities.find((priority) => priority.value === row.getValue('priority'))
-
-	// 		if (!priority) {
-	// 			return null
-	// 		}
-
-	// 		return (
-	// 			<div className='flex items-center'>
-	// 				{priority.icon && <priority.icon className='mr-2 h-4 w-4 text-muted-foreground' />}
-	// 				<span>{priority.label}</span>
-	// 			</div>
-	// 		)
-	// 	},
-	// 	filterFn: (row, id, value) => {
-	// 		return value.includes(row.getValue(id))
-	// 	},
-	// },
-
-	// {
-	// 	accessorKey: 'status',
-	// 	header: ({ column }) => <DataTableColumnHeader column={column} title='Status' />,
-	// 	cell: ({ row }) => {
-	// 		const status = statuses.find((status) => status.value === row.getValue('status'))
-
-	// 		if (!status) {
-	// 			return null
-	// 		}
-
-	// 		return (
-	// 			<div className='flex w-[100px] items-center'>
-	// 				{status.icon && <status.icon className='mr-2 h-4 w-4 text-muted-foreground' />}
-	// 				<span>{status.label}</span>
-	// 			</div>
-	// 		)
-	// 	},
-	// 	filterFn: (row, id, value) => {
-	// 		return value.includes(row.getValue(id))
-	// 	},
-	// },
+	{
+		id: 'actions',
+		cell: ({ row }) => <RowActionsCell row={row} />,
+	},
 ]

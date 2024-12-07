@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { useAccount, useTransactionReceipt, useWriteContract } from 'wagmi'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -10,90 +11,174 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-
+import AddFile from './addFile'
 import { EstateManagerArtifact } from '@/constants/artifacts/EstateManager'
+import { useQueryClient } from '@tanstack/react-query'
 
 /////////////////////////////////////////////////////////
 // ZOD SCHEMA
 /////////////////////////////////////////////////////////
 
 const FormSchema = z.object({
-	adminAddress: z.string().refine((value) => /^0x[a-fA-F0-9]{40}$/.test(value), { message: 'Adresse Ethereum non valide' }),
-	managerAddress: z.string().refine((value) => /^0x[a-fA-F0-9]{40}$/.test(value), { message: 'Adresse Ethereum non valide' }),
-	rnbCode: z.string().min(2, { message: 'rnb non valide' }),
+	address: z.string().min(2, { message: 'Adresse invalide' }),
+	town: z.string().min(2, { message: 'Ville invalide' }),
+	file: z.any(),
 })
 
-type MyEstatesProps = { idEstate: string }
+type MyEstatesProps = {
+	idEstate: string
+	rnbCode: string
+}
 
-const AddEstate = ({ idEstate }: MyEstatesProps) => {
-	const { address: currentAccount, status, isConnecting, isDisconnected, isReconnecting } = useAccount()
-	const { data: hash, error, isPending, isSuccess, writeContract } = useWriteContract()
+const AddEstate = ({ idEstate, rnbCode }: MyEstatesProps) => {
+	const { address: currentAccount } = useAccount()
+	const queryClient = useQueryClient()
+	const { writeContract, isPending, isSuccess, data: hash, error } = useWriteContract()
 	const { data: dataReceipt } = useTransactionReceipt({ hash })
+	const [result, setResult] = useState('')
+
+	console.log('error')
+	console.log(error)
 
 	const form = useForm<z.infer<typeof FormSchema>>({
+		mode: 'all',
 		resolver: zodResolver(FormSchema),
-		defaultValues: { adminAddress: '', managerAddress: '', rnbCode: '' },
+		defaultValues: { address: '', town: '' },
 	})
 
-	async function onSubmit(data: z.infer<typeof FormSchema>) {
-		const { adminAddress, managerAddress, rnbCode } = data
+	/////////////////////////////////////////////////////////
+	// onSubmit
+	/////////////////////////////////////////////////////////
 
-		writeContract({
-			address: idEstate as `0x${string}`,
-			abi: EstateManagerArtifact.abi,
-			functionName: 'mintNFT',
-			args: [currentAccount as `0x${string}`, BigInt(1), 'url'],
+	const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+		try {
+			setResult('Sending....')
+			const formData = new FormData()
+
+			formData.append('idEstate', idEstate)
+			formData.append('tokenId', '1')
+			formData.append('rnbCode', rnbCode)
+
+			for (const key in data) {
+				if (key === 'file') {
+					formData.append(key, data[key][0])
+				} else {
+					formData.append(key, data[key])
+				}
+			}
+
+			const res = await fetch(`/api/nft/files`, {
+				method: 'POST',
+				body: formData,
+			}).then((res) => res.json())
+
+			if (res.success) {
+				console.log('Success', res)
+
+				// Mint le NFT
+				writeContract({
+					address: idEstate as `0x${string}`,
+					abi: EstateManagerArtifact.abi,
+					functionName: 'mintNFT',
+					args: [currentAccount as `0x${string}`, res.metadata.url],
+				})
+
+				setResult(res.message)
+			} else {
+				console.log('Error', res)
+				setResult(res.message)
+			}
+
+			toast({ title: 'NFT Minté', description: 'Le NFT a été créé avec succès.' })
+		} catch (error) {
+			console.error('Erreur lors du mint NFT:', error)
+			toast({ variant: 'destructive', title: 'Erreur', description: 'Une erreur est survenue.' })
+		}
+	}
+
+	/////////////////////////////////////////////////////////
+	// comment
+	/////////////////////////////////////////////////////////
+
+	console.log('dataReceipt=====')
+	console.log(dataReceipt)
+	console.log(isSuccess)
+
+	useEffect(() => {
+		async function handleDeploymentReceipt() {
+			if (isSuccess && hash) {
+				console.log(dataReceipt)
+
+				if (dataReceipt && dataReceipt.logs[0]?.address) {
+					const deployment = {
+						blockHash: dataReceipt.blockHash,
+						blockNumber: dataReceipt.blockNumber,
+						contractAddress: dataReceipt.logs[0]?.address,
+						cumulativeGasUsed: dataReceipt.cumulativeGasUsed,
+						effectiveGasPrice: dataReceipt.effectiveGasPrice,
+						fromAddress: dataReceipt.from,
+						gasUsed: dataReceipt.gasUsed,
+						deploymentDate: new Date(),
+					}
+
+					console.log(deployment)
+
+					// await saveDeployment(deployment)
+
+					form.reset()
+
+					// queryClient.invalidateQueries({ queryKey: ['voting_contracts'] })
+
+					// toast({ title: 'Vote Successful', description: 'The vote was added successfully.' })
+
+					// setOpen(false)
+				}
+			}
+		}
+
+		handleDeploymentReceipt().catch((err) => {
+			console.error('Error handling deployment receipt:', err)
+			toast({
+				variant: 'destructive',
+				title: 'Error',
+				description: 'An error occurred while processing the transaction receipt.',
+			})
 		})
-    }
-    
-
-//     API Key: 9c94b8445030ab2193ca
-// API Secret: b898a7ad09b1971b0c4a7432fbd7c76d3eb709c186b52c50094579ee6f6e8fb6
-// JWT: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiJhZjRhMzQ4Ny00NTBkLTRjZDMtYmIwYi05YzYzMzViNjQ4MTIiLCJlbWFpbCI6InRyaXN0YW4ubWFjaWFnQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaW5fcG9saWN5Ijp7InJlZ2lvbnMiOlt7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6IkZSQTEifSx7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6Ik5ZQzEifV0sInZlcnNpb24iOjF9LCJtZmFfZW5hYmxlZCI6ZmFsc2UsInN0YXR1cyI6IkFDVElWRSJ9LCJhdXRoZW50aWNhdGlvblR5cGUiOiJzY29wZWRLZXkiLCJzY29wZWRLZXlLZXkiOiI5Yzk0Yjg0NDUwMzBhYjIxOTNjYSIsInNjb3BlZEtleVNlY3JldCI6ImI4OThhN2FkMDliMTk3MWIwYzRhNzQzMmZiZDdjNzZkM2ViNzA5YzE4NmI1MmM1MDA5NDU3OWVlNmY2ZThmYjYiLCJleHAiOjE3NjQ3ODM5MTh9.qmv-Xm1JQG0I2N28k3MyX43vROOa65yF9TNqTytRFCI
+	}, [isSuccess, hash, form, dataReceipt])
 
 	return (
 		<Card className='w-[350px]'>
 			<CardHeader>
-				<CardTitle>Ajouter un batiment</CardTitle>
-				<CardDescription>Un appeartement ou autre chose...</CardDescription>
+				<CardTitle>Ajouter un bâtiment</CardTitle>
+				<CardDescription>Un appartement ou autre...</CardDescription>
 			</CardHeader>
 			<CardContent>
-				<form>
+				<form onSubmit={form.handleSubmit(onSubmit)}>
 					<div className='grid w-full items-center gap-4'>
 						<div className='flex flex-col space-y-1.5'>
-							<Label htmlFor='name'>Addresse</Label>
-							<Input id='name' placeholder='Name of your project' />
+							<Label htmlFor='address'>Adresse</Label>
+							<Input id='address' placeholder='Adresse du bâtiment' {...form.register('address')} />
 						</div>
 						<div className='flex flex-col space-y-1.5'>
-							<Label htmlFor='name'>Ville</Label>
-							<Input id='name' placeholder='Name of your project' />
+							<Label htmlFor='ville'>Ville</Label>
+							<Input id='town' placeholder='Ville du bâtiment' {...form.register('town')} />
 						</div>
-						<div className='flex flex-col space-y-1.5'>
-							<Label htmlFor='name'>Image</Label>
-							<Input id='name' placeholder='Name of your project' />
-						</div>
-						{/* <div className='flex flex-col space-y-1.5'>
-							<Label htmlFor='framework'>Framework</Label>
-							<Select>
-								<SelectTrigger id='framework'>
-									<SelectValue placeholder='Select' />
-								</SelectTrigger>
-								<SelectContent position='popper'>
-									<SelectItem value='next'>Next.js</SelectItem>
-									<SelectItem value='sveltekit'>SvelteKit</SelectItem>
-									<SelectItem value='astro'>Astro</SelectItem>
-									<SelectItem value='nuxt'>Nuxt.js</SelectItem>
-								</SelectContent>
-							</Select>
-						</div> */}
+
+						<input type='file' {...form.register('file')} />
 					</div>
+
+					{/* <Image
+						src='https://brown-broad-whitefish-602.mypinata.cloud/files/bafybeih4fh3soo2ugao2udduzr4uou4e2nb25zdekcnvpku5pzt6y7ozcu?X-Algorithm=PINATA1&X-Date=1733479735&X-Expires=30&X-Method=GET&X-Signature=4d6cc794f22d368e537d25f386e146de4c0deddea71aba9afc9d64443ffed55e'
+						width={500}
+						height={500}
+						alt='Picture of the author'
+					/> */}
+
+					<Button type='submit' disabled={isPending}>
+						{isPending ? 'En cours...' : 'Ajouter'}
+					</Button>
 				</form>
 			</CardContent>
-			<CardFooter className='flex justify-between'>
-				<Button variant='outline'>Cancel</Button>
-				<Button>Deploy</Button>
-			</CardFooter>
 		</Card>
 	)
 }

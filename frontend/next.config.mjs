@@ -24,7 +24,7 @@ const nextConfig = {
 	},
 
 	images: {
-		remotePatterns: [{ hostname: '*.public.blob.vercel-storage.com' }],
+		remotePatterns: [{ hostname: '*.public.blob.vercel-storage.com', hostname: 'brown-broad-whitefish-602.mypinata.cloud' }],
 	},
 }
 

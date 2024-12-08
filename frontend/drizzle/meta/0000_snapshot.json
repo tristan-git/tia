@@ -1,5 +1,5 @@
 {
-  "id": "46800494-2b88-4e96-9570-7de3ce352957",
+  "id": "7a46549f-1449-4255-a484-baf2b962214c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -203,6 +203,118 @@
           "tableTo": "users",
           "columnsFrom": [
             "createdBy"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.minted_nfts": {
+      "name": "minted_nfts",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "minted_nfts_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "token_id": {
+          "name": "token_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "estateManagerId": {
+          "name": "estateManagerId",
+          "type": "varchar(42)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ownerAddress": {
+          "name": "ownerAddress",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "metadata_url": {
+          "name": "metadata_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAtTimestamp": {
+          "name": "createdAtTimestamp",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mintedBy": {
+          "name": "mintedBy",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "transactionHash": {
+          "name": "transactionHash",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "minted_nfts_estateManagerId_estate_managers_id_fk": {
+          "name": "minted_nfts_estateManagerId_estate_managers_id_fk",
+          "tableFrom": "minted_nfts",
+          "tableTo": "estate_managers",
+          "columnsFrom": [
+            "estateManagerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "minted_nfts_ownerAddress_users_id_fk": {
+          "name": "minted_nfts_ownerAddress_users_id_fk",
+          "tableFrom": "minted_nfts",
+          "tableTo": "users",
+          "columnsFrom": [
+            "ownerAddress"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "minted_nfts_mintedBy_users_id_fk": {
+          "name": "minted_nfts_mintedBy_users_id_fk",
+          "tableFrom": "minted_nfts",
+          "tableTo": "users",
+          "columnsFrom": [
+            "mintedBy"
           ],
           "columnsTo": [
             "id"

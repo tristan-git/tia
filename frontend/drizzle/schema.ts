@@ -56,6 +56,23 @@ export const estateManagersTable = pgTable('estate_managers', {
 	createdAtTimestamp: timestamp().notNull(),
 })
 
+export const mintedNFTsTable = pgTable('minted_nfts', {
+	id: integer().primaryKey().generatedAlwaysAsIdentity(),
+	tokenId: bigint('token_id', { mode: 'bigint' }).notNull(),
+	estateManagerId: varchar({ length: 42 })
+		.notNull()
+		.references(() => estateManagersTable.id),
+	ownerAddress: integer()
+		.notNull()
+		.references(() => usersTable.id),
+	metadataURI: text('metadata_url').notNull(), // URI des métadonnées du NFT
+	createdAtTimestamp: timestamp().notNull(), // Date et heure de mint
+	mintedBy: integer()
+		.notNull()
+		.references(() => usersTable.id), // Référence à l'utilisateur qui a minté
+	transactionHash: varchar({ length: 255 }), // Hash de la transaction de mint
+})
+
 export const modulesTable = pgTable('modules', {
 	id: varchar({ length: 42 }).primaryKey(),
 	moduleName: varchar({ length: 255 }).notNull(),
@@ -94,14 +111,14 @@ export const userInterventionAccessTable = pgTable('user_intervention_access', {
 	id: bigint('id', { mode: 'bigint' }).primaryKey(),
 	interventionId: bigint('intervention_id', { mode: 'bigint' })
 		.notNull()
-		.references(() => interventionsTable.id), 
+		.references(() => interventionsTable.id),
 	moduleId: varchar({ length: 42 })
 		.notNull()
-		.references(() => modulesTable.id), 
+		.references(() => modulesTable.id),
 	tokenId: bigint('token_id', { mode: 'bigint' }).notNull(),
 	userId: integer()
 		.notNull()
-		.references(() => usersTable.id), 
+		.references(() => usersTable.id),
 	hasAccess: boolean().notNull(),
 	changedAtTimestamp: timestamp().notNull(),
 })

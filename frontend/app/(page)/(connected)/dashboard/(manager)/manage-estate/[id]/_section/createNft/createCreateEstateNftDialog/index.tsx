@@ -1,20 +1,24 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import Image from 'next/image'
 import { useAccount, useTransactionReceipt, useWriteContract } from 'wagmi'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { toast } from '@/hooks/use-toast'
 import { z } from 'zod'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-
-import { EstateManagerArtifact } from '@/constants/artifacts/EstateManager'
 import { useQueryClient } from '@tanstack/react-query'
-
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Form } from '@/components/ui/form'
+import InputFORM from '@/components/shared/form/InputFORM'
+import SelectFORM from '@/components/shared/form/SelectFORM'
+import { useGetManagersUsers } from '@/hooks/queries/manager/managerGetUsers'
+import { EstateManagerFactoryArtifact } from '@/constants/artifacts/EstateManagerFactory'
+import { addressEstateFactory } from '@/constants/contract'
+import { createEstateManager } from '@/actions/manager/createEstateManager'
+import { EstateManagerArtifact } from '@/constants/artifacts/EstateManager'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
 import { createNft } from '@/actions/manager/CreateNft'
 
 /////////////////////////////////////////////////////////
@@ -27,13 +31,24 @@ const FormSchema = z.object({
 	file: z.any(),
 })
 
-type MyEstatesProps = {
-	idEstate: string
-	rnbCode: string
-	tokenId: any
-}
+/////////////////////////////////////////////////////////
+// CreateVoteDialog
+/////////////////////////////////////////////////////////
 
-const AddEstate = ({ idEstate, rnbCode, tokenId }: MyEstatesProps) => {
+type CreateVoteDialogProps = { idEstate; rnbCode; tokenId }
+
+const CreateCreateEstateNftDialog = ({ idEstate, rnbCode, tokenId }: CreateVoteDialogProps) => {
+	// const { data: users } = useGetManagersUsers()
+	// const queryClient = useQueryClient()
+	// const { data: hash, error, isPending, isSuccess, writeContract } = useWriteContract()
+
+	const [open, setOpen] = useState(false)
+
+	// const form = useForm<z.infer<typeof FormSchema>>({
+	// 	resolver: zodResolver(FormSchema),
+	// 	defaultValues: { adminAddress: '', managerAddress: '', rnbCode: '' },
+	// })
+
 	const { address: currentAccount } = useAccount()
 	const queryClient = useQueryClient()
 	const { writeContract, isPending, isSuccess, data: hash, error } = useWriteContract()
@@ -46,10 +61,6 @@ const AddEstate = ({ idEstate, rnbCode, tokenId }: MyEstatesProps) => {
 		resolver: zodResolver(FormSchema),
 		defaultValues: { address: '', town: '' },
 	})
-
-	/////////////////////////////////////////////////////////
-	// onSubmit
-	/////////////////////////////////////////////////////////
 
 	const onSubmit = async (data: z.infer<typeof FormSchema>) => {
 		try {
@@ -86,14 +97,9 @@ const AddEstate = ({ idEstate, rnbCode, tokenId }: MyEstatesProps) => {
 		}
 	}
 
-	/////////////////////////////////////////////////////////
-	// Save nft to BDD
-	/////////////////////////////////////////////////////////
-
 	useEffect(() => {
 		async function handleDeploymentReceipt() {
-			if (isSuccess && hash && !isProcessed) {
-				setIsProcessed(true) // Marquez comme traité
+			if (isSuccess && hash) {
 				if (dataReceipt && dataReceipt.logs[0]?.address) {
 					const dataNft = {
 						tokenId: tokenId,
@@ -106,6 +112,7 @@ const AddEstate = ({ idEstate, rnbCode, tokenId }: MyEstatesProps) => {
 					form.reset()
 					queryClient.invalidateQueries({ queryKey: ['useGetManagerEstateNft'] })
 					toast({ title: 'Bâtiment ajouter', description: 'Le bâtiment est bien ajouté' })
+					setOpen(false)
 				}
 			}
 		}
@@ -116,38 +123,43 @@ const AddEstate = ({ idEstate, rnbCode, tokenId }: MyEstatesProps) => {
 				description: 'An error occurred while processing the transaction receipt.',
 			})
 		})
-	}, [isSuccess, hash, form, dataReceipt, isProcessed])
+	}, [isSuccess, hash, form, dataReceipt])
 
 	return (
-		<Card className='w-[350px]'>
-			<CardHeader>
-				<CardTitle>Ajouter un bâtiment</CardTitle>
-				<CardDescription>Un appartement ou autre...</CardDescription>
-			</CardHeader>
-			<CardContent>
-				<form onSubmit={form.handleSubmit(onSubmit)}>
-					<div className='grid w-full items-center gap-4'>
-						<div className='flex flex-col space-y-1.5'>
-							<Label htmlFor='address'>Adresse</Label>
-							<Input id='address' placeholder='Adresse du bâtiment' {...form.register('address')} />
-						</div>
-						<div className='flex flex-col space-y-1.5'>
-							<Label htmlFor='ville'>Ville</Label>
-							<Input id='town' placeholder='Ville du bâtiment' {...form.register('town')} />
-						</div>
+		<Dialog open={open} onOpenChange={setOpen}>
+			<DialogTrigger asChild>
+				<Button>Ajouter un batiment</Button>
+			</DialogTrigger>
+			<DialogContent className='sm:max-w-[425px]'>
+				<DialogHeader>
+					<DialogTitle>Ajouter un nouveau batiment</DialogTitle>
+					<DialogDescription>Entrer les détail du batiment</DialogDescription>
+				</DialogHeader>
+				<div className='grid gap-4 py-0'>
+					<Form {...form}>
+						<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+							<div className='grid w-full items-center gap-4'>
+								<div className='flex flex-col space-y-1.5'>
+									<Label htmlFor='address'>Adresse</Label>
+									<Input id='address' placeholder='Adresse du bâtiment' {...form.register('address')} />
+								</div>
+								<div className='flex flex-col space-y-1.5'>
+									<Label htmlFor='ville'>Ville</Label>
+									<Input id='town' placeholder='Ville du bâtiment' {...form.register('town')} />
+								</div>
 
-						<input type='file' {...form.register('file')} />
-					</div>
+								<input type='file' {...form.register('file')} />
+							</div>
 
-					{/* {url && <Image src={url} width={500} height={500} alt='Picture of the author' />} */}
-
-					<Button type='submit' disabled={isPending}>
-						{isPending ? 'En cours...' : 'Ajouter'}
-					</Button>
-				</form>
-			</CardContent>
-		</Card>
+							<Button type='submit' className='w-full'>
+								Ajouter
+							</Button>
+						</form>
+					</Form>
+				</div>
+			</DialogContent>
+		</Dialog>
 	)
 }
 
-export default AddEstate
+export default CreateCreateEstateNftDialog

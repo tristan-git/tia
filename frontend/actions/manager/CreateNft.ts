@@ -10,12 +10,17 @@ export async function createNft(nftData: {
 	fromAddress: string
 	metadataURI: string
 	transactionHash?: string
+	town: string
+	address: string
+	img: string
 }) {
 	const user = await db
 		.select({ id: usersTable.id })
 		.from(usersTable)
 		.where(sql`LOWER(${usersTable.walletAddress}) = LOWER(${nftData.fromAddress})`)
+
 	const nextTokenId = BigInt(nftData.tokenId) + BigInt(1)
+
 	await db.insert(mintedNFTsTable).values({
 		tokenId: nextTokenId,
 		estateManagerId: nftData.estateManagerId,
@@ -24,5 +29,8 @@ export async function createNft(nftData: {
 		mintedBy: user[0].id,
 		transactionHash: nftData.transactionHash || null,
 		createdAtTimestamp: new Date(),
+		address: nftData.address,
+		town: nftData.town,
+		img: nftData.img,
 	})
 }

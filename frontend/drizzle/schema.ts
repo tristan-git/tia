@@ -65,12 +65,15 @@ export const mintedNFTsTable = pgTable('minted_nfts', {
 	ownerAddress: integer()
 		.notNull()
 		.references(() => usersTable.id),
-	metadataURI: text('metadata_url').notNull(), // URI des métadonnées du NFT
-	createdAtTimestamp: timestamp().notNull(), // Date et heure de mint
+	metadataURI: text('metadata_url').notNull(),
+	createdAtTimestamp: timestamp().notNull(),
 	mintedBy: integer()
 		.notNull()
-		.references(() => usersTable.id), // Référence à l'utilisateur qui a minté
-	transactionHash: varchar({ length: 255 }), // Hash de la transaction de mint
+		.references(() => usersTable.id),
+	transactionHash: varchar({ length: 255 }),
+	address: varchar({ length: 255 }).notNull(),
+	town: varchar({ length: 255 }).notNull(),
+	img: varchar({ length: 255 }).notNull(),
 })
 
 export const modulesTable = pgTable('modules', {

@@ -8,8 +8,8 @@ import { toast } from '@/hooks/use-toast'
 import { z } from 'zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
-import { Form } from '@/components/ui/form'
 import InputFORM from '@/components/shared/form/InputFORM'
 import SelectFORM from '@/components/shared/form/SelectFORM'
 import { useGetManagersUsers } from '@/hooks/queries/manager/managerGetUsers'
@@ -20,6 +20,8 @@ import { EstateManagerArtifact } from '@/constants/artifacts/EstateManager'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { createNft } from '@/actions/manager/CreateNft'
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
+import { Checkbox } from '@/components/ui/checkbox'
 
 /////////////////////////////////////////////////////////
 // ZOD SCHEMA
@@ -35,9 +37,9 @@ const FormSchema = z.object({
 // CreateCreateEstateNftDialog
 /////////////////////////////////////////////////////////
 
-type CreateCreateEstateNftDialogProps = { idEstate; rnbCode; tokenId }
+type CreatePermissionDialogProps = { idEstate; rnbCode; tokenId }
 
-const CreateCreateEstateNftDialog = ({ idEstate, rnbCode, tokenId }: CreateCreateEstateNftDialogProps) => {
+const CreatePermissionDialog = ({ idEstate, rnbCode, tokenId }: CreatePermissionDialogProps) => {
 	const [open, setOpen] = useState(false)
 
 	const { address: currentAccount } = useAccount()
@@ -52,6 +54,12 @@ const CreateCreateEstateNftDialog = ({ idEstate, rnbCode, tokenId }: CreateCreat
 		resolver: zodResolver(FormSchema),
 		defaultValues: { address: '', town: '' },
 	})
+
+	const handleOpenDialog = (e: React.MouseEvent) => {
+		e.preventDefault()
+		e.stopPropagation()
+		setOpen(true)
+	}
 
 	const onSubmit = async (data: z.infer<typeof FormSchema>) => {
 		try {
@@ -125,38 +133,91 @@ const CreateCreateEstateNftDialog = ({ idEstate, rnbCode, tokenId }: CreateCreat
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-				<Button>Ajouter un batiment</Button>
+				<Button variant='outline'>Permission</Button>
 			</DialogTrigger>
 			<DialogContent className='sm:max-w-[425px]'>
 				<DialogHeader>
-					<DialogTitle>Ajouter un nouveau batiment</DialogTitle>
-					<DialogDescription>Entrer les détail du batiment</DialogDescription>
+					<DialogTitle>Assigner des modules</DialogTitle>
+					<DialogDescription>texte explication.</DialogDescription>
 				</DialogHeader>
-				<div className='grid gap-4 py-0'>
+				<div className='grid gap-4 py-4'>
 					<Form {...form}>
-						<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-							<div className='grid w-full items-center gap-4'>
-								<div className='flex flex-col space-y-1.5'>
-									<Label htmlFor='address'>Adresse</Label>
-									<Input id='address' placeholder='Adresse du bâtiment' {...form.register('address')} />
-								</div>
-								<div className='flex flex-col space-y-1.5'>
-									<Label htmlFor='ville'>Ville</Label>
-									<Input id='town' placeholder='Ville du bâtiment' {...form.register('town')} />
-								</div>
+						<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-2'>
+							<FormField
+								control={form.control}
+								name='InterventionManager'
+								render={({ field }) => (
+									<FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
+										<FormControl>
+											<Checkbox checked={field.value} onCheckedChange={field.onChange} />
+										</FormControl>
+										<div className='space-y-1 leading-none'>
+											<FormLabel>Module intervention</FormLabel>
+											<FormDescription>Description du module intervention</FormDescription>
+										</div>
+									</FormItem>
+								)}
+							/>
 
-								<input type='file' {...form.register('file')} />
-							</div>
+							<FormField
+								control={form.control}
+								name='AutreModule'
+								render={({ field }) => (
+									<FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
+										<FormControl>
+											<Checkbox checked={field.value} onCheckedChange={field.onChange} />
+										</FormControl>
+										<div className='space-y-1 leading-none'>
+											<FormLabel>Module notaire</FormLabel>
+											<FormDescription>Démo : ce module n'existe pas</FormDescription>
+										</div>
+									</FormItem>
+								)}
+							/>
 
 							<Button type='submit' className='w-full'>
-								Ajouter
+								Assigner
 							</Button>
 						</form>
 					</Form>
 				</div>
 			</DialogContent>
 		</Dialog>
+
+		// <Dialog open={open} onOpenChange={setOpen}>
+		// 	<DialogTrigger asChild>
+		// 		<Button variant='outline'>Permission</Button>
+		// 	</DialogTrigger>
+		// 	<DialogContent className='sm:max-w-[425px]'>
+		// 		<DialogHeader>
+		// 			<DialogTitle>Ajouter un nouveau batiment</DialogTitle>
+		// 			<DialogDescription>Entrer les détail du batiment</DialogDescription>
+		// 		</DialogHeader>
+		// 		<div className='grid gap-4 py-0'>
+		// 			<Form {...form}>
+		// 				<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+		// 					<div className='grid w-full items-center gap-4'>
+		// 						<div className='flex flex-col space-y-1.5'>
+		// 							<Label htmlFor='address'>Adresse</Label>
+		// 							<Input id='address' placeholder='Adresse du bâtiment' {...form.register('address')} />
+		// 						</div>
+		// 						<div className='flex flex-col space-y-1.5'>
+		// 							<Label htmlFor='ville'>Ville</Label>
+		// 							<Input id='town' placeholder='Ville du bâtiment' {...form.register('town')} />
+		// 						</div>
+
+		// 						<input type='file' {...form.register('file')} />
+		// 					</div>
+
+		// 					<Button type='submit' className='w-full'>
+		// 						Ajouter
+		// 					</Button>
+		// 				</form>
+		// 			</Form>
+		// 		</div>
+		// 	</DialogContent>
+		// </Dialog>
 	)
 }
 
-export default CreateCreateEstateNftDialog
+export default CreatePermissionDialog

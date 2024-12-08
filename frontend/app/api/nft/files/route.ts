@@ -35,7 +35,9 @@ export async function POST(request: NextRequest) {
 
 		// Generate a custom path
 		const fileExtension = getFileExtension(file.name)
-		const customPath = `${idEstate}/${tokenId}/${hashHex}.${fileExtension}`
+		const currentToken = parseInt(tokenId)
+		const nextToken = currentToken + 1
+		const customPath = `${idEstate}/${nextToken}/${hashHex}.${fileExtension}`
 
 		// Upload the file
 		const blob = await put(customPath, buffer, {
@@ -68,7 +70,7 @@ export async function POST(request: NextRequest) {
 		const metadataBuffer = Buffer.from(JSON.stringify(metadata))
 
 		// Upload des métadonnées
-		const metadataPath = `${idEstate}/${tokenId}/metadata.json`
+		const metadataPath = `${idEstate}/${nextToken}/metadata.json`
 		const resMetadata = await put(metadataPath, metadataBuffer, {
 			access: 'public',
 			addRandomSuffix: false,

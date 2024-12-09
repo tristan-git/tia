@@ -1,119 +1,95 @@
 import React, { useEffect, useState } from 'react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import { useForm, useFieldArray } from 'react-hook-form'
 import { z } from 'zod'
 import { useQueryClient } from '@tanstack/react-query'
-import { useAccount, useDeployContract, useTransactionReceipt, useWriteContract } from 'wagmi'
-
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form'
-import { toast } from '@/hooks/use-toast'
+import { Form, FormControl, FormItem, FormLabel } from '@/components/ui/form'
 import { Checkbox } from '@/components/ui/checkbox'
-import { InterventionManagerArtifact } from '@/constants/artifacts/InterventionManager'
-import { addressEstateFactory } from '@/constants/contract'
-import { EstateManagerFactoryArtifact } from '@/constants/artifacts/EstateManagerFactory'
-import { assignModule } from '@/actions/admin/assignModule'
-import { useGetAdminUsers } from '@/hooks/queries/admin/useGetUsers'
+import { toast } from '@/hooks/use-toast'
 import { useGetUsersPrestataire } from '@/hooks/queries/admin/useGetUsersPrestataire'
-
-/////////////////////////////////////////////////////////
-// ZOD SCHEMA
-/////////////////////////////////////////////////////////
+import { useTransactionReceipt, useWriteContract } from 'wagmi'
+import { EstateManagerArtifact } from '@/constants/artifacts/EstateManager'
+import { assignPrestatairePermission } from '@/actions/users/assignPrestatairePermission'
 
 const FormSchema = z.object({
-	InterventionManager: z.boolean().default(false).optional(),
-	AutreModule: z.boolean().default(false).optional(),
+	users: z.array(
+		z.object({
+			id: z.number(),
+			name: z.string(),
+			checked: z.boolean().default(false),
+		})
+	),
 })
 
-/////////////////////////////////////////////////////////
-// COMPONENT
-/////////////////////////////////////////////////////////
+type AssignPermissionProps = { dataNft: any; disabled?: boolean; setOpenMenu: any }
 
-type AssignPermissionProps = { contractAddress: any; disabled?: boolean; setOpenMenu: any }
-
-const AssignPermission = ({ contractAddress, disabled, setOpenMenu }: AssignPermissionProps) => {
-	const { data: users } = useGetUsersPrestataire()
-
-	console.log(users)
-
-	const { address: currentAccount } = useAccount()
+const AssignPermission = ({ dataNft, disabled, setOpenMenu }: AssignPermissionProps) => {
 	const queryClient = useQueryClient()
+	const { data: users } = useGetUsersPrestataire()
 	const [open, setOpen] = useState(false)
-	const { deployContract, data: hashDeployed, isSuccess: isSuccessDeployed } = useDeployContract()
-	const { data: dataDeployedReceipt } = useTransactionReceipt({ hash: hashDeployed })
+
 	const { data: hashWriteContract, isSuccess: isSuccessWrite, writeContract } = useWriteContract()
 	const { data: dataWriteReceipt } = useTransactionReceipt({ hash: hashWriteContract })
 
-	const handleOpenDialog = (e: React.MouseEvent) => {
-		e.preventDefault()
-		e.stopPropagation()
-		setOpen(true)
-	}
-
 	/////////////////////////////////////////////////////////
-	// useForm
+	// React Hook Form Setup
 	/////////////////////////////////////////////////////////
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
-		defaultValues: { AutreModule: false, InterventionManager: true },
+		defaultValues: {
+			users:
+				users?.map((user: any) => ({
+					id: user.id,
+					name: `${user.firstName} ${user.lastName}`,
+					checked: false,
+				})) || [],
+		},
 	})
+
+	const { fields, replace } = useFieldArray({
+		control: form.control,
+		name: 'users',
+	})
+
+	// Mise à jour des utilisateurs si la liste change
+	useEffect(() => {
+		if (users) {
+			replace(
+				users?.map((user: any) => ({
+					id: user.id,
+					name: `${user.firstName} ${user.lastName}`,
+					checked: false,
+				}))
+			)
+		}
+	}, [users, replace])
 
 	/////////////////////////////////////////////////////////
 	// onSubmit
 	/////////////////////////////////////////////////////////
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
-		const { InterventionManager } = data
-		console.log(data)
-		// // Module InterventionManager selected
-		// if (InterventionManager) {
-		// 	deployContract({
-		// 		abi: InterventionManagerArtifact.abi,
-		// 		args: [contractAddress],
-		// 		bytecode: InterventionManagerArtifact.bytecode,
-		// 	})
-		// } else {
-		// 	setOpen(false)
-		// 	setOpenMenu(false)
-		// }
+		const selectedUsers = data.users.filter((user) => user.checked)
+		const selectedUserIds = selectedUsers.map((user) => user.id)
+		const walletAddresses = users?.filter((user) => selectedUserIds.includes(user.id)).map((user) => user.walletAddress)
+
+		const tokenId = dataNft?.tokenId
+		const moduleName = 'InterventionManager'
+
+		if (walletAddresses?.length) {
+			writeContract({
+				address: dataNft?.estateManagerId,
+				abi: EstateManagerArtifact.abi,
+				functionName: 'grantExecuteModuleAccess',
+				args: [tokenId, moduleName, walletAddresses[0] as `0x${string}`],
+			})
+		}
 	}
-
-	/////////////////////////////////////////////////////////
-	// DEPLOYED CONTRACT
-	/////////////////////////////////////////////////////////
-
-	useEffect(() => {
-		// async function handleDeploymentReceipt() {
-		// 	const { InterventionManager } = form.getValues()
-		// 	if (isSuccessDeployed && hashDeployed) {
-		// 		if (dataDeployedReceipt && dataDeployedReceipt?.logs[0]?.address && InterventionManager) {
-		// 			const addressEstateManager = contractAddress
-		// 			const moduleName = 'InterventionManager'
-		// 			const moduleAddress = dataDeployedReceipt.logs[0]?.address
-
-		// 			writeContract({
-		// 				address: addressEstateFactory,
-		// 				abi: EstateManagerFactoryArtifact.abi,
-		// 				functionName: 'registerModuleInManager',
-		// 				args: [addressEstateManager as `0x${string}`, moduleName, moduleAddress],
-		// 			})
-		// 		}
-		// 	}
-		// }
-
-		// handleDeploymentReceipt().catch((err) => {
-		// 	console.error('Error handling deployment receipt:', err)
-		// 	toast({
-		// 		variant: 'destructive',
-		// 		title: 'Error',
-		// 		description: 'An error occurred while processing the transaction receipt.',
-		// 	})
-		// })
-	}, [isSuccessDeployed, hashDeployed, form, dataDeployedReceipt, queryClient])
 
 	/////////////////////////////////////////////////////////
 	// WRITE CONTRACT
@@ -123,41 +99,56 @@ const AssignPermission = ({ contractAddress, disabled, setOpenMenu }: AssignPerm
 		async function handleWriteReceipt() {
 			if (isSuccessWrite && hashWriteContract) {
 				if (dataWriteReceipt && dataWriteReceipt.logs[0]?.address) {
-					const moduleName = 'InterventionManager'
+					const { users: usersForms } = form.getValues()
+					const selectedUsers = usersForms.filter((user) => user.checked)
+					const selectedUserIds = selectedUsers.map((user) => user.id)
+					const walletAddresses = users?.filter((user) => selectedUserIds.includes(user.id)).map((user) => user.walletAddress)
 
-					const moduleData = {
+					const permissionData = {
+						authorizedAddress: walletAddresses[0],
 						moduleName: 'InterventionManager',
-						moduleAddress: dataDeployedReceipt?.logs[0]?.address,
-						addressEstateManager: contractAddress,
-						blockHash: dataDeployedReceipt?.blockHash,
-						blockNumber: dataDeployedReceipt?.blockNumber,
-						timestamp: new Date(),
-						admin: currentAccount,
+						tokenId: dataNft?.tokenId,
+						estateManagerId: dataNft?.estateManagerId,
 					}
 
-					// await assignModule(moduleData)
+					await assignPrestatairePermission(permissionData)
 					form.reset()
 					queryClient.invalidateQueries({ queryKey: ['getManagerEstate'] })
-					toast({ title: 'Module assigné', description: `MODULE: Intervention Manager` })
+					toast({ title: 'permission assignée', description: `permission: assignée` })
 					setOpen(false)
 					setOpenMenu(false)
 				}
 			}
 		}
 
-		// handleWriteReceipt().catch((err) => {
-		// 	console.error('Error handling deployment receipt:', err)
-		// 	toast({
-		// 		variant: 'destructive',
-		// 		title: 'Error',
-		// 		description: 'An error occurred while processing the transaction receipt.',
-		// 	})
-		// })
+		handleWriteReceipt().catch((err) => {
+			console.error('Error handling deployment receipt:', err)
+			toast({
+				variant: 'destructive',
+				title: 'Error',
+				description: 'An error occurred while processing the transaction receipt.',
+			})
+		})
 	}, [isSuccessWrite, hashWriteContract, form, dataWriteReceipt, queryClient])
 
+	/////////////////////////////////////////////////////////
+	// Render Component
+	/////////////////////////////////////////////////////////
+
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
-			<DropdownMenuItem onClick={handleOpenDialog} disabled={disabled}>
+		<Dialog
+			open={open}
+			onOpenChange={(isOpen) => {
+				if (isOpen !== open) setOpen(isOpen)
+			}}
+		>
+			<DropdownMenuItem
+				onClick={(e) => {
+					e.preventDefault()
+					e.stopPropagation()
+					setOpen(true)
+				}}
+			>
 				Permissions interventions
 			</DropdownMenuItem>
 			<DialogContent className='sm:max-w-[425px]'>
@@ -168,40 +159,19 @@ const AssignPermission = ({ contractAddress, disabled, setOpenMenu }: AssignPerm
 				<div className='grid gap-4 py-4'>
 					<Form {...form}>
 						<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-2'>
-							{users?.map((user, i) => (
-								<FormField
-									key={i}
-									control={form.control}
-									name='InterventionManager'
-									render={({ field }) => (
-										<FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
-											<FormControl>
-												<Checkbox checked={field.value} onCheckedChange={field.onChange} />
-											</FormControl>
-											<div className='space-y-1 leading-none'>
-												<FormLabel>{`${user?.firstName} ${user?.lastName}`}</FormLabel>
-												<FormDescription>Prestataire</FormDescription>
-											</div>
-										</FormItem>
-									)}
-								/>
+							{fields.map((field, index) => (
+								<FormItem key={field.id} className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
+									<FormControl>
+										<Checkbox
+											checked={form.watch(`users.${index}.checked`)}
+											onCheckedChange={(value) => form.setValue(`users.${index}.checked`, value as boolean)}
+										/>
+									</FormControl>
+									<div className='space-y-1 leading-none'>
+										<FormLabel>{field.name}</FormLabel>
+									</div>
+								</FormItem>
 							))}
-
-							{/* <FormField
-								control={form.control}
-								name='AutreModule'
-								render={({ field }) => (
-									<FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
-										<FormControl>
-											<Checkbox checked={field.value} onCheckedChange={field.onChange} />
-										</FormControl>
-										<div className='space-y-1 leading-none'>
-											<FormLabel>Module notaire</FormLabel>
-											<FormDescription>Démo : ce module n'existe pas</FormDescription>
-										</div>
-									</FormItem>
-								)}
-							/> */}
 
 							<Button type='submit' className='w-full'>
 								Assigner

@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1733585964051,
-      "tag": "0000_loving_cloak",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1733654445599,
-      "tag": "0001_fair_shaman",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1733655366508,
-      "tag": "0002_empty_jane_foster",
+      "when": 1733729983107,
+      "tag": "0000_mixed_iceman",
       "breakpoints": true
     }
   ]

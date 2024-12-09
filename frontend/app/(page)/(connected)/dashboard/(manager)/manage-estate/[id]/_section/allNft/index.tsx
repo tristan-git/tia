@@ -1,7 +1,6 @@
 import React from 'react'
 import { useGetManagerEstateNft } from '@/hooks/queries/manager/useGetManagerEstateNft'
 import { useAccount } from 'wagmi'
-import Nft from './nft'
 import { DataTableToolbar } from '../tableConf/toolBar'
 import { DataTable } from '@/components/shared/dataTable/data-table'
 import { columns } from '../tableConf/columns'

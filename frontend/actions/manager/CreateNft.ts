@@ -1,7 +1,7 @@
 'use server'
 
 import { db } from '@/drizzle/db'
-import { eq, sql } from 'drizzle-orm'
+import { sql } from 'drizzle-orm'
 import { mintedNFTsTable, usersTable } from '@/drizzle/schema'
 
 export async function createNft(nftData: {

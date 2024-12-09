@@ -96,14 +96,14 @@ export const moduleInterventionManagersTable = pgTable('module_intervention_mana
 })
 
 export const interventionsTable = pgTable('interventions', {
-	id: bigint('id', { mode: 'bigint' }).primaryKey(),
-	moduleId: varchar({ length: 42 })
-		.notNull()
-		.references(() => modulesTable.id),
+	id: integer().primaryKey().generatedAlwaysAsIdentity(),
 	tokenId: bigint('token_id', { mode: 'bigint' }).notNull(),
-	interventionHash: varchar({ length: 255 }).notNull(),
+	title: varchar({ length: 255 }).notNull(),
 	isValidated: boolean().default(false),
-	validateFrom: varchar({ length: 42 }),
+	validateFrom: integer().references(() => usersTable.id),
+	estateManagerId: varchar({ length: 42 })
+		.notNull()
+		.references(() => estateManagersTable.id),
 	createdAtTimestamp: timestamp().notNull(),
 	createdBy: integer()
 		.notNull()
@@ -127,10 +127,16 @@ export const userInterventionAccessTable = pgTable('user_intervention_access', {
 })
 
 export const userModuleAccessTable = pgTable('user_module_access', {
-	id: varchar({ length: 42 }).primaryKey(),
+	id: integer().primaryKey().generatedAlwaysAsIdentity(),
 	moduleName: varchar({ length: 255 }).notNull(),
-	authorizedAddress: varchar({ length: 42 }).notNull(),
+	authorizedAddress: integer()
+		.notNull()
+		.references(() => usersTable.id),
+
 	tokenId: bigint('token_id', { mode: 'bigint' }).notNull(),
+	estateManagerId: varchar({ length: 42 })
+		.notNull()
+		.references(() => estateManagersTable.id),
 	assignedAtTimestamp: timestamp().notNull(),
 	revokedAtTimestamp: timestamp(),
 })

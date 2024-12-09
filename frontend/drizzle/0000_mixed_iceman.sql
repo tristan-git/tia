@@ -15,12 +15,12 @@ CREATE TABLE IF NOT EXISTS "estate_managers" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "interventions" (
-	"id" bigint PRIMARY KEY NOT NULL,
-	"moduleId" varchar(42) NOT NULL,
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "interventions_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"token_id" bigint NOT NULL,
-	"interventionHash" varchar(255) NOT NULL,
+	"title" varchar(255) NOT NULL,
 	"isValidated" boolean DEFAULT false,
-	"validateFrom" varchar(42),
+	"validateFrom" integer,
+	"estateManagerId" varchar(42) NOT NULL,
 	"createdAtTimestamp" timestamp NOT NULL,
 	"createdBy" integer NOT NULL
 );
@@ -33,7 +33,10 @@ CREATE TABLE IF NOT EXISTS "minted_nfts" (
 	"metadata_url" text NOT NULL,
 	"createdAtTimestamp" timestamp NOT NULL,
 	"mintedBy" integer NOT NULL,
-	"transactionHash" varchar(255)
+	"transactionHash" varchar(255),
+	"address" varchar(255) NOT NULL,
+	"town" varchar(255) NOT NULL,
+	"img" varchar(255) NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "module_intervention_managers" (
@@ -62,10 +65,11 @@ CREATE TABLE IF NOT EXISTS "user_intervention_access" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "user_module_access" (
-	"id" varchar(42) PRIMARY KEY NOT NULL,
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "user_module_access_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"moduleName" varchar(255) NOT NULL,
-	"authorizedAddress" varchar(42) NOT NULL,
+	"authorizedAddress" integer NOT NULL,
 	"token_id" bigint NOT NULL,
+	"estateManagerId" varchar(42) NOT NULL,
 	"assignedAtTimestamp" timestamp NOT NULL,
 	"revokedAtTimestamp" timestamp
 );
@@ -92,7 +96,13 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "interventions" ADD CONSTRAINT "interventions_moduleId_modules_id_fk" FOREIGN KEY ("moduleId") REFERENCES "public"."modules"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "interventions" ADD CONSTRAINT "interventions_validateFrom_users_id_fk" FOREIGN KEY ("validateFrom") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "interventions" ADD CONSTRAINT "interventions_estateManagerId_estate_managers_id_fk" FOREIGN KEY ("estateManagerId") REFERENCES "public"."estate_managers"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -147,6 +157,18 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "user_intervention_access" ADD CONSTRAINT "user_intervention_access_userId_users_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "user_module_access" ADD CONSTRAINT "user_module_access_authorizedAddress_users_id_fk" FOREIGN KEY ("authorizedAddress") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "user_module_access" ADD CONSTRAINT "user_module_access_estateManagerId_estate_managers_id_fk" FOREIGN KEY ("estateManagerId") REFERENCES "public"."estate_managers"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

@@ -1,1 +1,0 @@
-ALTER TABLE "minted_nfts" ADD COLUMN "img" varchar(255) NOT NULL;

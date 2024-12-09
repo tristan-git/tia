@@ -1,5 +1,5 @@
 {
-  "id": "7a46549f-1449-4255-a484-baf2b962214c",
+  "id": "b41cc566-bd5c-4da9-a354-e621d4132bd4",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -134,15 +134,20 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "integer",
           "primaryKey": true,
-          "notNull": true
-        },
-        "moduleId": {
-          "name": "moduleId",
-          "type": "varchar(42)",
-          "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "interventions_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
         },
         "token_id": {
           "name": "token_id",
@@ -150,8 +155,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "interventionHash": {
-          "name": "interventionHash",
+        "title": {
+          "name": "title",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
@@ -165,9 +170,15 @@
         },
         "validateFrom": {
           "name": "validateFrom",
-          "type": "varchar(42)",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
+        },
+        "estateManagerId": {
+          "name": "estateManagerId",
+          "type": "varchar(42)",
+          "primaryKey": false,
+          "notNull": true
         },
         "createdAtTimestamp": {
           "name": "createdAtTimestamp",
@@ -184,12 +195,25 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "interventions_moduleId_modules_id_fk": {
-          "name": "interventions_moduleId_modules_id_fk",
+        "interventions_validateFrom_users_id_fk": {
+          "name": "interventions_validateFrom_users_id_fk",
           "tableFrom": "interventions",
-          "tableTo": "modules",
+          "tableTo": "users",
           "columnsFrom": [
-            "moduleId"
+            "validateFrom"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "interventions_estateManagerId_estate_managers_id_fk": {
+          "name": "interventions_estateManagerId_estate_managers_id_fk",
+          "tableFrom": "interventions",
+          "tableTo": "estate_managers",
+          "columnsFrom": [
+            "estateManagerId"
           ],
           "columnsTo": [
             "id"
@@ -279,6 +303,24 @@
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
+        },
+        "address": {
+          "name": "address",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "town": {
+          "name": "town",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "img": {
+          "name": "img",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
@@ -538,9 +580,20 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "varchar(42)",
+          "type": "integer",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "user_module_access_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
         },
         "moduleName": {
           "name": "moduleName",
@@ -550,13 +603,19 @@
         },
         "authorizedAddress": {
           "name": "authorizedAddress",
-          "type": "varchar(42)",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
         "token_id": {
           "name": "token_id",
           "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "estateManagerId": {
+          "name": "estateManagerId",
+          "type": "varchar(42)",
           "primaryKey": false,
           "notNull": true
         },
@@ -574,7 +633,34 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "user_module_access_authorizedAddress_users_id_fk": {
+          "name": "user_module_access_authorizedAddress_users_id_fk",
+          "tableFrom": "user_module_access",
+          "tableTo": "users",
+          "columnsFrom": [
+            "authorizedAddress"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "user_module_access_estateManagerId_estate_managers_id_fk": {
+          "name": "user_module_access_estateManagerId_estate_managers_id_fk",
+          "tableFrom": "user_module_access",
+          "tableTo": "estate_managers",
+          "columnsFrom": [
+            "estateManagerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},

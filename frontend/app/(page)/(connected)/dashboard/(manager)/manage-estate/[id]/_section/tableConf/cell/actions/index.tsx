@@ -37,7 +37,7 @@ export function RowActionsCell<TData>({ row }: DataTableRowActionsProps<TData>) 
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align='end' className='w-[200px]'>
 				<DropdownMenuSeparator />
-				<AssignPermission setOpenMenu={setOpen} contractAddress={row.original.id as any} />
+				<AssignPermission setOpenMenu={setOpen} dataNft={row.original} />
 
 				<DropdownMenuSeparator />
 

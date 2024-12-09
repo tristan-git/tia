@@ -1,5 +1,5 @@
 {
-  "id": "b41cc566-bd5c-4da9-a354-e621d4132bd4",
+  "id": "3e50a168-2191-4189-b30a-134725d9c317",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -155,6 +155,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "indexIntervention": {
+          "name": "indexIntervention",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
         "title": {
           "name": "title",
           "type": "varchar(255)",
@@ -303,6 +309,12 @@
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
+        },
+        "addressInterventionManager": {
+          "name": "addressInterventionManager",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
         },
         "address": {
           "name": "address",

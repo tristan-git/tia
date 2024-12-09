@@ -13,6 +13,7 @@ export async function createNft(nftData: {
 	town: string
 	address: string
 	img: string
+	addressInterventionManager: string
 }) {
 	const user = await db
 		.select({ id: usersTable.id })
@@ -32,5 +33,6 @@ export async function createNft(nftData: {
 		address: nftData.address,
 		town: nftData.town,
 		img: nftData.img,
+		addressInterventionManager: nftData.addressInterventionManager,
 	})
 }

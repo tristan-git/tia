@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { useAccount, useTransactionReceipt, useWriteContract } from 'wagmi'
+import { useAccount, useTransactionReceipt, useWatchContractEvent, useWriteContract } from 'wagmi'
 import { ethers } from 'ethers'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -15,6 +15,7 @@ import { Form } from '@/components/ui/form'
 import InputFORM from '@/components/shared/form/InputFORM'
 import { EstateManagerArtifact } from '@/constants/artifacts/EstateManager'
 import { createIntervention } from '@/actions/intervention/createIntervention'
+import { InterventionManagerArtifact } from '@/constants/artifacts/InterventionManager'
 
 /////////////////////////////////////////////////////////
 // ZOD SCHEMA
@@ -31,9 +32,10 @@ const FormSchema = z.object({
 type CreateInterventionDialogProps = {
 	idEstate: any
 	tokenId: any
+	addressInterventionManager: any
 }
 
-const CreateInterventionDialog = ({ idEstate, tokenId }: CreateInterventionDialogProps) => {
+const CreateInterventionDialog = ({ idEstate, tokenId, addressInterventionManager }: CreateInterventionDialogProps) => {
 	const [open, setOpen] = useState(false)
 
 	const { address: currentAccount } = useAccount()
@@ -41,13 +43,19 @@ const CreateInterventionDialog = ({ idEstate, tokenId }: CreateInterventionDialo
 	const { writeContract, isPending, isSuccess, data: hash, error } = useWriteContract()
 	const { data: dataReceipt } = useTransactionReceipt({ hash })
 
-	console.log(error?.message)
+	/////////////////////////////////////////////////////////
+	// FORM INIT
+	/////////////////////////////////////////////////////////
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		mode: 'all',
 		resolver: zodResolver(FormSchema),
 		defaultValues: { title: '' },
 	})
+
+	/////////////////////////////////////////////////////////
+	// onSubmit
+	/////////////////////////////////////////////////////////
 
 	const onSubmit = async (data: z.infer<typeof FormSchema>) => {
 		try {
@@ -62,27 +70,51 @@ const CreateInterventionDialog = ({ idEstate, tokenId }: CreateInterventionDialo
 				abi: EstateManagerArtifact.abi,
 				functionName: 'executeModule',
 				args: [moduleName, tokenId, fnName, encodedData],
+				account: currentAccount,
 			})
 		} catch (error) {
 			toast({ variant: 'destructive', title: 'Erreur', description: 'Une erreur est survenue.' })
 		}
 	}
 
+	/////////////////////////////////////////////////////////
+	// handleWrite
+	/////////////////////////////////////////////////////////
+
 	useEffect(() => {
 		async function handleWrite() {
-			if (isSuccess && hash) {
+			if (isSuccess && hash && open) {
 				if (dataReceipt && dataReceipt.logs[0]?.address) {
-					const { title } = form.getValues()
+					let tokenIdLOG
+					let titleLOG
+					let createdByLOG
+					let indexInterventionLOG
+
+					if (dataReceipt?.logs) {
+						dataReceipt?.logs.forEach((log, index) => {
+							const iface = new ethers.Interface(InterventionManagerArtifact.abi)
+							const decodedLog = new ethers.Interface(InterventionManagerArtifact.abi).parseLog(log)
+							const parsedLog = iface.parseLog(log)
+							if (decodedLog?.name == 'InterventionAdded') {
+								const args = parsedLog.args
+								tokenIdLOG = args.tokenId.toString()
+								titleLOG = args.title
+								createdByLOG = args.from
+								indexInterventionLOG = args.interventionIndex.toString()
+							}
+						})
+					}
 
 					const createInterventionData = {
-						tokenId: tokenId,
-						title,
+						tokenId: tokenIdLOG,
+						title: titleLOG,
 						estateManagerId: idEstate,
-						createdBy: currentAccount,
+						createdBy: createdByLOG,
+						indexIntervention: indexInterventionLOG,
 					}
 					await createIntervention(createInterventionData)
 					form.reset()
-					queryClient.invalidateQueries({ queryKey: ['useGetManagerEstateNft'] })
+					queryClient.invalidateQueries({ queryKey: ['useGetInterventionsByNft'] })
 					toast({ title: 'Intervention ajouter', description: 'Intervention est bien ajouté' })
 					setOpen(false)
 				}
@@ -107,6 +139,7 @@ const CreateInterventionDialog = ({ idEstate, tokenId }: CreateInterventionDialo
 					<DialogTitle>Créer une intervention</DialogTitle>
 					<DialogDescription>Entrer les détail de l'intervention</DialogDescription>
 				</DialogHeader>
+
 				<div className='grid gap-4 py-0'>
 					<Form {...form}>
 						<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>

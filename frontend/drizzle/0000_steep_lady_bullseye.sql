@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS "estate_managers" (
 CREATE TABLE IF NOT EXISTS "interventions" (
 	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "interventions_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"token_id" bigint NOT NULL,
+	"indexIntervention" integer NOT NULL,
 	"title" varchar(255) NOT NULL,
 	"isValidated" boolean DEFAULT false,
 	"validateFrom" integer,
@@ -34,6 +35,7 @@ CREATE TABLE IF NOT EXISTS "minted_nfts" (
 	"createdAtTimestamp" timestamp NOT NULL,
 	"mintedBy" integer NOT NULL,
 	"transactionHash" varchar(255),
+	"addressInterventionManager" varchar(255) NOT NULL,
 	"address" varchar(255) NOT NULL,
 	"town" varchar(255) NOT NULL,
 	"img" varchar(255) NOT NULL

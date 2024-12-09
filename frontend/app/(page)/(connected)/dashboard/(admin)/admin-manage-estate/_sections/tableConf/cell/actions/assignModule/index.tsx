@@ -82,7 +82,7 @@ const AssignModule = ({ contractAddress, disabled, setOpenMenu }: AddProposalPro
 	useEffect(() => {
 		async function handleDeploymentReceipt() {
 			const { InterventionManager } = form.getValues()
-			if (isSuccessDeployed && hashDeployed) {
+			if (isSuccessDeployed && hashDeployed && open) {
 				if (dataDeployedReceipt && dataDeployedReceipt?.logs[0]?.address && InterventionManager) {
 					const addressEstateManager = contractAddress
 					const moduleName = 'InterventionManager'
@@ -116,8 +116,7 @@ const AssignModule = ({ contractAddress, disabled, setOpenMenu }: AddProposalPro
 		async function handleWriteReceipt() {
 			if (isSuccessWrite && hashWriteContract) {
 				if (dataWriteReceipt && dataWriteReceipt.logs[0]?.address) {
-					const moduleName = 'InterventionManager'
-
+					//  dataDeployedReceipt.logs[0]?.address
 					const moduleData = {
 						moduleName: 'InterventionManager',
 						moduleAddress: dataDeployedReceipt?.logs[0]?.address,

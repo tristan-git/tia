@@ -71,6 +71,7 @@ export const mintedNFTsTable = pgTable('minted_nfts', {
 		.notNull()
 		.references(() => usersTable.id),
 	transactionHash: varchar({ length: 255 }),
+	addressInterventionManager: varchar({ length: 255 }).notNull(),
 	address: varchar({ length: 255 }).notNull(),
 	town: varchar({ length: 255 }).notNull(),
 	img: varchar({ length: 255 }).notNull(),
@@ -98,6 +99,7 @@ export const moduleInterventionManagersTable = pgTable('module_intervention_mana
 export const interventionsTable = pgTable('interventions', {
 	id: integer().primaryKey().generatedAlwaysAsIdentity(),
 	tokenId: bigint('token_id', { mode: 'bigint' }).notNull(),
+	indexIntervention: integer().notNull(),
 	title: varchar({ length: 255 }).notNull(),
 	isValidated: boolean().default(false),
 	validateFrom: integer().references(() => usersTable.id),

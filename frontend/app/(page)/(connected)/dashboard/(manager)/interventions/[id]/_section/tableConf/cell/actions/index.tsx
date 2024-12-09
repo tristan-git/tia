@@ -15,11 +15,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { voteSchema } from '@/app/(page)/(connected)/dashboard/votes/_sections/tableConf/schema'
 import { useAccount } from 'wagmi'
-import AddVoters from './addVoter'
-import UpdateStatus from './updateStatus'
-import AddProposal from './addProposal'
-import { WorkflowStatus } from '@/lib/enum'
-import Vote from './vote'
 
 interface DataTableRowActionsProps<TData> {
 	row: Row<TData>
@@ -27,17 +22,17 @@ interface DataTableRowActionsProps<TData> {
 
 export function RowActionsCell<TData>({ row }: DataTableRowActionsProps<TData>) {
 	const { address } = useAccount()
-	const data = voteSchema.parse(row.original)
-	const [selectedStatus, setSelectedStatus] = useState(data.workflowStatus)
-	const contractAddress = data.id as `0x${string}`
-	const isOwner = checksumAddress(address as `0x${string}`) == checksumAddress(data.owner as `0x${string}`)
-	const isVoter = data?.userVoters?.some(
-		({ userId }) => checksumAddress(userId as `0x${string}`) === checksumAddress(address as `0x${string}`)
-	)
+	// const data = voteSchema.parse(row.original)
+	// const [selectedStatus, setSelectedStatus] = useState(data.workflowStatus)
+	// const contractAddress = data.id as `0x${string}`
+	// const isOwner = checksumAddress(address as `0x${string}`) == checksumAddress(data.owner as `0x${string}`)
+	// const isVoter = data?.userVoters?.some(
+	// 	({ userId }) => checksumAddress(userId as `0x${string}`) === checksumAddress(address as `0x${string}`)
+	// )
 
-	useEffect(() => {
-		setSelectedStatus(data.workflowStatus)
-	}, [data.workflowStatus])
+	// useEffect(() => {
+	// 	setSelectedStatus(data.workflowStatus)
+	// }, [data.workflowStatus])
 
 	const [open, setOpen] = useState(false)
 
@@ -56,37 +51,7 @@ export function RowActionsCell<TData>({ row }: DataTableRowActionsProps<TData>) 
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align='end' className='w-[160px]'>
-				{isOwner && (
-					<AddVoters
-						setOpenMenu={setOpen}
-						contractAddress={contractAddress}
-						disabled={WorkflowStatus.RegisteringVoters !== selectedStatus}
-					/>
-				)}
-
-				<AddProposal
-					setOpenMenu={setOpen}
-					contractAddress={contractAddress}
-					disabled={WorkflowStatus.ProposalsRegistrationStarted !== selectedStatus || !isVoter}
-				/>
-
-				<Vote
-					setOpenMenu={setOpen}
-					disabled={WorkflowStatus.VotingSessionStarted !== selectedStatus || !isVoter || !data?.proposals?.length}
-					contractAddress={contractAddress}
-					dataVote={data}
-				/>
-
 				<DropdownMenuSeparator />
-
-				{isOwner && (
-					<UpdateStatus
-						setOpenMenu={setOpen}
-						selectedStatus={selectedStatus}
-						setSelectedStatus={setSelectedStatus}
-						contractAddress={contractAddress}
-					/>
-				)}
 
 				<DropdownMenuSeparator />
 				<DropdownMenuItem>Close</DropdownMenuItem>

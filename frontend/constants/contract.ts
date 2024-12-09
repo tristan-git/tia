@@ -1,1 +1,1 @@
-export const addressEstateFactory = '0x047F24B6124b8Afc0AD482703DAe55Fc018f1213'
+export const addressEstateFactory = '0x01b760f627a35af62C5fD457aCf9AA16F8629346'

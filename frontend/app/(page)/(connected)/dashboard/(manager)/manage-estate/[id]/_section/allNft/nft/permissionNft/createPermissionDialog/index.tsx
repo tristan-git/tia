@@ -96,6 +96,8 @@ const CreatePermissionDialog = ({ idEstate, rnbCode, tokenId }: CreatePermission
 		}
 	}
 
+	console.log('🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡')
+
 	useEffect(() => {
 		async function handleWrite() {
 			if (isSuccess && hash) {
@@ -111,6 +113,7 @@ const CreatePermissionDialog = ({ idEstate, rnbCode, tokenId }: CreatePermission
 						town,
 						address,
 						img: url.blob.url,
+						addressInterventionManager: dataReceipt.logs[0]?.address,
 					}
 					await createNft(dataNft)
 					form.reset()
@@ -130,6 +133,8 @@ const CreatePermissionDialog = ({ idEstate, rnbCode, tokenId }: CreatePermission
 		})
 	}, [isSuccess, hash, form, dataReceipt])
 
+
+	console.log('🤡🤡🤡1111🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡')
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>

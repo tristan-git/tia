@@ -9,6 +9,7 @@ export async function createIntervention(createInterventionData: {
 	title: string
 	estateManagerId: string
 	createdBy: string
+	indexIntervention: number
 }) {
 	try {
 		const user = await db
@@ -22,6 +23,7 @@ export async function createIntervention(createInterventionData: {
 			estateManagerId: createInterventionData.estateManagerId,
 			createdAtTimestamp: new Date(),
 			createdBy: user[0].id,
+			indexIntervention: createInterventionData.indexIntervention,
 		})
 
 		return { success: true, message: 'intervention created successfully' }

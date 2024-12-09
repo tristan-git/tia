@@ -103,6 +103,7 @@ const CreateCreateEstateNftDialog = ({ idEstate, rnbCode, tokenId }: CreateCreat
 						town,
 						address,
 						img: url.blob.url,
+						addressInterventionManager: dataReceipt.logs[0]?.address,
 					}
 					await createNft(dataNft)
 					form.reset()

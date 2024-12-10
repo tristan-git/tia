@@ -1,6 +1,6 @@
 import { db } from '@/drizzle/db'
 import { eq, sql } from 'drizzle-orm'
-import { documentsTable, interventionsTable, modulesTable } from '@/drizzle/schema'
+import { documentsTable, interventionsTable, modulesTable, usersTable } from '@/drizzle/schema'
 import { NextResponse } from 'next/server'
 
 function serializeBigIntRecursive(obj: any): any {
@@ -32,6 +32,12 @@ export async function POST(req: any) {
 				validateFrom: interventionsTable.validateFrom,
 				createdAtTimestamp: interventionsTable.createdAtTimestamp,
 				createdBy: interventionsTable.createdBy,
+				createdByUser: {
+					id: usersTable.id,
+					walletAddress: usersTable.walletAddress,
+					firstName: usersTable.firstName,
+					lastName: usersTable.lastName,
+				},
 				estateManagerId: interventionsTable.estateManagerId,
 				moduleId: modulesTable.id,
 				documents: sql`COALESCE(
@@ -48,8 +54,9 @@ export async function POST(req: any) {
 			.from(interventionsTable)
 			.leftJoin(documentsTable, eq(documentsTable.interventionId, interventionsTable.id))
 			.leftJoin(modulesTable, eq(modulesTable.estateManagerId, interventionsTable.estateManagerId))
+			.leftJoin(usersTable, eq(usersTable.id, interventionsTable.createdBy))
 			.where(eq(interventionsTable.estateManagerId, idEstate))
-			.groupBy(interventionsTable.id, modulesTable.id)
+			.groupBy(interventionsTable.id, modulesTable.id, usersTable.id)
 
 		if (!interventionsByNft?.length) {
 			return NextResponse.json({ data: [] }, { status: 200 })

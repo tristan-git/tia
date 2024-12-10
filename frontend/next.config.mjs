@@ -38,6 +38,10 @@ const nextConfig = {
 				protocol: 'https',
 				hostname: 'brown-broad-whitefish-602.mypinata.cloud',
 			},
+			{
+				protocol: 'https',
+				hostname: 'ui.shadcn.com',
+			},
 		],
 	},
 }

@@ -1,30 +1,4 @@
-import { bigint, integer, pgTable, text, timestamp, uuid, varchar, boolean } from 'drizzle-orm/pg-core'
-
-// export const usersTable = pgTable('users', {
-// 	id: integer().primaryKey().generatedAlwaysAsIdentity(),
-// 	name: varchar({ length: 255 }).notNull(),
-// 	age: integer().notNull(),
-// 	email: varchar({ length: 255 }).notNull().unique(),
-// })
-
-// export const usersTable2 = pgTable('users2', {
-// 	id: integer().primaryKey().generatedAlwaysAsIdentity(),
-// 	name: varchar({ length: 255 }).notNull(),
-// 	age: integer().notNull(),
-// 	email: varchar({ length: 255 }).notNull().unique(),
-// })
-
-// export const deployments = pgTable('deployments', {
-// 	id: uuid('id').primaryKey().defaultRandom(),
-// 	blockHash: text('block_hash').notNull(),
-// 	blockNumber: bigint('block_number', { mode: 'bigint' }).notNull(),
-// 	contractAddress: text('contract_address').notNull().unique(),
-// 	cumulativeGasUsed: bigint('cumulative_gas_used', { mode: 'bigint' }).notNull(),
-// 	effectiveGasPrice: bigint('effective_gas_price', { mode: 'bigint' }).notNull(),
-// 	fromAddress: text('from_address').notNull(),
-// 	gasUsed: bigint('gas_used', { mode: 'bigint' }).notNull(),
-// 	deploymentDate: timestamp('deployment_date').defaultNow().notNull(),
-// })
+import { bigint, integer, pgTable, text, timestamp, uuid, varchar, boolean, uniqueIndex } from 'drizzle-orm/pg-core'
 
 export const accountRolesTable = pgTable('account_roles', {
 	id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -126,21 +100,40 @@ export const documentsTable = pgTable('documents', {
 		.references(() => usersTable.id),
 })
 
-export const userInterventionAccessTable = pgTable('user_intervention_access', {
-	id: bigint('id', { mode: 'bigint' }).primaryKey(),
-	interventionId: bigint('intervention_id', { mode: 'bigint' })
-		.notNull()
-		.references(() => interventionsTable.id),
-	moduleId: varchar({ length: 42 })
-		.notNull()
-		.references(() => modulesTable.id),
-	tokenId: bigint('token_id', { mode: 'bigint' }).notNull(),
-	userId: integer()
-		.notNull()
-		.references(() => usersTable.id),
-	hasAccess: boolean().notNull(),
-	changedAtTimestamp: timestamp().notNull(),
-})
+// export const userInterventionAccessDocumentTable = pgTable('user_intervention_access_document', {
+// 	id: integer().primaryKey().generatedAlwaysAsIdentity(),
+// 	interventionId: integer()
+// 		.notNull()
+// 		.references(() => interventionsTable.id),
+// 	tokenId: bigint('token_id', { mode: 'bigint' }).notNull(),
+// 	indexIntervention: integer().notNull(),
+// 	estateManagerId: varchar({ length: 42 })
+// 		.notNull()
+// 		.references(() => estateManagersTable.id),
+// 	userId: integer().references(() => usersTable.id),
+// 	changedBy: integer().references(() => usersTable.id),
+// 	hasAccess: boolean().notNull(),
+// 	changedAtTimestamp: timestamp().notNull(),
+// })
+
+export const userInterventionAccessDocumentTable = pgTable(
+	'user_intervention_access_document',
+	{
+		id: integer().primaryKey().generatedAlwaysAsIdentity(),
+		interventionId: integer().notNull(),
+		tokenId: bigint('token_id', { mode: 'bigint' }).notNull(),
+		indexIntervention: integer().notNull(),
+		estateManagerId: varchar({ length: 42 }).notNull(),
+		userId: integer(),
+		changedBy: integer(),
+		hasAccess: boolean().notNull(),
+		changedAtTimestamp: timestamp().notNull(),
+	},
+	(table) => ({
+		// Ajout d'un index unique
+		uniqueIndex: uniqueIndex('user_intervention_access_document_unique').on(table.interventionId, table.userId, table.estateManagerId),
+	})
+)
 
 export const userModuleAccessTable = pgTable('user_module_access', {
 	id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -157,19 +150,19 @@ export const userModuleAccessTable = pgTable('user_module_access', {
 	revokedAtTimestamp: timestamp(),
 })
 
-// export const interventionAccessChangesTable = pgTable('intervention_access_changes', {
-// 	id: bigint().primaryKey(),
-// 	interventionId: bigint()
-// 	  .notNull()
-// 	  .references(() => interventionsTable.id), // Référence à `interventions`
+// export const interventionAccessDocumentTable = pgTable('intervention_access_document', {
+// 	id: integer().primaryKey().generatedAlwaysAsIdentity(),
+// 	interventionId: bigint('intervention_id', { mode: 'bigint' })
+// 		.notNull()
+// 		.references(() => interventionsTable.id),
 // 	moduleId: varchar({ length: 42 })
-// 	  .notNull()
-// 	  .references(() => modulesTable.id), // Référence à `modules`
+// 		.notNull()
+// 		.references(() => modulesTable.id), // Référence à `modules`
 // 	tokenId: bigint().notNull(),
 // 	account: varchar({ length: 42 }).notNull(),
 // 	hasAccess: boolean().notNull(),
 // 	changedAtTimestamp: bigint().notNull(),
 // 	changedBy: varchar({ length: 42 })
-// 	  .notNull()
-// 	  .references(() => usersTable.id), // Référence à `users`
-//   })
+// 		.notNull()
+// 		.references(() => usersTable.id), // Référence à `users`
+// })

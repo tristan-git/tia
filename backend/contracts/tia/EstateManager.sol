@@ -142,6 +142,12 @@ contract EstateManager is ERC721URIStorage, AccessControl {
 
 		tokenExecuteModuleAccess[tokenId][moduleName][authorizedAddress] = true;
 
+		// Donne accees au module au manager
+		if (tokenExecuteModuleAccess[tokenId][moduleName][msg.sender] == false) {
+			tokenExecuteModuleAccess[tokenId][moduleName][msg.sender] = true;
+			emit ModuleRoleAssigned(tokenId, moduleName, msg.sender);
+		}
+
 		emit ModuleRoleAssigned(tokenId, moduleName, authorizedAddress);
 	}
 
@@ -217,14 +223,11 @@ contract EstateManager is ERC721URIStorage, AccessControl {
 		return super.supportsInterface(interfaceId);
 	}
 
-	// ////////////////////////////////////////////////////////////////////
-	// TODO supprimer c pour un test
-	// ////////////////////////////////////////////////////////////////////
 	/**
 	 * @dev Retourne le code RNB du bâtiment ou de la maison.
 	 * @return uint256 Code RNB.
 	 */
-	function getTokenId() external view returns (uint256) {
+	function getNextTokenId() external view returns (uint256) {
 		return _nextTokenId;
 	}
 }

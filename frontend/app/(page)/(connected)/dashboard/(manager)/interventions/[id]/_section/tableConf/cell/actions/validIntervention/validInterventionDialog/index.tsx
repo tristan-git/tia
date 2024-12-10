@@ -87,14 +87,17 @@ const ValidInterventionDialog = ({ dataIntervention, disabled }: ValidInterventi
 	const { address: currentAccount } = useAccount()
 	const { data: users } = useGetAllUsers()
 	const queryClient = useQueryClient()
-	const { writeContract, isPending, isSuccess, data: hash, error } = useWriteContract()
+	const { writeContract, isPending, isSuccess, data: hash, error, failureReason } = useWriteContract()
 	const { data: dataReceipt } = useTransactionReceipt({ hash })
+	const walletPrestataire = users?.filter(({ accountRoleId }) => accountRoleId == dataIntervention?.createdBy)?.[0]?.walletAddress
 
 	const handleOpenDialog = (e: React.MouseEvent) => {
 		e.preventDefault()
 		e.stopPropagation()
 		setOpen(true)
 	}
+
+	console.log(failureReason)
 
 	/////////////////////////////////////////////////////////
 	// Request Blockchain
@@ -104,7 +107,7 @@ const ValidInterventionDialog = ({ dataIntervention, disabled }: ValidInterventi
 		abi: InterventionManagerArtifact.abi,
 		address: dataIntervention?.moduleId,
 		functionName: 'getInterventions',
-		args: [BigInt(dataIntervention?.tokenId), currentAccount as `0x${string}`],
+		args: [BigInt(dataIntervention?.tokenId), walletPrestataire as `0x${string}`],
 		account: currentAccount,
 	})
 
@@ -127,6 +130,7 @@ const ValidInterventionDialog = ({ dataIntervention, disabled }: ValidInterventi
 			const moduleName = 'InterventionManager'
 			const fnName = 'validateIntervention'
 			const encodedData = ethers.AbiCoder.defaultAbiCoder().encode(['uint256'], [parseInt(dataIntervention?.indexIntervention)])
+
 			writeContract({
 				address: dataIntervention?.estateManagerId as `0x${string}`,
 				abi: EstateManagerArtifact.abi,

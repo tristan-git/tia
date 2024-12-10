@@ -18,10 +18,11 @@ const MyEstates = ({ idEstate }: MyEstatesProps) => {
 		functionName: 'getRnbCode',
 	})
 
-	const { data: tokenId } = useReadContract({
+	// TODO ????????
+	const { data: nextTokenId } = useReadContract({
 		abi: EstateManagerArtifact.abi,
 		address: idEstate,
-		functionName: 'getTokenId',
+		functionName: 'getNextTokenId',
 	})
 
 	return (
@@ -31,7 +32,7 @@ const MyEstates = ({ idEstate }: MyEstatesProps) => {
 					<h2 className='text-2xl font-semibold tracking-tight'>{`Votre batiement RNB : ${rnbCode}`}</h2>
 					<p className='text-sm text-muted-foreground'>Manager vos bien immobillier ici</p>
 				</div>
-				<AddEstate idEstate={idEstate} rnbCode={rnbCode} tokenId={tokenId} />
+				<AddEstate idEstate={idEstate} rnbCode={rnbCode} tokenId={nextTokenId} />
 			</div>
 
 			<AllNft idEstate={idEstate} setSelectedNft={setSelectedNft} selectedNft={selectedNft} />

@@ -112,6 +112,20 @@ export const interventionsTable = pgTable('interventions', {
 		.references(() => usersTable.id),
 })
 
+export const documentsTable = pgTable('documents', {
+	id: integer().primaryKey().generatedAlwaysAsIdentity(),
+	interventionId: integer()
+		.notNull()
+		.references(() => interventionsTable.id),
+	title: varchar({ length: 255 }).notNull(),
+	documentHash: varchar({ length: 255 }).notNull(),
+	fileExtension: varchar({ length: 255 }).notNull(),
+	createdAtTimestamp: timestamp().notNull(),
+	createdBy: integer()
+		.notNull()
+		.references(() => usersTable.id),
+})
+
 export const userInterventionAccessTable = pgTable('user_intervention_access', {
 	id: bigint('id', { mode: 'bigint' }).primaryKey(),
 	interventionId: bigint('intervention_id', { mode: 'bigint' })
@@ -142,20 +156,6 @@ export const userModuleAccessTable = pgTable('user_module_access', {
 	assignedAtTimestamp: timestamp().notNull(),
 	revokedAtTimestamp: timestamp(),
 })
-
-//   export const documentsTable = pgTable('documents', {
-// 	id: bigint().primaryKey(),
-// 	interventionId: bigint()
-// 	  .notNull()
-// 	  .references(() => interventionsTable.id), // Référence à `interventions`
-// 	moduleId: varchar({ length: 42 })
-// 	  .notNull()
-// 	  .references(() => modulesTable.id), // Référence à `modules`
-// 	documentHash: varchar({ length: 255 }).notNull(),
-// 	createdBy: varchar({ length: 42 })
-// 	  .notNull()
-// 	  .references(() => usersTable.id), // Référence à `users`
-//   })
 
 // export const interventionAccessChangesTable = pgTable('intervention_access_changes', {
 // 	id: bigint().primaryKey(),

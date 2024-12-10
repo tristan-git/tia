@@ -1,0 +1,1 @@
+export const bucketPath = "https://97tjwcygbwqvo2fa.public.blob.vercel-storage.com"

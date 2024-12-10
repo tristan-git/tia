@@ -17,7 +17,6 @@ type InterventionsByNftProps = {
 
 const InterventionsByNft = ({ idEstate, tokenId }: InterventionsByNftProps) => {
 	const { address: currentAccount } = useAccount()
-
 	const { data } = useGetInterventionsByNft(currentAccount, idEstate, tokenId)
 
 	return <DataTable data={data?.data || []} columns={columns} config={config} />

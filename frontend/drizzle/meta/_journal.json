@@ -8,6 +8,20 @@
       "when": 1733739632549,
       "tag": "0000_steep_lady_bullseye",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1733754829149,
+      "tag": "0001_typical_scrambler",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1733820984960,
+      "tag": "0002_acoustic_king_bedlam",
+      "breakpoints": true
     }
   ]
 }

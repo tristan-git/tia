@@ -1,22 +1,10 @@
 'use client'
 
-import { ColumnDef } from '@tanstack/react-table'
-
-import { Badge } from '@/components/ui/badge'
-import { Vote, voteSchema } from './schema'
-import OwnerCell from './cell/OwnerCell'
-import { statusVotes } from '@/constants/statusVotes'
-import CustomBadge from '@/components/shared/_ui/badge'
-import { RowActionsCell } from './cell/actions'
-import { WorkflowStatus } from '@/lib/enum'
-import NbVotersCell from './cell/NbVotersCell'
-import WinnerDisplay from './cell/winnerDisplay'
-import { checksumAddress } from 'viem'
-import { Cross2Icon } from '@radix-ui/react-icons'
-import { DataTableColumnHeader } from '@/components/shared/dataTable/data-table-column-header'
 import Link from 'next/link'
+import { RowActionsCell } from './cell/actions'
+import { DataTableColumnHeader } from '@/components/shared/dataTable/data-table-column-header'
 
-export const columns: ColumnDef<Vote>[] = [
+export const columns = [
 	{
 		accessorKey: 'id',
 		header: ({ column }) => <DataTableColumnHeader column={column} title='Id' />,
@@ -62,6 +50,15 @@ export const columns: ColumnDef<Vote>[] = [
 		cell: ({ row }) => {
 			const date = new Date(row.getValue('createdAtTimestamp'))
 			return <div className='flex text-xs'>{date.toLocaleString()}</div>
+		},
+	},
+
+	{
+		accessorKey: 'documents',
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Nb documents' />,
+		cell: ({ row }) => {
+			const documents = row.getValue('documents')
+			return <div className='flex text-xs'>{documents?.length}</div>
 		},
 	},
 

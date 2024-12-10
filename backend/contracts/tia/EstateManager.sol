@@ -4,6 +4,7 @@ pragma solidity 0.8.28;
 import '@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol';
 import '@openzeppelin/contracts/access/AccessControl.sol';
 import '@openzeppelin/contracts/utils/Strings.sol';
+
 import 'hardhat/console.sol';
 
 interface IModule {
@@ -17,9 +18,12 @@ contract EstateManager is ERC721URIStorage, AccessControl {
 	// TODO hash dans bytes et pas string
 	// TODO verifier les import inutile dans les contrat
 	// TODO interface IModuleRegistry et IModule dans dautre fichier ?
+
 	address private immutable estateManagerFactoryContract;
 	bytes32 public immutable rnbCode;
 	bytes32 public constant ESTATE_MANAGER_ROLE = keccak256('ESTATE_MANAGER_ROLE');
+
+	uint256 private _nextTokenId;
 
 	// Mapping des modules par leur nom
 	mapping(string => address) private modules;
@@ -28,11 +32,7 @@ contract EstateManager is ERC721URIStorage, AccessControl {
 	mapping(uint256 => mapping(string => mapping(address => bool))) private tokenExecuteModuleAccess;
 
 	event MetadataUpdated(uint256 indexed tokenId, string newMetadataURI);
-	event ModuleRoleAssigned(
-		uint256 indexed tokenId,
-		string indexed moduleName,
-		address indexed authorizedAddress
-	);
+	event ModuleRoleAssigned(uint256 indexed tokenId, string indexed moduleName, address indexed authorizedAddress);
 	event ModuleRoleRevoked(uint256 indexed tokenId, string indexed moduleName, address indexed authorizedAddress);
 	event ModuleRegistered(string indexed moduleName, address indexed moduleAddress);
 	event ModuleUpdated(string indexed moduleName, address indexed oldAddress, address indexed newAddress);
@@ -52,6 +52,7 @@ contract EstateManager is ERC721URIStorage, AccessControl {
 		require(bytes(_rnbCode).length > 0, 'RNB code is required');
 		require(bytes(_rnbCode).length <= 32, 'RNB code must be <= 32 characters');
 
+		_nextTokenId = 1;
 		rnbCode = bytes32(abi.encodePacked(_rnbCode));
 		estateManagerFactoryContract = _estateManagerFactoryContract;
 
@@ -63,22 +64,24 @@ contract EstateManager is ERC721URIStorage, AccessControl {
 	// ////////////////////////////////////////////////////////////////////
 
 	/**
-	 * @dev Permet au admin de minter un nouveau NFT.
+	 * @dev Permet à un administrateur de minter un nouveau NFT avec un ID généré automatiquement.
 	 * @param to Adresse du bénéficiaire.
-	 * @param tokenId ID unique du token.
 	 * @param initialURI URI initial du token.
 	 */
-	function mintNFT(address to, uint256 tokenId, string calldata initialURI) public onlyRole(DEFAULT_ADMIN_ROLE) {
-		_mint(to, tokenId);
-		_setTokenURI(tokenId, initialURI); // Définit l'URI initial
-	}
+	function mintNFT(address to, string calldata initialURI) public onlyRole(ESTATE_MANAGER_ROLE) {
+		require(to != address(0), 'Invalid address');
 
+		uint256 tokenId = _nextTokenId;
+		_mint(to, tokenId);
+		_nextTokenId++;
+		_setTokenURI(tokenId, initialURI);
+	}
 	/**
 	 * @dev Permet de mettre à jour les métadonnées d'un NFT existant.
 	 * @param tokenId ID du token à mettre à jour.
 	 * @param newMetadataURI Nouvelle URI des métadonnées.
 	 */
-	function updateMetadata(uint256 tokenId, string calldata newMetadataURI) external onlyRole(DEFAULT_ADMIN_ROLE) {
+	function updateMetadata(uint256 tokenId, string calldata newMetadataURI) external onlyRole(ESTATE_MANAGER_ROLE) {
 		// require(_exists(tokenId), 'NFT does not exist');
 		_setTokenURI(tokenId, newMetadataURI);
 		emit MetadataUpdated(tokenId, newMetadataURI);
@@ -90,7 +93,6 @@ contract EstateManager is ERC721URIStorage, AccessControl {
 	 * @return string URI des métadonnées.
 	 */
 	function getMetadataURI(uint256 tokenId) external view returns (string memory) {
-		// require(_exists(tokenId), 'NFT does not exist');
 		return tokenURI(tokenId);
 	}
 
@@ -135,7 +137,7 @@ contract EstateManager is ERC721URIStorage, AccessControl {
 		uint256 tokenId,
 		string calldata moduleName,
 		address authorizedAddress
-	) external onlyRole(DEFAULT_ADMIN_ROLE) {
+	) external onlyRole(ESTATE_MANAGER_ROLE) {
 		require(authorizedAddress != address(0), 'Invalid authorized address');
 
 		tokenExecuteModuleAccess[tokenId][moduleName][authorizedAddress] = true;
@@ -153,7 +155,7 @@ contract EstateManager is ERC721URIStorage, AccessControl {
 		uint256 tokenId,
 		string calldata moduleName,
 		address authorizedAddress
-	) external onlyRole(DEFAULT_ADMIN_ROLE) {
+	) external onlyRole(ESTATE_MANAGER_ROLE) {
 		require(tokenExecuteModuleAccess[tokenId][moduleName][authorizedAddress], 'Address not authorized');
 
 		tokenExecuteModuleAccess[tokenId][moduleName][authorizedAddress] = false;
@@ -213,5 +215,16 @@ contract EstateManager is ERC721URIStorage, AccessControl {
 	 */
 	function supportsInterface(bytes4 interfaceId) public view override(ERC721URIStorage, AccessControl) returns (bool) {
 		return super.supportsInterface(interfaceId);
+	}
+
+	// ////////////////////////////////////////////////////////////////////
+	// TODO supprimer c pour un test
+	// ////////////////////////////////////////////////////////////////////
+	/**
+	 * @dev Retourne le code RNB du bâtiment ou de la maison.
+	 * @return uint256 Code RNB.
+	 */
+	function getTokenId() external view returns (uint256) {
+		return _nextTokenId;
 	}
 }

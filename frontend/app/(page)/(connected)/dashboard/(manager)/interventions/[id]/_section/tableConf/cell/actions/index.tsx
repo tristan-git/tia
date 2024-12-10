@@ -1,10 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import {  useState } from 'react'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
-import { checksumAddress } from 'viem'
 import { Row } from '@tanstack/react-table'
-
 import { Button } from '@/components/ui/button'
 import {
 	DropdownMenu,
@@ -13,7 +11,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { voteSchema } from '@/app/(page)/(connected)/dashboard/votes/_sections/tableConf/schema'
+
 import { useAccount } from 'wagmi'
 import AddDocument from './addDocument'
 import ValidIntervention from './validIntervention'

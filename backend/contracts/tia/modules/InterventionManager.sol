@@ -106,12 +106,14 @@ contract InterventionManager {
 		// Vérifie si l'utilisateur a MANAGER_ROLE dans estateManagerContract
 		require(IAccessControl(estateManagerContract).hasRole(ESTATE_MANAGER_ROLE, _from), 'Only a manager can validate');
 
-		uint256 _interventionIndex = abi.decode(_data, (uint256));
+		// uint256 _interventionIndex = abi.decode(_data, (uint256));
 
-		require(_interventionIndex < interventions[_tokenId][_from].length, 'Invalid intervention index');
-		require(interventions[_tokenId][_from][_interventionIndex].isValidated == false, 'Already validated');
+		(uint256 _interventionIndex, address _createdBy) = abi.decode(_data, (uint256, address));
 
-		interventions[_tokenId][_from][_interventionIndex].isValidated = true;
+		require(_interventionIndex < interventions[_tokenId][_createdBy].length, 'Invalid intervention index');
+		require(interventions[_tokenId][_createdBy][_interventionIndex].isValidated == false, 'Already validated');
+
+		interventions[_tokenId][_createdBy][_interventionIndex].isValidated = true;
 
 		emit InterventionValidated(_tokenId, _interventionIndex, _from);
 	}

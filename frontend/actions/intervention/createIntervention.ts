@@ -28,7 +28,7 @@ export async function createIntervention(createInterventionData: {
 
 		return { success: true, message: 'intervention created successfully' }
 	} catch (error) {
-		console.error('Error assigning permission:', error)
+		console.error('Error created intervention:', error)
 		return { success: false, message: 'Error created intervention', error }
 	}
 }

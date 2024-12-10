@@ -100,22 +100,6 @@ export const documentsTable = pgTable('documents', {
 		.references(() => usersTable.id),
 })
 
-// export const userInterventionAccessDocumentTable = pgTable('user_intervention_access_document', {
-// 	id: integer().primaryKey().generatedAlwaysAsIdentity(),
-// 	interventionId: integer()
-// 		.notNull()
-// 		.references(() => interventionsTable.id),
-// 	tokenId: bigint('token_id', { mode: 'bigint' }).notNull(),
-// 	indexIntervention: integer().notNull(),
-// 	estateManagerId: varchar({ length: 42 })
-// 		.notNull()
-// 		.references(() => estateManagersTable.id),
-// 	userId: integer().references(() => usersTable.id),
-// 	changedBy: integer().references(() => usersTable.id),
-// 	hasAccess: boolean().notNull(),
-// 	changedAtTimestamp: timestamp().notNull(),
-// })
-
 export const userInterventionAccessDocumentTable = pgTable(
 	'user_intervention_access_document',
 	{
@@ -149,20 +133,3 @@ export const userModuleAccessTable = pgTable('user_module_access', {
 	assignedAtTimestamp: timestamp().notNull(),
 	revokedAtTimestamp: timestamp(),
 })
-
-// export const interventionAccessDocumentTable = pgTable('intervention_access_document', {
-// 	id: integer().primaryKey().generatedAlwaysAsIdentity(),
-// 	interventionId: bigint('intervention_id', { mode: 'bigint' })
-// 		.notNull()
-// 		.references(() => interventionsTable.id),
-// 	moduleId: varchar({ length: 42 })
-// 		.notNull()
-// 		.references(() => modulesTable.id), // Référence à `modules`
-// 	tokenId: bigint().notNull(),
-// 	account: varchar({ length: 42 }).notNull(),
-// 	hasAccess: boolean().notNull(),
-// 	changedAtTimestamp: bigint().notNull(),
-// 	changedBy: varchar({ length: 42 })
-// 		.notNull()
-// 		.references(() => usersTable.id), // Référence à `users`
-// })

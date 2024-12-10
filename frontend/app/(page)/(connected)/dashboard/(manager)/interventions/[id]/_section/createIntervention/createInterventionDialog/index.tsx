@@ -16,6 +16,7 @@ import InputFORM from '@/components/shared/form/InputFORM'
 import { EstateManagerArtifact } from '@/constants/artifacts/EstateManager'
 import { createIntervention } from '@/actions/intervention/createIntervention'
 import { InterventionManagerArtifact } from '@/constants/artifacts/InterventionManager'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 /////////////////////////////////////////////////////////
 // ZOD SCHEMA
@@ -33,14 +34,15 @@ type CreateInterventionDialogProps = {
 	idEstate: any
 	tokenId: any
 	addressInterventionManager: any
+	disabled: any
 }
 
-const CreateInterventionDialog = ({ idEstate, tokenId, addressInterventionManager }: CreateInterventionDialogProps) => {
+const CreateInterventionDialog = ({ idEstate, tokenId, addressInterventionManager, disabled }: CreateInterventionDialogProps) => {
 	const [open, setOpen] = useState(false)
 
 	const { address: currentAccount } = useAccount()
 	const queryClient = useQueryClient()
-	const { writeContract, isPending, isSuccess, data: hash, error } = useWriteContract()
+	const { writeContract, isPending, isSuccess, data: hash, error, failureReason } = useWriteContract()
 	const { data: dataReceipt } = useTransactionReceipt({ hash })
 
 	/////////////////////////////////////////////////////////
@@ -131,8 +133,8 @@ const CreateInterventionDialog = ({ idEstate, tokenId, addressInterventionManage
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogTrigger asChild>
-				<Button>Creer une intervention</Button>
+			<DialogTrigger asChild disabled={disabled}>
+				{disabled ? <Button disabled={disabled}>Creer une intervention</Button> : <Button>Creer une intervention</Button>}
 			</DialogTrigger>
 			<DialogContent className='sm:max-w-[425px]'>
 				<DialogHeader>

@@ -97,8 +97,6 @@ const ValidInterventionDialog = ({ dataIntervention, disabled }: ValidInterventi
 		setOpen(true)
 	}
 
-	console.log(failureReason)
-
 	/////////////////////////////////////////////////////////
 	// Request Blockchain
 	/////////////////////////////////////////////////////////
@@ -129,7 +127,10 @@ const ValidInterventionDialog = ({ dataIntervention, disabled }: ValidInterventi
 		try {
 			const moduleName = 'InterventionManager'
 			const fnName = 'validateIntervention'
-			const encodedData = ethers.AbiCoder.defaultAbiCoder().encode(['uint256'], [parseInt(dataIntervention?.indexIntervention)])
+			const encodedData = ethers.AbiCoder.defaultAbiCoder().encode(
+				['uint256', 'address'],
+				[parseInt(dataIntervention?.indexIntervention), walletPrestataire]
+			)
 
 			writeContract({
 				address: dataIntervention?.estateManagerId as `0x${string}`,

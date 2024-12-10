@@ -55,7 +55,7 @@ export async function POST(req: any) {
 			.leftJoin(documentsTable, eq(documentsTable.interventionId, interventionsTable.id))
 			.leftJoin(modulesTable, eq(modulesTable.estateManagerId, interventionsTable.estateManagerId))
 			.leftJoin(usersTable, eq(usersTable.id, interventionsTable.createdBy))
-			.where(eq(interventionsTable.estateManagerId, idEstate))
+			.where(sql`${interventionsTable.estateManagerId} = ${idEstate} AND ${interventionsTable.tokenId} = ${BigInt(tokenId)}`)
 			.groupBy(interventionsTable.id, modulesTable.id, usersTable.id)
 
 		if (!interventionsByNft?.length) {
@@ -66,7 +66,7 @@ export async function POST(req: any) {
 
 		return NextResponse.json({ data: serializedData }, { status: 200 })
 	} catch (error) {
-		console.error('Erreur de connexion au réseau:', error)
-		return NextResponse.json({ message: 'Erreur de connexion au réseau', error: error?.message }, { status: 500 })
+		console.error('Erreur get intervention by nft:', error)
+		return NextResponse.json({ message: 'Erreur get intervention by nft', error: error?.message }, { status: 500 })
 	}
 }

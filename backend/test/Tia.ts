@@ -58,7 +58,7 @@ describe('Building Manager Contracts', function () {
 
 		// 2. Déployer un EstateManager via la Factory
 		const rnbCode = 'AB12345' // Exemple de code RNB
-		const tx = await EstateManagerFactory.createEstateManager(tiaAdmin.address, manager.address, rnbCode)
+		const tx = await EstateManagerFactory.createEstateManager(tiaAdmin.address, tiaAdmin.address, rnbCode)
 		await tx.wait()
 		const estateManagerAddress = await EstateManagerFactory.deployedManagers(0)
 
@@ -204,29 +204,30 @@ describe('Building Manager Contracts', function () {
 			const { EstateManager, InterventionManager, tiaAdmin, manager } = await loadFixture(deployBuildingManagerFixture)
 
 			// Mint un NFT
-			await EstateManager.connect(tiaAdmin).mintNFT(tiaAdmin.address, 1, 'vervelBlob')
+			await EstateManager.connect(tiaAdmin).mintNFT(tiaAdmin.address, 'vervelBlob')
 
 			// Assigner un rôle d'accès en écriture au manager pour le module "InterventionManager"
-			await EstateManager.connect(tiaAdmin).grantExecuteModuleAccess(1, 'InterventionManager', manager.address)
+			await EstateManager.connect(tiaAdmin).grantExecuteModuleAccess(1, 'InterventionManager', tiaAdmin.address)
 
 			// Ajouter une intervention
 			const interventionHash = ethers.keccak256(ethers.toUtf8Bytes('Reparation plomberie:Plomberie'))
 			const dataIntervention = ethers.AbiCoder.defaultAbiCoder().encode(['bytes32'], [interventionHash])
 
-			await EstateManager.connect(manager).executeModule('InterventionManager', 1, 'addIntervention', dataIntervention)
+			await EstateManager.connect(tiaAdmin).executeModule('InterventionManager', 1, 'addIntervention', dataIntervention)
 
 			// Ajouter un document à l'intervention
 			const documentHash = ethers.keccak256(ethers.toUtf8Bytes('Plumbing Report:Facture:0xabc123'))
 			const interventionIndex = 0
 			const dataDocument = ethers.AbiCoder.defaultAbiCoder().encode(['uint256', 'bytes32'], [interventionIndex, documentHash])
 
-			await EstateManager.connect(manager).executeModule('InterventionManager', 1, 'addDocument', dataDocument)
+			await EstateManager.connect(tiaAdmin).executeModule('InterventionManager', 1, 'addDocument', dataDocument)
 
 			// Récupérer les interventions associées
-			const interventions = await InterventionManager.getInterventions(1, manager.address)
+			const interventions = await InterventionManager.getInterventions(1, tiaAdmin.address)
 
-			console.log('interventions llall')
-			console.log(interventions)
+			console.log('=================================')
+			console.log(interventions[0].interventionHash)
+			console.log(interventions[0].documents[0].documentHash)
 
 			// Vérifications
 			expect(interventions.length).to.equal(1)
@@ -236,11 +237,11 @@ describe('Building Manager Contracts', function () {
 
 			// Validate the intervention
 			const dataValidate = ethers.AbiCoder.defaultAbiCoder().encode(['uint256'], [0])
-			console.log(dataValidate)
-			await EstateManager.connect(manager).executeModule('InterventionManager', 1, 'validateIntervention', dataValidate)
+
+			await EstateManager.connect(tiaAdmin).executeModule('InterventionManager', 1, 'validateIntervention', dataValidate)
 
 			// Verify intervention validation
-			const validatedIntervention = await InterventionManager.getInterventions(1, manager.address)
+			const validatedIntervention = await InterventionManager.connect(tiaAdmin).getInterventions(1, tiaAdmin.address)
 
 			expect(validatedIntervention[0].isValidated).to.be.true
 		})

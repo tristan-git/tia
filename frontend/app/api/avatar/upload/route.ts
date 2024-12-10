@@ -1,7 +1,7 @@
 import { put } from '@vercel/blob'
 import { NextResponse } from 'next/server'
 
-function getFileExtension(filename) {
+function getFileExtension(filename: any) {
 	const parts = filename.split('.')
 	return parts.length > 1 ? parts.pop().toLowerCase() : '' // Retourne l'extension ou une chaîne vide
 }

@@ -1,26 +1,34 @@
-
-DROP TABLE IF EXISTS "users" CASCADE;
-DROP TABLE IF EXISTS "account_roles" CASCADE;
-DROP TABLE IF EXISTS "estate_managers" CASCADE;
-DROP TABLE IF EXISTS "modules" CASCADE;
-DROP TABLE IF EXISTS "interventions" CASCADE;
-DROP TABLE IF EXISTS "module_intervention_managers" CASCADE;
-DROP TABLE IF EXISTS "user_intervention_access" CASCADE;
-DROP TABLE IF EXISTS "user_module_access" CASCADE;
-
-
-
-INSERT INTO "account_roles" ("name")
-VALUES ('admin'), ('manager'), ('prestataire'), ('viewer');
-
-
-INSERT INTO "users" ("firstName", "lastName", "walletAddress", "accountRoleId")
+DROP TABLE IF EXISTS "public"."users" CASCADE
+DROP TABLE IF EXISTS "public"."user_module_access" CASCADE
+DROP TABLE IF EXISTS "public"."user_intervention_access" CASCADE
+DROP TABLE IF EXISTS "public"."modules" CASCADE
+DROP TABLE IF EXISTS "public"."module_intervention_managers" CASCADE
+DROP TABLE IF EXISTS "public"."interventions" CASCADE
+DROP TABLE IF EXISTS "public"."estate_managers" CASCADE
+DROP TABLE IF EXISTS "public"."account_roles" CASCADE
+INSERT INTO
+	"account_roles" ("name")
 VALUES
-  ('Tristan', 'Admin', '0x734cEf8774dEB4FD18DFe57f010b842941012BBB', 1), -- admin
-  ('Bob', 'Manager', '0x0BeC14837e54F84C4815574967F802a8c3a64d7b', 2), -- manager
-  ('Charlie', 'Prestataire', '0xdD2FD4581271e230360230F9337D5c0430Bf44C0', 3), -- prestataire
-  ('Dave', 'Viewer', '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266', 4) -- viewer
-ON CONFLICT ("walletAddress") DO NOTHING;
+	('admin'),
+	('manager'),
+	('prestataire'),
+	('viewer');
+
+
+INSERT INTO
+	"users" ("firstName", "lastName", "walletAddress", "accountRoleId")
+VALUES
+	('Tristan', 'Admin', '0x734cEf8774dEB4FD18DFe57f010b842941012BBB', 1), -- admin
+	('Bob', 'Manager', '0x0BeC14837e54F84C4815574967F802a8c3a64d7b', 2), -- manager
+	(
+		'Charlie',
+		'Prestataire',
+		'0xdD2FD4581271e230360230F9337D5c0430Bf44C0',
+		3
+	), -- prestataire
+	('Dave', 'Viewer', '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266', 4) -- viewer
+	ON CONFLICT ("walletAddress")
+DO NOTHING;
 
 
 CREATE TABLE IF NOT EXISTS

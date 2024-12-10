@@ -1,0 +1,1 @@
+ALTER TABLE "documents" ADD COLUMN "fileExtension" varchar(255) NOT NULL;

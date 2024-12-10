@@ -1,5 +1,5 @@
 {
-  "id": "46800494-2b88-4e96-9570-7de3ce352957",
+  "id": "3e50a168-2191-4189-b30a-134725d9c317",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -134,15 +134,20 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "integer",
           "primaryKey": true,
-          "notNull": true
-        },
-        "moduleId": {
-          "name": "moduleId",
-          "type": "varchar(42)",
-          "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "interventions_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
         },
         "token_id": {
           "name": "token_id",
@@ -150,8 +155,14 @@
           "primaryKey": false,
           "notNull": true
         },
-        "interventionHash": {
-          "name": "interventionHash",
+        "indexIntervention": {
+          "name": "indexIntervention",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
@@ -165,9 +176,15 @@
         },
         "validateFrom": {
           "name": "validateFrom",
-          "type": "varchar(42)",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
+        },
+        "estateManagerId": {
+          "name": "estateManagerId",
+          "type": "varchar(42)",
+          "primaryKey": false,
+          "notNull": true
         },
         "createdAtTimestamp": {
           "name": "createdAtTimestamp",
@@ -184,12 +201,25 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "interventions_moduleId_modules_id_fk": {
-          "name": "interventions_moduleId_modules_id_fk",
+        "interventions_validateFrom_users_id_fk": {
+          "name": "interventions_validateFrom_users_id_fk",
           "tableFrom": "interventions",
-          "tableTo": "modules",
+          "tableTo": "users",
           "columnsFrom": [
-            "moduleId"
+            "validateFrom"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "interventions_estateManagerId_estate_managers_id_fk": {
+          "name": "interventions_estateManagerId_estate_managers_id_fk",
+          "tableFrom": "interventions",
+          "tableTo": "estate_managers",
+          "columnsFrom": [
+            "estateManagerId"
           ],
           "columnsTo": [
             "id"
@@ -203,6 +233,142 @@
           "tableTo": "users",
           "columnsFrom": [
             "createdBy"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.minted_nfts": {
+      "name": "minted_nfts",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "minted_nfts_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "token_id": {
+          "name": "token_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "estateManagerId": {
+          "name": "estateManagerId",
+          "type": "varchar(42)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ownerAddress": {
+          "name": "ownerAddress",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "metadata_url": {
+          "name": "metadata_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAtTimestamp": {
+          "name": "createdAtTimestamp",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mintedBy": {
+          "name": "mintedBy",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "transactionHash": {
+          "name": "transactionHash",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "addressInterventionManager": {
+          "name": "addressInterventionManager",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "address": {
+          "name": "address",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "town": {
+          "name": "town",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "img": {
+          "name": "img",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "minted_nfts_estateManagerId_estate_managers_id_fk": {
+          "name": "minted_nfts_estateManagerId_estate_managers_id_fk",
+          "tableFrom": "minted_nfts",
+          "tableTo": "estate_managers",
+          "columnsFrom": [
+            "estateManagerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "minted_nfts_ownerAddress_users_id_fk": {
+          "name": "minted_nfts_ownerAddress_users_id_fk",
+          "tableFrom": "minted_nfts",
+          "tableTo": "users",
+          "columnsFrom": [
+            "ownerAddress"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "minted_nfts_mintedBy_users_id_fk": {
+          "name": "minted_nfts_mintedBy_users_id_fk",
+          "tableFrom": "minted_nfts",
+          "tableTo": "users",
+          "columnsFrom": [
+            "mintedBy"
           ],
           "columnsTo": [
             "id"
@@ -426,9 +592,20 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "varchar(42)",
+          "type": "integer",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "user_module_access_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
         },
         "moduleName": {
           "name": "moduleName",
@@ -438,13 +615,19 @@
         },
         "authorizedAddress": {
           "name": "authorizedAddress",
-          "type": "varchar(42)",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
         "token_id": {
           "name": "token_id",
           "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "estateManagerId": {
+          "name": "estateManagerId",
+          "type": "varchar(42)",
           "primaryKey": false,
           "notNull": true
         },
@@ -462,7 +645,34 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "user_module_access_authorizedAddress_users_id_fk": {
+          "name": "user_module_access_authorizedAddress_users_id_fk",
+          "tableFrom": "user_module_access",
+          "tableTo": "users",
+          "columnsFrom": [
+            "authorizedAddress"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "user_module_access_estateManagerId_estate_managers_id_fk": {
+          "name": "user_module_access_estateManagerId_estate_managers_id_fk",
+          "tableFrom": "user_module_access",
+          "tableTo": "estate_managers",
+          "columnsFrom": [
+            "estateManagerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},

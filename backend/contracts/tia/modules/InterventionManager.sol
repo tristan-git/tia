@@ -10,11 +10,12 @@ contract InterventionManager {
 	bytes32 public constant ESTATE_MANAGER_ROLE = keccak256('ESTATE_MANAGER_ROLE');
 
 	struct Document {
+		string title;
 		bytes32 documentHash;
 	}
 
 	struct Intervention {
-		bytes32 interventionHash;
+		string title;
 		Document[] documents;
 		bool isValidated;
 	}
@@ -26,14 +27,8 @@ contract InterventionManager {
 	mapping(uint256 => mapping(uint256 => mapping(address => bool))) private interventionAccess;
 
 	event InterventionManagerInitialized(address indexed estateManagerContract, address indexed from, uint256 timestamp);
-	event InterventionAdded(
-		uint256 indexed tokenId,
-		bytes32 interventionHash,
-		uint256 timestamp,
-		address from,
-		uint256 interventionIndex
-	);
-	event DocumentAdded(uint256 indexed tokenId, uint256 interventionIndex, bytes32 documentHash, address from);
+	event InterventionAdded(uint256 indexed tokenId, string title, uint256 timestamp, address from, uint256 interventionIndex);
+	event DocumentAdded(uint256 indexed tokenId, uint256 interventionIndex, bytes32 documentHash, string title, address from);
 	event InterventionValidated(uint256 indexed tokenId, uint256 interventionIndex, address from);
 	event InterventionAccessChanged(
 		uint256 indexed tokenId,
@@ -79,33 +74,31 @@ contract InterventionManager {
 
 	// Ajouter une intervention
 	function _addIntervention(uint256 _tokenId, address _from, bytes calldata _data) internal {
-		bytes32 _interventionHash = abi.decode(_data, (bytes32));
-
-		require(_interventionHash != bytes32(0), "Hash d'intervention invalide");
+		string memory _title = abi.decode(_data, (string));
 
 		interventions[_tokenId][_from].push();
 		uint256 newIndex = interventions[_tokenId][_from].length - 1;
-		interventions[_tokenId][_from][newIndex].interventionHash = _interventionHash;
+		interventions[_tokenId][_from][newIndex].title = _title;
 
 		// celui qui creer l'intervention a access a lintervention
 		interventionAccess[_tokenId][newIndex][_from] = true;
 
+		emit InterventionAdded(_tokenId, _title, block.timestamp, _from, newIndex);
 		emit InterventionAccessChanged(_tokenId, newIndex, _from, _from, true);
-		emit InterventionAdded(_tokenId, _interventionHash, block.timestamp, _from, newIndex);
 	}
 
 	// Ajouter un document à une intervention spécifique
 	function _addDocument(uint256 _tokenId, address _from, bytes calldata _data) internal {
-		(uint256 _interventionIndex, bytes32 _documentHash) = abi.decode(_data, (uint256, bytes32));
+		(uint256 _interventionIndex, string memory _title, bytes32 _documentHash) = abi.decode(_data, (uint256, string, bytes32));
 
 		require(_documentHash != bytes32(0), 'Hash document invalide');
 
 		require(_interventionIndex < interventions[_tokenId][_from].length, 'Invalid intervention index');
 		require(!interventions[_tokenId][_from][_interventionIndex].isValidated, 'Intervention already validated');
 
-		interventions[_tokenId][_from][_interventionIndex].documents.push(Document({documentHash: _documentHash}));
+		interventions[_tokenId][_from][_interventionIndex].documents.push(Document({documentHash: _documentHash, title: _title}));
 
-		emit DocumentAdded(_tokenId, _interventionIndex, _documentHash, _from);
+		emit DocumentAdded(_tokenId, _interventionIndex, _documentHash, _title, _from);
 	}
 
 	// Valider une intervention par le propriétaire
@@ -113,12 +106,14 @@ contract InterventionManager {
 		// Vérifie si l'utilisateur a MANAGER_ROLE dans estateManagerContract
 		require(IAccessControl(estateManagerContract).hasRole(ESTATE_MANAGER_ROLE, _from), 'Only a manager can validate');
 
-		uint256 _interventionIndex = abi.decode(_data, (uint256));
+		// uint256 _interventionIndex = abi.decode(_data, (uint256));
 
-		require(_interventionIndex < interventions[_tokenId][_from].length, 'Invalid intervention index');
-		require(interventions[_tokenId][_from][_interventionIndex].isValidated == false, 'Already validated');
+		(uint256 _interventionIndex, address _createdBy) = abi.decode(_data, (uint256, address));
 
-		interventions[_tokenId][_from][_interventionIndex].isValidated = true;
+		require(_interventionIndex < interventions[_tokenId][_createdBy].length, 'Invalid intervention index');
+		require(interventions[_tokenId][_createdBy][_interventionIndex].isValidated == false, 'Already validated');
+
+		interventions[_tokenId][_createdBy][_interventionIndex].isValidated = true;
 
 		emit InterventionValidated(_tokenId, _interventionIndex, _from);
 	}

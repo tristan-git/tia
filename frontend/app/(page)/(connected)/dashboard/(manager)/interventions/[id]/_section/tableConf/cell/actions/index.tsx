@@ -17,6 +17,8 @@ import { voteSchema } from '@/app/(page)/(connected)/dashboard/votes/_sections/t
 import { useAccount } from 'wagmi'
 import AddDocument from './addDocument'
 import ValidIntervention from './validIntervention'
+import { useIsManager } from '@/hooks/queries/role/useIsManager'
+import { useIsInterventionPrestataire } from '@/hooks/queries/role/useIsInterventionPrestataire'
 
 interface DataTableRowActionsProps<TData> {
 	row: Row<TData>
@@ -24,8 +26,10 @@ interface DataTableRowActionsProps<TData> {
 
 export function RowActionsCell<TData>({ row }: DataTableRowActionsProps<TData>) {
 	const { address } = useAccount()
-
 	const [open, setOpen] = useState(false)
+	const isManager = useIsManager(address, row?.original?.estateManagerId)
+	const isValidatedIntervention = row?.original?.isValidated
+	const isPrestataire = useIsInterventionPrestataire(row?.original?.estateManagerId, row?.original?.tokenId, address)
 
 	const handleOpenDialog = (e: React.MouseEvent) => {
 		e.preventDefault()
@@ -42,9 +46,9 @@ export function RowActionsCell<TData>({ row }: DataTableRowActionsProps<TData>) 
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align='end' className='w-[160px]'>
-				<AddDocument dataIntervention={row.original} />
+				<AddDocument dataIntervention={row.original} disabled={isValidatedIntervention || !isPrestataire} />
 				<DropdownMenuSeparator />
-				<ValidIntervention dataIntervention={row.original} />
+				<ValidIntervention dataIntervention={row.original} disabled={!isManager || isValidatedIntervention || isPrestataire} />
 				<DropdownMenuSeparator />
 				<DropdownMenuItem>Close</DropdownMenuItem>
 			</DropdownMenuContent>

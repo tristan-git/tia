@@ -33,9 +33,10 @@ const FormSchema = z.object({
 
 type AddDocumentDialogProps = {
 	dataIntervention: any
+	disabled: boolean
 }
 
-const AddDocumentDialog = ({ dataIntervention }: AddDocumentDialogProps) => {
+const AddDocumentDialog = ({ dataIntervention, disabled }: AddDocumentDialogProps) => {
 	const [open, setOpen] = useState(false)
 
 	const { address: currentAccount } = useAccount()
@@ -93,7 +94,7 @@ const AddDocumentDialog = ({ dataIntervention }: AddDocumentDialogProps) => {
 					account: currentAccount,
 				})
 
-				setUrl({ blob: res.blob, documentHash: res.hashHex })
+				setUrl({ blob: res.blob, documentHash: res.hashHex, fileExtension: res.fileExtension })
 			}
 		} catch (error) {
 			toast({ variant: 'destructive', title: 'Erreur', description: 'Une erreur est survenue.' })
@@ -126,7 +127,7 @@ const AddDocumentDialog = ({ dataIntervention }: AddDocumentDialogProps) => {
 						interventionId: parseInt(dataIntervention?.id),
 						title: titleLOG,
 						documentHash: documentHash,
-						fileExtension : url?.fileExtension
+						fileExtension: url?.fileExtension,
 					}
 
 					await createDocument(createDocumentData)
@@ -150,7 +151,9 @@ const AddDocumentDialog = ({ dataIntervention }: AddDocumentDialogProps) => {
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
-			<DropdownMenuItem onClick={handleOpenDialog}>Ajouter un document</DropdownMenuItem>
+			<DropdownMenuItem disabled={disabled} onClick={handleOpenDialog}>
+				Ajouter un document
+			</DropdownMenuItem>
 
 			<DialogContent className='sm:max-w-[425px]'>
 				<DialogHeader>

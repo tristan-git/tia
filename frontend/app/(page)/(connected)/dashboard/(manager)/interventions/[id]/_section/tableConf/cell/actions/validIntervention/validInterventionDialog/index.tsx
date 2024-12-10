@@ -8,33 +8,31 @@ import { toast } from '@/hooks/use-toast'
 import { z } from 'zod'
 import { ethers } from 'ethers'
 import { useQueryClient } from '@tanstack/react-query'
+import { File } from 'lucide-react'
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
-import InputFORM from '@/components/shared/form/InputFORM'
 import { EstateManagerArtifact } from '@/constants/artifacts/EstateManager'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { InterventionManagerArtifact } from '@/constants/artifacts/InterventionManager'
-import { createDocument } from '@/actions/intervention/createDocument'
 import { useGetAllUsers } from '@/hooks/queries/users/useGetAllUsers'
-import { ChevronRight, File } from 'lucide-react'
 import { bucketPath } from '@/constants/bucket'
+import { validIntervention } from '@/actions/intervention/validIntervention'
 
 /////////////////////////////////////////////////////////
 // Document Component
 /////////////////////////////////////////////////////////
 
-const DocumentItem = ({ doc, dataIntervention, index, users }) => {
+const DocumentItem = ({ doc, dataIntervention, index, users }: any) => {
 	const { documents, estateManagerId, tokenId, indexIntervention } = dataIntervention
 	const dataCreated = documents?.[index]?.createdAtTimestamp ? new Date(documents?.[index]?.createdAtTimestamp) : null
 	const { firstName, lastName } = users?.filter(({ id }) => documents?.[index]?.createdBy == id)?.[0] || {}
+	const fileExtension = documents?.[index]?.fileExtension
 
-	console.log('------------')
-	console.log(dataIntervention)
-	console.log(doc)
-
-	const file = `${bucketPath}/${estateManagerId}/${tokenId}/interventions/${indexIntervention}/${doc?.documentHash?.slice(2)}.png`
+	const file = `${bucketPath}/${estateManagerId}/${tokenId}/interventions/${indexIntervention}/${doc?.documentHash?.slice(
+		2
+	)}.${fileExtension}`
 
 	const openImageInNewTab = () => {
 		window.open(file, '_blank')
@@ -80,9 +78,10 @@ const FormSchema = z.object({})
 
 type ValidInterventionDialogProps = {
 	dataIntervention: any
+	disabled: boolean
 }
 
-const ValidInterventionDialog = ({ dataIntervention }: ValidInterventionDialogProps) => {
+const ValidInterventionDialog = ({ dataIntervention, disabled }: ValidInterventionDialogProps) => {
 	const [open, setOpen] = useState(false)
 
 	const { address: currentAccount } = useAccount()
@@ -90,7 +89,6 @@ const ValidInterventionDialog = ({ dataIntervention }: ValidInterventionDialogPr
 	const queryClient = useQueryClient()
 	const { writeContract, isPending, isSuccess, data: hash, error } = useWriteContract()
 	const { data: dataReceipt } = useTransactionReceipt({ hash })
-	const [url, setUrl] = useState({})
 
 	const handleOpenDialog = (e: React.MouseEvent) => {
 		e.preventDefault()
@@ -120,67 +118,83 @@ const ValidInterventionDialog = ({ dataIntervention }: ValidInterventionDialogPr
 		defaultValues: {},
 	})
 
-	const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-		console.log('ici')
+	/////////////////////////////////////////////////////////
+	// onSubmit
+	/////////////////////////////////////////////////////////
+
+	const onSubmit = async (_data: z.infer<typeof FormSchema>) => {
 		try {
-			// writeContract({
-			// 	address: dataIntervention?.estateManagerId as `0x${string}`,
-			// 	abi: EstateManagerArtifact.abi,
-			// 	functionName: 'executeModule',
-			// 	args: [moduleName, dataIntervention?.tokenId, fnName, encodedData],
-			// 	account: currentAccount,
-			// })
+			const moduleName = 'InterventionManager'
+			const fnName = 'validateIntervention'
+			const encodedData = ethers.AbiCoder.defaultAbiCoder().encode(['uint256'], [parseInt(dataIntervention?.indexIntervention)])
+			writeContract({
+				address: dataIntervention?.estateManagerId as `0x${string}`,
+				abi: EstateManagerArtifact.abi,
+				functionName: 'executeModule',
+				args: [moduleName, dataIntervention?.tokenId, fnName, encodedData],
+				account: currentAccount,
+			})
 		} catch (error) {
 			toast({ variant: 'destructive', title: 'Erreur', description: 'Une erreur est survenue.' })
 		}
 	}
 
+	/////////////////////////////////////////////////////////
+	// handleWrite
+	/////////////////////////////////////////////////////////
+
 	useEffect(() => {
-		// async function handleWrite() {
-		// 	if (isSuccess && hash && open) {
-		// 		if (dataReceipt && dataReceipt.logs[0]?.address) {
-		// 			let titleLOG
-		// 			let createdByLOG
-		// 			const documentHash = url?.documentHash
-		// 			if (dataReceipt?.logs) {
-		// 				dataReceipt?.logs.forEach((log, index) => {
-		// 					const iface = new ethers.Interface(InterventionManagerArtifact.abi)
-		// 					const decodedLog = new ethers.Interface(InterventionManagerArtifact.abi).parseLog(log)
-		// 					const parsedLog = iface.parseLog(log)
-		// 					if (decodedLog?.name == 'DocumentAdded') {
-		// 						const args = parsedLog.args
-		// 						titleLOG = args.title
-		// 						createdByLOG = args.from
-		// 					}
-		// 				})
-		// 			}
-		// 			const createDocumentData = {
-		// 				createdBy: createdByLOG,
-		// 				interventionId: parseInt(dataIntervention?.id),
-		// 				title: titleLOG,
-		// 				documentHash: documentHash,
-		// 			}
-		// 			await createDocument(createDocumentData)
-		// 			form.reset()
-		// 			queryClient.invalidateQueries({ queryKey: ['useGetInterventionsByNft'] })
-		// 			toast({ title: 'Document ajouter', description: 'Le document est bien ajouté' })
-		// 			setUrl({})
-		// 			setOpen(false)
-		// 		}
-		// 	}
-		// }
-		// handleWrite().catch((err) => {
-		// 	toast({
-		// 		variant: 'destructive',
-		// 		title: 'Error',
-		// 		description: 'An error occurred while processing the transaction receipt.',
-		// 	})
-		// })
+		async function handleWrite() {
+			if (isSuccess && hash && open) {
+				if (dataReceipt && dataReceipt.logs[0]?.address) {
+					let tokenIdLOG
+					let validatedByLOG
+					let indexInterventionLOG
+
+					if (dataReceipt?.logs) {
+						dataReceipt?.logs.forEach((log, index) => {
+							const iface = new ethers.Interface(InterventionManagerArtifact.abi)
+							const decodedLog = new ethers.Interface(InterventionManagerArtifact.abi).parseLog(log)
+							const parsedLog = iface.parseLog(log)
+							if (decodedLog?.name == 'InterventionValidated') {
+								const args = parsedLog.args
+								tokenIdLOG = args.tokenId.toString()
+								validatedByLOG = args.from
+								indexInterventionLOG = args.interventionIndex.toString()
+							}
+						})
+					}
+
+					const validInterventionData = {
+						validatedBy: validatedByLOG,
+						interventionId: parseInt(dataIntervention?.id),
+						indexIntervention: indexInterventionLOG,
+						tokenId: tokenIdLOG,
+					}
+					await validIntervention(validInterventionData)
+					form.reset()
+					queryClient.invalidateQueries({ queryKey: ['useGetInterventionsByNft'] })
+					toast({ title: 'Intervention validé', description: 'Intervention est bien validé' })
+					setOpen(false)
+				}
+			}
+		}
+		handleWrite().catch((err) => {
+			toast({
+				variant: 'destructive',
+				title: 'Error',
+				description: 'An error occurred while processing the transaction receipt.',
+			})
+			form.reset()
+			setOpen(false)
+		})
 	}, [isSuccess, hash, form, dataReceipt])
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
-			<DropdownMenuItem onClick={handleOpenDialog}>Valider l'intervention</DropdownMenuItem>
+			<DropdownMenuItem disabled={disabled} onClick={handleOpenDialog}>
+				Valider l'intervention
+			</DropdownMenuItem>
 
 			<DialogContent className='sm:max-w-[700px]'>
 				<DialogHeader>

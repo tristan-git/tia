@@ -3,10 +3,11 @@ import ValidInterventionDialog from './validInterventionDialog'
 
 type ValidInterventionProps = {
 	dataIntervention: any
+	disabled: boolean
 }
 
-const ValidIntervention = ({ dataIntervention }: ValidInterventionProps) => {
-	return <ValidInterventionDialog dataIntervention={dataIntervention} />
+const ValidIntervention = ({ dataIntervention, disabled }: ValidInterventionProps) => {
+	return <ValidInterventionDialog dataIntervention={dataIntervention} disabled={disabled} />
 }
 
 export default ValidIntervention

@@ -64,40 +64,41 @@ export async function getManagerEstateNft({ currentAccount, idEstate }) {
 			AND ${userModuleAccessTable.estateManagerId} = ${mintedNFTsTable.estateManagerId}
 		), '[]'
 	  )`.as('userModuleAccess'),
-			
-			
-	  interventions: sql`COALESCE(
-		jsonb_agg(jsonb_build_object(
-		  'id', ${interventionsTable.id},
-		  'indexIntervention', ${interventionsTable.indexIntervention},
-		  'title', ${interventionsTable.title},
-		  'isValidated', ${interventionsTable.isValidated},
-		  'validateFrom', ${interventionsTable.validateFrom},
-		  'createdAtTimestamp', ${interventionsTable.createdAtTimestamp},
-		  'createdBy', ${interventionsTable.createdBy},
-		  'documents', (
-			SELECT COALESCE(
-			  jsonb_agg(jsonb_build_object(
-				'id', ${documentsTable.id},
-				'title', ${documentsTable.title},
-				'documentHash', ${documentsTable.documentHash},
-				'fileExtension', ${documentsTable.fileExtension},
-				'createdAtTimestamp', ${documentsTable.createdAtTimestamp},
-				'createdBy', ${documentsTable.createdBy}
-			  )), '[]'
+
+			interventions: sql`COALESCE(
+		jsonb_agg(DISTINCT jsonb_build_object(
+			'id', ${interventionsTable.id},
+			'indexIntervention', ${interventionsTable.indexIntervention},
+			'title', ${interventionsTable.title},
+			'isValidated', ${interventionsTable.isValidated},
+			'validateFrom', ${interventionsTable.validateFrom},
+			'createdAtTimestamp', ${interventionsTable.createdAtTimestamp},
+			'createdBy', ${interventionsTable.createdBy},
+			'documents', (
+				SELECT COALESCE(
+					jsonb_agg(DISTINCT jsonb_build_object(
+						'id', ${documentsTable.id},
+						'title', ${documentsTable.title},
+						'documentHash', ${documentsTable.documentHash},
+						'fileExtension', ${documentsTable.fileExtension},
+						'createdAtTimestamp', ${documentsTable.createdAtTimestamp},
+						'createdBy', ${documentsTable.createdBy}
+					)), '[]'
+				)
+				FROM ${documentsTable}
+				WHERE ${documentsTable.interventionId} = ${interventionsTable.id}
 			)
-			FROM ${documentsTable}
-			WHERE ${documentsTable.interventionId} = ${interventionsTable.id}
-		  )
 		)) FILTER (WHERE ${interventionsTable.id} IS NOT NULL), '[]'
-	  )`.as('interventions'),
-			
+	)`.as('interventions'),
 		})
 		.from(mintedNFTsTable)
 		.leftJoin(ownerAlias, eq(mintedNFTsTable.ownerAddress, ownerAlias.id))
 		.leftJoin(mintedByAlias, eq(mintedNFTsTable.mintedBy, mintedByAlias.id))
 		.leftJoin(modulesTable, eq(modulesTable.estateManagerId, mintedNFTsTable.estateManagerId))
-		.leftJoin(interventionsTable, eq(mintedNFTsTable.tokenId, interventionsTable.tokenId))
+		.leftJoin(
+			interventionsTable,
+			and(eq(mintedNFTsTable.tokenId, interventionsTable.tokenId), eq(mintedNFTsTable.estateManagerId, interventionsTable.estateManagerId))
+		)
 		.leftJoin(
 			userModuleAccessTable,
 			and(
@@ -110,6 +111,8 @@ export async function getManagerEstateNft({ currentAccount, idEstate }) {
 
 	// Convertir les BigInt en string avant de retourner
 	const serializedData = serializeBigInt(nftsWithDetails)
+
+	console.log(serializedData)
 
 	return serializedData
 }

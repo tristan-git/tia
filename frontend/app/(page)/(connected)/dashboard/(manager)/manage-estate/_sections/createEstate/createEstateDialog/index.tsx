@@ -147,7 +147,7 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 												values: [
 													{ value: 'immeuble', text: 'Immeuble' },
 													{ value: 'Lotissement', text: 'Lotissement' },
-													{ value: 'Résidence Unique', text: 'Résidence Unique' },
+													{ value: 'zone_commerciale', text: 'Zone Commerciale' },
 												],
 											},
 										],

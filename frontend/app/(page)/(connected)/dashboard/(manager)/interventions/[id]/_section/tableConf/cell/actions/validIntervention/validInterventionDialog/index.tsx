@@ -20,6 +20,7 @@ import { useGetAllUsers } from '@/hooks/queries/users/useGetAllUsers'
 import { bucketPath } from '@/constants/bucket'
 import { validIntervention } from '@/actions/intervention/validIntervention'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { EyeOpenIcon, FileIcon, UploadIcon } from '@radix-ui/react-icons'
 
 /////////////////////////////////////////////////////////
 // Document Component
@@ -40,26 +41,34 @@ const DocumentItem = ({ doc, dataIntervention, index, users }: any) => {
 	}
 
 	return (
-		<div className='space-y-2 flex flex-row items-center justify-between rounded-lg border p-4 mb-2'>
-			<div className='space-y-0.5'>
-				<p className='font-bold peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm'>
-					{doc?.title} <span className='text-xs font-light text-muted-foreground'> {dataCreated?.toLocaleString()}</span>
-				</p>
-				<p className='font-light peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-xs'>
-					<span className='text-xs font-bold'>HASH : </span>
-					<span className='text-muted-foreground'>{doc?.documentHash?.slice(2)}</span>
-				</p>
+		<div className='p-4  rounded-lg  items-start justify-between space-y-2 flex flex-row  border mb-2'>
+			<div className='flex items-start space-x-4'>
+				<div className='flex-shrink-0'>
+					<div className='p-2 bg-gray-100 rounded-md'>
+						<FileIcon className='w-6 h-6 text-gray-500' />
+					</div>
+				</div>
 
-				{firstName && lastName && (
-					<p className='font-light peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-xs'>
-						<span className='text-xs font-bold'>Ajouté par : </span>
-						<span className='text-muted-foreground'>{firstName + ' ' + lastName}</span>
+				<div className='space-y-1'>
+					<p className='text-[13px] font-bold uppercase'>
+						{doc?.title}
+						<span className='block text-xs opacity-50 font-light'>{dataCreated?.toLocaleString()}</span>
 					</p>
-				)}
+
+					<p className='text-xs '>
+						<span className='font-semibold'>HASH: </span>
+						{doc?.documentHash?.slice(2)}
+					</p>
+
+					<p className='text-xs '>
+						<span className='font-semibold'>Prestataire: </span>
+						{firstName + ' ' + lastName}
+					</p>
+				</div>
 			</div>
 
-			<Button variant='outline' size='icon' onClick={openImageInNewTab}>
-				<File />
+			<Button variant='outlineDefault' size='icon' onClick={openImageInNewTab}>
+				<UploadIcon />
 			</Button>
 		</div>
 	)
@@ -210,7 +219,7 @@ const ValidInterventionDialog = ({ dataIntervention, disabled }: ValidInterventi
 						<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
 							<div className='grid w-full items-center gap-2'>
 								{data?.[dataIntervention?.indexIntervention]?.documents?.length ? (
-									<ScrollArea className={data?.[dataIntervention?.indexIntervention]?.documents?.length> 3 ? 'h-[305px]' : 'max-h-fit'}>
+									<ScrollArea className={data?.[dataIntervention?.indexIntervention]?.documents?.length > 3 ? 'h-[305px]' : 'max-h-fit'}>
 										{data?.[dataIntervention?.indexIntervention]?.documents?.map((doc, i) => (
 											<DocumentItem key={i} doc={doc} dataIntervention={dataIntervention} index={i} users={users} />
 										))}
@@ -231,6 +240,10 @@ const ValidInterventionDialog = ({ dataIntervention, disabled }: ValidInterventi
 						</form>
 					</Form>
 				</div>
+
+
+
+				
 			</DialogContent>
 		</Dialog>
 	)

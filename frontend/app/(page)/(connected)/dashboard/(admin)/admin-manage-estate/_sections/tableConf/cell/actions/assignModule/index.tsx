@@ -68,7 +68,7 @@ const AssignModuleDialog = ({ setOpenMenu, contractAddress, disabled }: AssignMo
 				</DialogHeader>
 				<div className='grid gap-4 py-0'>
 					<div className='space-y-6'>
-						<ScrollArea className='max-h-96'>
+						<ScrollArea className='h-[280px]'>
 							<div className='grid w-full items-center gap-2'>
 								{listModule?.map((moduleData, i) => (
 									<UpdateModule key={i} moduleData={moduleData} contractAddress={contractAddress} />

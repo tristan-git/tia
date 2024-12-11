@@ -1,6 +1,6 @@
 'use client'
 
-import {  useState } from 'react'
+import { useState } from 'react'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { Row } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
@@ -55,7 +55,7 @@ export function RowActionsCell<TData>({ row }: DataTableRowActionsProps<TData>) 
 			<DropdownMenuContent align='end' className='w-[180px]'>
 				<AddDocument dataIntervention={row.original} disabled={isValidatedIntervention || !isPrestataire} />
 				<PermissionDocument dataIntervention={row.original} disabled={!isManager} />
-				<ValidIntervention dataIntervention={row.original} disabled={!isManager} />
+				<ValidIntervention dataIntervention={row.original} disabled={!isManager || isValidatedIntervention} />
 				<DropdownMenuSeparator />
 				<DropdownMenuItem>Close</DropdownMenuItem>
 			</DropdownMenuContent>

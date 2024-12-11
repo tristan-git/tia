@@ -15,6 +15,7 @@ import {
 import PermissionIntervention from './assignPermission'
 import { useIsManager } from '@/hooks/queries/role/useIsManager'
 import { useAccount } from 'wagmi'
+import { useHaveAccessModule } from '@/hooks/queries/role/usehaveAccessModule'
 
 interface DataTableRowActionsProps<TData> {
 	row: Row<TData>
@@ -24,12 +25,21 @@ export function RowActionsCell<TData>({ row }: DataTableRowActionsProps<TData>) 
 	const { address } = useAccount()
 	const [open, setOpen] = useState(false)
 	const isManager = useIsManager(address, row?.original?.estateManagerId) as boolean
+	const haveAccessModule = useHaveAccessModule({
+		contractAddress: row?.original?.estateManagerId,
+		tokenId: row?.original?.tokenId,
+		userAddress: address as `0x${string}`,
+	})
 
 	const handleOpenDialog = (e: React.MouseEvent) => {
 		e.preventDefault()
 		e.stopPropagation()
 		setOpen(true)
 	}
+
+	console.log('address=======', address)
+	console.log(isManager)
+	console.log(haveAccessModule)
 
 	return (
 		<DropdownMenu open={open} onOpenChange={setOpen}>
@@ -43,6 +53,7 @@ export function RowActionsCell<TData>({ row }: DataTableRowActionsProps<TData>) 
 				<DropdownMenuSeparator />
 
 				<PermissionIntervention dataNft={row.original} disabled={!isManager} />
+				{/* <PermissionIntervention dataNft={row.original} disabled={!isManager || !haveAccessModule} /> */}
 
 				<DropdownMenuSeparator />
 

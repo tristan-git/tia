@@ -24,6 +24,7 @@ export const estateManagersTable = pgTable('estate_managers', {
 		.notNull()
 		.references(() => usersTable.id),
 	rnbCode: varchar({ length: 255 }).notNull(),
+	networkTypes: varchar({ length: 255 }).notNull(),
 	factoryId: varchar({ length: 42 }).notNull(),
 	createdAtBlock: bigint('created_at_block', { mode: 'bigint' }).notNull(),
 	createdAtTransactionHash: varchar({ length: 255 }).notNull(),

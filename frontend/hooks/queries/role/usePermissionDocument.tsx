@@ -8,6 +8,7 @@ export const usePermissionDocument = (contractAddress: any, tokenId: any, userAd
 	const _account = userAddress
 
 	const { data: haveAccess, isError } = useReadContract({
+		scopeKey: 'usePermissionDocument',
 		address: contractAddress,
 		abi: InterventionManagerArtifact?.abi,
 		functionName: 'hasInterventionAccess',

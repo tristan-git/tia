@@ -1,4 +1,5 @@
 import { SquareTerminal } from 'lucide-react'
+import { Share1Icon } from '@radix-ui/react-icons'
 
 import Dashboard from '@/components/shared/dashboard'
 import DashboardContent from './_sections/dashboard/content'
@@ -19,9 +20,9 @@ const dashboardConfig = {
 			roleAccess: 'manager',
 			navMain: [
 				{
-					title: 'Bien immobilier',
+					title: 'Réseaux immobilier',
 					url: '/dashboard/manage-estate',
-					icon: SquareTerminal,
+					icon: Share1Icon,
 					// subNav: [
 					// 	{ title: 'Votes', url: '/dashboard/votes' },
 					// 	{ title: 'subnav2', url: '#' },

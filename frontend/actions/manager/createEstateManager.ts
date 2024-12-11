@@ -1,7 +1,7 @@
 'use server'
 
 import { db } from '@/drizzle/db'
-import { estateManagersTable } from '@/drizzle/schema'
+import { estateManagersTable, usersTable } from '@/drizzle/schema'
 
 export async function createEstateManager(deploymentData: {
 	id: string
@@ -13,6 +13,7 @@ export async function createEstateManager(deploymentData: {
 	blockNumber: bigint
 	transactionHash: string
 	timestamp?: Date
+	networkTypes: any
 }) {
 	try {
 		await db.insert(estateManagersTable).values({
@@ -24,6 +25,7 @@ export async function createEstateManager(deploymentData: {
 			createdAtBlock: deploymentData.blockNumber,
 			createdAtTransactionHash: deploymentData.transactionHash,
 			createdAtTimestamp: deploymentData.timestamp || new Date(),
+			networkTypes: deploymentData.networkTypes || '-',
 		})
 		return { success: true, message: 'Estate manager created successfully' }
 	} catch (error) {

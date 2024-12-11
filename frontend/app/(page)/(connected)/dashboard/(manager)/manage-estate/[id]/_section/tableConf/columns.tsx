@@ -54,7 +54,7 @@ export const columns: ColumnDef<Vote>[] = [
 		cell: ({ row }) => {
 			return (
 				<div className='flex flex-col text-xs'>
-					<div>{row?.original?.town}</div>
+					<div className='font-bold uppercase text-[12px]'>{row?.original?.town}</div>
 					<div>{row.getValue('address')}</div>
 				</div>
 			)

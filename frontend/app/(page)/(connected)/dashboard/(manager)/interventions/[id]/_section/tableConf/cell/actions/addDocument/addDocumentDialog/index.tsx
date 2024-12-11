@@ -12,18 +12,65 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
-import InputFORM from '@/components/shared/form/InputFORM'
 import { EstateManagerArtifact } from '@/constants/artifacts/EstateManager'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { InterventionManagerArtifact } from '@/constants/artifacts/InterventionManager'
 import { createDocument } from '@/actions/intervention/createDocument'
+import SelectFORM from '@/components/shared/form/SelectFORM'
+import { Input } from '@/components/ui/input'
+import { FileIcon } from '@radix-ui/react-icons'
+
+const groups = [
+	{
+		selectLabelText: 'Documents Administratifs',
+		values: [
+			{ value: 'Contrat de location', text: 'Contrat de location' },
+			{ value: 'Attestation d’assurance', text: 'Attestation d’assurance' },
+			{ value: 'Facture', text: 'Facture' },
+			{ value: 'Relevé de charges', text: 'Relevé de charges' },
+		],
+	},
+	{
+		selectLabelText: 'Documents Techniques',
+		values: [
+			{ value: 'Rapport technique', text: 'Rapport technique' },
+			{ value: 'Diagnostic immobilier', text: 'Diagnostic immobilier' },
+			{ value: 'Plan d’architecte', text: 'Plan d’architecte' },
+			{ value: 'Guide d’utilisation', text: 'Guide d’utilisation' },
+		],
+	},
+	{
+		selectLabelText: 'Documents Juridiques',
+		values: [
+			{ value: 'Contrat de prestation', text: 'Contrat de prestation' },
+			{ value: 'Avis d’expulsion', text: 'Avis d’expulsion' },
+			{ value: 'Procès-verbal', text: 'Procès-verbal' },
+		],
+	},
+	{
+		selectLabelText: 'Documents Financiers',
+		values: [
+			{ value: 'Relevé bancaire', text: 'Relevé bancaire' },
+			{ value: 'Bilan comptable', text: 'Bilan comptable' },
+			{ value: 'Quittance de loyer', text: 'Quittance de loyer' },
+		],
+	},
+	{
+		selectLabelText: 'Autres Documents',
+		values: [
+			{ value: 'Photographie', text: 'Photographie' },
+			{ value: 'Vidéo', text: 'Vidéo' },
+			{ value: 'Note manuscrite', text: 'Note manuscrite' },
+		],
+	},
+]
 
 /////////////////////////////////////////////////////////
 // ZOD SCHEMA
 /////////////////////////////////////////////////////////
 
 const FormSchema = z.object({
-	title: z.string().min(2, { message: 'Nom invalide' }),
+	title: z.string().min(2, { message: 'Requis' }),
 	file: z.any(),
 })
 
@@ -63,6 +110,8 @@ const AddDocumentDialog = ({ dataIntervention, disabled }: AddDocumentDialogProp
 
 	const onSubmit = async (data: z.infer<typeof FormSchema>) => {
 		try {
+			console.log('data?.file.length:', data?.file.length)
+			console.log('data?.file.name:', data?.file.name)
 			const formData = new FormData()
 			formData.append('idEstate', dataIntervention?.estateManagerId)
 			formData.append('tokenId', dataIntervention?.tokenId)
@@ -133,7 +182,7 @@ const AddDocumentDialog = ({ dataIntervention, disabled }: AddDocumentDialogProp
 					await createDocument(createDocumentData)
 
 					form.reset()
-					queryClient.invalidateQueries({ queryKey: ['useGetInterventionsByNft'] })
+					queryClient.invalidateQueries({ queryKey: ['useGetInterventionsByNft', 'usePermissionDocument'] })
 					toast({ title: 'Document ajouter', description: 'Le document est bien ajouté' })
 					setUrl({})
 					setOpen(false)
@@ -165,10 +214,19 @@ const AddDocumentDialog = ({ dataIntervention, disabled }: AddDocumentDialogProp
 						<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
 							<div className='grid w-full items-center gap-4'>
 								<div className='grid w-full items-center gap-4'>
-									<InputFORM form={form} name='title' placeholder='Nom du document' className='w-full' />
+									<SelectFORM form={form} name='title' placeholder='Type de document' selectGroup={{ groups }} />
 								</div>
 
-								<input type='file' {...form.register('file')} />
+								<div
+									className='border-2 border-dashed border-gray-200 rounded-lg flex flex-col gap-1 p-6 items-center cursor-pointer'
+									onClick={() => document.getElementById('file')?.click()}
+								>
+									<FileIcon className='w-12 h-12' />
+									<span className='text-sm font-medium text-gray-500'>Cliquer pour importer un document</span>
+									<span className='text-xs text-gray-500'>PDF, image, video..</span>
+
+									<Input id='file' type='file' placeholder='File' {...form.register('file')} className='hidden' />
+								</div>
 							</div>
 
 							<Button type='submit' className='w-full'>

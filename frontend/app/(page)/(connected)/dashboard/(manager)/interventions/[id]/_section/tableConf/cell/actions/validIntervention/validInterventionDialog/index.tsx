@@ -19,6 +19,7 @@ import { InterventionManagerArtifact } from '@/constants/artifacts/InterventionM
 import { useGetAllUsers } from '@/hooks/queries/users/useGetAllUsers'
 import { bucketPath } from '@/constants/bucket'
 import { validIntervention } from '@/actions/intervention/validIntervention'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 /////////////////////////////////////////////////////////
 // Document Component
@@ -39,29 +40,27 @@ const DocumentItem = ({ doc, dataIntervention, index, users }: any) => {
 	}
 
 	return (
-		<div>
-			<div className='space-y-2 flex flex-row items-center justify-between rounded-lg border p-4'>
-				<div className='space-y-0.5'>
-					<p className='font-bold peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm'>
-						{doc?.title} <span className='text-xs font-light text-muted-foreground'> {dataCreated?.toLocaleString()}</span>
-					</p>
+		<div className='space-y-2 flex flex-row items-center justify-between rounded-lg border p-4 mb-2'>
+			<div className='space-y-0.5'>
+				<p className='font-bold peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm'>
+					{doc?.title} <span className='text-xs font-light text-muted-foreground'> {dataCreated?.toLocaleString()}</span>
+				</p>
+				<p className='font-light peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-xs'>
+					<span className='text-xs font-bold'>HASH : </span>
+					<span className='text-muted-foreground'>{doc?.documentHash?.slice(2)}</span>
+				</p>
+
+				{firstName && lastName && (
 					<p className='font-light peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-xs'>
-						<span className='text-xs font-bold'>HASH : </span>
-						<span className='text-muted-foreground'>{doc?.documentHash?.slice(2)}</span>
+						<span className='text-xs font-bold'>Ajouté par : </span>
+						<span className='text-muted-foreground'>{firstName + ' ' + lastName}</span>
 					</p>
-
-					{firstName && lastName && (
-						<p className='font-light peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-xs'>
-							<span className='text-xs font-bold'>Ajouté par : </span>
-							<span className='text-muted-foreground'>{firstName + ' ' + lastName}</span>
-						</p>
-					)}
-				</div>
-
-				<Button variant='outline' size='icon' onClick={openImageInNewTab}>
-					<File />
-				</Button>
+				)}
 			</div>
+
+			<Button variant='outline' size='icon' onClick={openImageInNewTab}>
+				<File />
+			</Button>
 		</div>
 	)
 }
@@ -211,9 +210,11 @@ const ValidInterventionDialog = ({ dataIntervention, disabled }: ValidInterventi
 						<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
 							<div className='grid w-full items-center gap-2'>
 								{data?.[dataIntervention?.indexIntervention]?.documents?.length ? (
-									data?.[dataIntervention?.indexIntervention]?.documents?.map((doc, i) => (
-										<DocumentItem key={i} doc={doc} dataIntervention={dataIntervention} index={i} users={users} />
-									))
+									<ScrollArea className={data?.[dataIntervention?.indexIntervention]?.documents?.length> 3 ? 'h-[305px]' : 'max-h-fit'}>
+										{data?.[dataIntervention?.indexIntervention]?.documents?.map((doc, i) => (
+											<DocumentItem key={i} doc={doc} dataIntervention={dataIntervention} index={i} users={users} />
+										))}
+									</ScrollArea>
 								) : (
 									<div className='flex h-[200px] shrink-0 items-center justify-center rounded-md border border-dashed'>
 										<div className='mx-auto flex max-w-[420px] flex-col items-center justify-center text-center'>

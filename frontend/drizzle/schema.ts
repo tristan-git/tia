@@ -119,17 +119,29 @@ export const userInterventionAccessDocumentTable = pgTable(
 	})
 )
 
-export const userModuleAccessTable = pgTable('user_module_access', {
-	id: integer().primaryKey().generatedAlwaysAsIdentity(),
-	moduleName: varchar({ length: 255 }).notNull(),
-	authorizedAddress: integer()
-		.notNull()
-		.references(() => usersTable.id),
+export const userModuleAccessTable = pgTable(
+	'user_module_access',
+	{
+		id: integer().primaryKey().generatedAlwaysAsIdentity(),
+		moduleName: varchar({ length: 255 }).notNull(),
+		authorizedAddress: integer()
+			.notNull()
+			.references(() => usersTable.id),
 
-	tokenId: bigint('token_id', { mode: 'bigint' }).notNull(),
-	estateManagerId: varchar({ length: 42 })
-		.notNull()
-		.references(() => estateManagersTable.id),
-	assignedAtTimestamp: timestamp().notNull(),
-	revokedAtTimestamp: timestamp(),
-})
+		tokenId: bigint('token_id', { mode: 'bigint' }).notNull(),
+		estateManagerId: varchar({ length: 42 })
+			.notNull()
+			.references(() => estateManagersTable.id),
+		assignedAtTimestamp: timestamp(),
+		revokedAtTimestamp: timestamp(),
+	},
+	(table) => ({
+		// Ajout d'un index unique
+		uniqueIndex: uniqueIndex('user_module_access_unique').on(
+			table.moduleName,
+			table.tokenId,
+			table.estateManagerId,
+			table.authorizedAddress
+		),
+	})
+)

@@ -12,14 +12,18 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import AssignPermission from './assignPermission'
+import PermissionIntervention from './assignPermission'
+import { useIsManager } from '@/hooks/queries/role/useIsManager'
+import { useAccount } from 'wagmi'
 
 interface DataTableRowActionsProps<TData> {
 	row: Row<TData>
 }
 
 export function RowActionsCell<TData>({ row }: DataTableRowActionsProps<TData>) {
+	const { address } = useAccount()
 	const [open, setOpen] = useState(false)
+	const isManager = useIsManager(address, row?.original?.estateManagerId) as boolean
 
 	const handleOpenDialog = (e: React.MouseEvent) => {
 		e.preventDefault()
@@ -37,7 +41,8 @@ export function RowActionsCell<TData>({ row }: DataTableRowActionsProps<TData>) 
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align='end' className='w-[200px]'>
 				<DropdownMenuSeparator />
-				<AssignPermission setOpenMenu={setOpen} dataNft={row.original} />
+
+				<PermissionIntervention dataNft={row.original} disabled={!isManager} />
 
 				<DropdownMenuSeparator />
 

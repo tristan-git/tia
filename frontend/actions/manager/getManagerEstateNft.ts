@@ -30,6 +30,7 @@ export async function getManagerEstateNft({ currentAccount, idEstate }) {
 			createdAtTimestamp: mintedNFTsTable.createdAtTimestamp,
 			addressInterventionManager: mintedNFTsTable.addressInterventionManager,
 			address: mintedNFTsTable.address,
+			estateManagerId: mintedNFTsTable.estateManagerId,
 			town: mintedNFTsTable.town,
 			img: mintedNFTsTable.img,
 			ownerDetails: {

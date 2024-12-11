@@ -36,7 +36,5 @@ export const useGetManagerEstateNft = (currentAccount: any, idEstate: any) => {
 
 			return response.json()
 		},
-		// staleTime: Number.POSITIVE_INFINITY,
-		// refetchInterval: 3_000,
 	})
 }

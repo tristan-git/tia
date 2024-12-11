@@ -5,6 +5,7 @@ import Dashboard from '@/components/shared/dashboard'
 import DashboardContent from './_sections/dashboard/content'
 import DashboardSideBar from './_sections/dashboard/sideBar'
 import DashboardHeader from './_sections/dashboard/header'
+import { CubeIcon ,PersonIcon} from '@radix-ui/react-icons'
 
 /////////////////////////////////////////////////////////
 // dashboard Config
@@ -42,7 +43,7 @@ const dashboardConfig = {
 				{
 					title: 'utilisateurs',
 					url: '/dashboard/manage-users',
-					icon: SquareTerminal,
+					icon: PersonIcon,
 					// subNav: [
 					// 	{ title: 'Votes', url: '/dashboard/votes' },
 					// 	{ title: 'subnav2', url: '#' },
@@ -51,7 +52,7 @@ const dashboardConfig = {
 				{
 					title: 'Assigner module',
 					url: '/dashboard/admin-manage-estate',
-					icon: SquareTerminal,
+					icon: CubeIcon,
 					// subNav: [
 					// 	{ title: 'Votes', url: '/dashboard/votes' },
 					// 	{ title: 'subnav2', url: '#' },

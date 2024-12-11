@@ -1,6 +1,6 @@
 import { db } from '@/drizzle/db'
-import { eq, sql } from 'drizzle-orm'
-import { documentsTable, interventionsTable, modulesTable, usersTable } from '@/drizzle/schema'
+import { aliasedTable, eq, sql } from 'drizzle-orm'
+import { documentsTable, interventionsTable, modulesTable, usersTable, estateManagersTable } from '@/drizzle/schema'
 import { NextResponse } from 'next/server'
 
 function serializeBigIntRecursive(obj: any): any {
@@ -21,6 +21,10 @@ export async function POST(req: any) {
 		const body = await req.json()
 		const { currentAccount, idEstate, tokenId } = body
 
+		// Alias pour les utilisateurs
+		const createdByUser = aliasedTable(usersTable, 'createdByUser')
+		const managerUser = aliasedTable(usersTable, 'managerUser')
+
 		// Récupérer les interventions pour le NFT spécifique
 		const interventionsByNft = await db
 			.select({
@@ -32,12 +36,20 @@ export async function POST(req: any) {
 				validateFrom: interventionsTable.validateFrom,
 				createdAtTimestamp: interventionsTable.createdAtTimestamp,
 				createdBy: interventionsTable.createdBy,
+
 				createdByUser: {
-					id: usersTable.id,
-					walletAddress: usersTable.walletAddress,
-					firstName: usersTable.firstName,
-					lastName: usersTable.lastName,
+					id: createdByUser.id,
+					walletAddress: createdByUser.walletAddress,
+					firstName: createdByUser.firstName,
+					lastName: createdByUser.lastName,
 				},
+				managerDetail: {
+					id: managerUser.id,
+					walletAddress: managerUser.walletAddress,
+					firstName: managerUser.firstName,
+					lastName: managerUser.lastName,
+				},
+
 				estateManagerId: interventionsTable.estateManagerId,
 				moduleId: modulesTable.id,
 				documents: sql`COALESCE(
@@ -54,9 +66,11 @@ export async function POST(req: any) {
 			.from(interventionsTable)
 			.leftJoin(documentsTable, eq(documentsTable.interventionId, interventionsTable.id))
 			.leftJoin(modulesTable, eq(modulesTable.estateManagerId, interventionsTable.estateManagerId))
-			.leftJoin(usersTable, eq(usersTable.id, interventionsTable.createdBy))
+			.leftJoin(createdByUser, eq(createdByUser.id, interventionsTable.createdBy))
+			.leftJoin(estateManagersTable, eq(estateManagersTable.id, interventionsTable.estateManagerId))
+			.leftJoin(managerUser, eq(managerUser.id, estateManagersTable.managerId))
 			.where(sql`${interventionsTable.estateManagerId} = ${idEstate} AND ${interventionsTable.tokenId} = ${BigInt(tokenId)}`)
-			.groupBy(interventionsTable.id, modulesTable.id, usersTable.id)
+			.groupBy(interventionsTable.id, modulesTable.id, createdByUser.id, managerUser.id, estateManagersTable.id)
 
 		if (!interventionsByNft?.length) {
 			return NextResponse.json({ data: [] }, { status: 200 })

@@ -3,6 +3,8 @@
 import Link from 'next/link'
 import { RowActionsCell } from './cell/actions'
 import { DataTableColumnHeader } from '@/components/shared/dataTable/data-table-column-header'
+import { Badge } from '@/components/ui/badge'
+import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
 
 export const columns = [
 	{
@@ -40,16 +42,19 @@ export const columns = [
 		accessorKey: 'isValidated',
 		header: ({ column }) => <DataTableColumnHeader column={column} title='Valider' />,
 		cell: ({ row }) => {
-			return <div className=' text-xs'>{row.getValue('isValidated') ? 'oui' : 'non'}</div>
-		},
-	},
-
-	{
-		accessorKey: 'createdAtTimestamp',
-		header: ({ column }) => <DataTableColumnHeader column={column} title='Creer le' />,
-		cell: ({ row }) => {
-			const date = new Date(row.getValue('createdAtTimestamp'))
-			return <div className='flex text-xs'>{date.toLocaleString()}</div>
+			return (
+				<div className=' text-xs'>
+					{row.getValue('isValidated') ? (
+						<Badge variant='green' className='flex items-center space-x-1 w-fit'>
+							<div>OUI</div>
+						</Badge>
+					) : (
+						<Badge variant='red' className='flex items-center space-x-1 w-fit'>
+							<div>NON</div>
+						</Badge>
+					)}
+				</div>
+			)
 		},
 	},
 
@@ -59,6 +64,33 @@ export const columns = [
 		cell: ({ row }) => {
 			const documents = row.getValue('documents')
 			return <div className='flex text-xs'>{documents?.length}</div>
+		},
+	},
+
+	{
+		accessorKey: 'createdByUser',
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Créer par' />,
+		cell: ({ row }) => {
+			const createdByUser = row.getValue('createdByUser')
+			return <div className='flex text-xs'>{`${createdByUser?.firstName} ${createdByUser?.lastName}`}</div>
+		},
+	},
+
+	{
+		accessorKey: 'managerDetail',
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Manager' />,
+		cell: ({ row }) => {
+			const managerDetail = row.getValue('managerDetail')
+			return <div className='flex text-xs'>{`${managerDetail?.firstName} ${managerDetail?.lastName}`}</div>
+		},
+	},
+
+	{
+		accessorKey: 'createdAtTimestamp',
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Creer le' />,
+		cell: ({ row }) => {
+			const date = new Date(row.getValue('createdAtTimestamp'))
+			return <div className='flex text-xs'>{date.toLocaleString()}</div>
 		},
 	},
 

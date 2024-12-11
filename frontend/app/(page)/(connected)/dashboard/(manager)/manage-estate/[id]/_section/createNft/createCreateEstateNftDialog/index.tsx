@@ -35,9 +35,14 @@ const FormSchema = z.object({
 // CreateCreateEstateNftDialog
 /////////////////////////////////////////////////////////
 
-type CreateCreateEstateNftDialogProps = { idEstate; rnbCode; tokenId }
+type CreateCreateEstateNftDialogProps = {
+	idEstate: any
+	rnbCode: any
+	tokenId: any
+	disabled: any
+}
 
-const CreateCreateEstateNftDialog = ({ idEstate, rnbCode, tokenId }: CreateCreateEstateNftDialogProps) => {
+const CreateCreateEstateNftDialog = ({ idEstate, rnbCode, tokenId, disabled }: CreateCreateEstateNftDialogProps) => {
 	const [open, setOpen] = useState(false)
 
 	const { address: currentAccount } = useAccount()
@@ -125,7 +130,7 @@ const CreateCreateEstateNftDialog = ({ idEstate, rnbCode, tokenId }: CreateCreat
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogTrigger asChild>
+			<DialogTrigger asChild disabled={disabled}>
 				<Button>Ajouter un batiment</Button>
 			</DialogTrigger>
 			<DialogContent className='sm:max-w-[425px]'>

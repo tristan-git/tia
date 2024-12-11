@@ -18,8 +18,11 @@ import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui
 import { useAccount, useDisconnect } from 'wagmi'
 import ButtonWalletConnect from './ButtonWalletConnect'
 import { useAccountModal, useChainModal, useConnectModal } from '@rainbow-me/rainbowkit'
+import { useContext } from 'react'
+import { BlockchainContext } from '@/components/provider/blockchainProvider'
 
 export default function WalletConnect() {
+	const { userAccount } = useContext(BlockchainContext)
 	const { address, isConnected } = useAccount()
 	const { openAccountModal } = useAccountModal()
 	const { openChainModal } = useChainModal()
@@ -40,13 +43,13 @@ export default function WalletConnect() {
 								>
 									<Avatar className='h-8 w-8 rounded-lg'>
 										<div className='flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground'>
-											<CircleUser className='h-6 w-6 rounded-lg' />
+											<img className='aspect-square h-full w-full' alt='Avatar' src='https://ui.shadcn.com/avatars/02.png'></img>
 										</div>
 									</Avatar>
 
 									<div className='grid flex-1 text-left text-sm leading-tight'>
-										<span className='truncate font-semibold'>{'tristan'}</span>
-										<span className='truncate text-xs'>{address}</span>
+										<span className='truncate font-semibold max-w-30'>{`${userAccount?.firstName} ${userAccount?.lastName}`}</span>
+										<span className='truncate text-xs'>{userAccount?.roleName}</span>
 									</div>
 									<ChevronsUpDown className='ml-auto size-4' />
 								</SidebarMenuButton>
@@ -61,13 +64,13 @@ export default function WalletConnect() {
 									<div className='flex items-center gap-2 px-1 py-1.5 text-left text-sm'>
 										<Avatar className='h-8 w-8 rounded-lg'>
 											<div className='flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground'>
-												<CircleUser className='h-6 w-6 rounded-lg' />
+												<img className='aspect-square h-full w-full' alt='Avatar' src='https://ui.shadcn.com/avatars/02.png'></img>
 											</div>
 										</Avatar>
 
 										<div className='grid flex-1 text-left text-sm leading-tight'>
-											<span className='truncate font-semibold'>{'tristan'}</span>
-											<span className='truncate text-xs'>{address}</span>
+											<span className='truncate font-semibold max-w-30'>{`${userAccount?.firstName} ${userAccount?.lastName}`}</span>
+											<span className='truncate text-xs'>{userAccount?.roleName}</span>
 										</div>
 									</div>
 								</DropdownMenuLabel>

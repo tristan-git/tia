@@ -10,8 +10,6 @@ import AddEstate from './createNft'
 type MyEstatesProps = { idEstate: `0x${string}` }
 
 const MyEstates = ({ idEstate }: MyEstatesProps) => {
-	const [selectedNft, setSelectedNft] = useState(null)
-
 	const { data: rnbCode } = useReadContract({
 		abi: EstateManagerArtifact.abi,
 		address: idEstate,
@@ -35,7 +33,7 @@ const MyEstates = ({ idEstate }: MyEstatesProps) => {
 				<AddEstate idEstate={idEstate} rnbCode={rnbCode} tokenId={nextTokenId} />
 			</div>
 
-			<AllNft idEstate={idEstate} setSelectedNft={setSelectedNft} selectedNft={selectedNft} />
+			<AllNft idEstate={idEstate} />
 		</>
 	)
 }

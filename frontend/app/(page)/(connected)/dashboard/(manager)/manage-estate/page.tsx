@@ -18,6 +18,7 @@ const config = {
 export default function ManageEstate() {
 	const { data } = useGetManagerEstate()
 
+	
 	return (
 		<>
 			<div className='container max-w-screen-xl overflow-hidden p-4'>

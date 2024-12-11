@@ -6,6 +6,8 @@ import { Vote, voteSchema } from './schema'
 import { RowActionsCell } from './cell/actions'
 import { DataTableColumnHeader } from '@/components/shared/dataTable/data-table-column-header'
 import Link from 'next/link'
+import { Badge } from '@/components/ui/badge'
+import { PersonIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons'
 
 export const columns: ColumnDef<Vote>[] = [
 	{
@@ -31,7 +33,7 @@ export const columns: ColumnDef<Vote>[] = [
 			return (
 				<div className=' text-xs'>
 					<Link href={`/dashboard/interventions/${row.getValue('id')}`} className='hover:underline underline-offset-4 '>
-						<Image src={row.getValue('img')} width={80} height={80} className='object-cover h-18 w-18' />
+						<Image src={row.getValue('img')} width={80} height={80} className='object-none h-12 w-12 rounded-sm' />
 					</Link>
 				</div>
 			)
@@ -50,14 +52,81 @@ export const columns: ColumnDef<Vote>[] = [
 		accessorKey: 'address',
 		header: ({ column }) => <DataTableColumnHeader column={column} title='Address' />,
 		cell: ({ row }) => {
-			return <div className='flex text-xs'>{row.getValue('address')}</div>
+			return (
+				<div className='flex flex-col text-xs'>
+					<div>{row?.original?.town}</div>
+					<div>{row.getValue('address')}</div>
+				</div>
+			)
 		},
 	},
+
 	{
-		accessorKey: 'town',
-		header: ({ column }) => <DataTableColumnHeader column={column} title='Ville' />,
+		accessorKey: 'modules',
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Module' />,
 		cell: ({ row }) => {
-			return <div className='flex text-xs'>{row.getValue('town')}</div>
+			const nbModule = row.getValue('modules')
+
+			return nbModule?.length ? (
+				<div className=' text-xs'>
+					<Badge variant='outline'>Intervention</Badge>
+				</div>
+			) : (
+				<Badge variant='red'>Aucun module assigné</Badge>
+			)
+		},
+	},
+
+	{
+		accessorKey: 'interventions',
+		header: ({ column }) => <DataTableColumnHeader column={column} title='nb interventions' />,
+		cell: ({ row }) => {
+			const interventions = row.getValue('interventions')
+
+			return interventions?.length ? (
+				<div className='flex items-center text-xs'>
+					<div>{`${interventions?.length}`}</div>
+				</div>
+			) : (
+				<div className='flex items-center text-xs'>
+					<div>0</div>
+				</div>
+			)
+		},
+	},
+
+	{
+		accessorKey: 'userModuleAccess',
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Permission intervention' />,
+		cell: ({ row }) => {
+			const userModuleAccess = row.getValue('userModuleAccess')
+
+			return userModuleAccess?.length ? (
+				<div className='flex items-center text-xs'>
+					<Badge variant='outline' className='flex items-center space-x-1 w-fit'>
+						<PersonIcon className='h-4 w-3 ' />
+						<div>{`${userModuleAccess?.length} utilisateurs`}</div>
+					</Badge>
+				</div>
+			) : (
+				<Badge variant='red' className='flex items-center space-x-1 w-fit'>
+					<ExclamationTriangleIcon className='h-4 w-3' />
+					<div>Aucune permissions</div>
+				</Badge>
+			)
+		},
+	},
+
+	{
+		accessorKey: 'mintedByDetail',
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Manager' />,
+		cell: ({ row }) => {
+			const { firstName, lastName } = row.getValue('mintedByDetail') || {}
+			return (
+				<div className='flex flex-col text-xs'>
+					<div>{`${firstName} ${lastName}`}</div>
+				</div>
+			)
 		},
 	},
 

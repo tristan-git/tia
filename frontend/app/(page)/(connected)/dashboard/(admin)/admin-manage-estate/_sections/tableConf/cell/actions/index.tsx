@@ -12,7 +12,8 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import AssignModule from './assignModule'
+
+import AssignModuleDialog from './assignModule'
 
 interface DataTableRowActionsProps<TData> {
 	row: Row<TData>
@@ -35,9 +36,8 @@ export function RowActionsCell<TData>({ row }: DataTableRowActionsProps<TData>) 
 					<span className='sr-only'>Open menu</span>
 				</Button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent align='end' className='w-[160px]'>
-				<DropdownMenuSeparator />
-				<AssignModule setOpenMenu={setOpen} contractAddress={row.original.id as any} />
+			<DropdownMenuContent align='end' className='w-[200px]'>
+				<AssignModuleDialog setOpenMenu={setOpen} contractAddress={row.original.id as any} />
 				<DropdownMenuSeparator />
 				<DropdownMenuItem>Close</DropdownMenuItem>
 			</DropdownMenuContent>

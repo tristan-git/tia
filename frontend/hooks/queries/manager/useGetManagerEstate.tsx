@@ -29,7 +29,5 @@ export const useGetManagerEstate = () => {
 			const response = await fetch('/api/manager/get-manager-estate')
 			return response.json()
 		},
-		// staleTime: Number.POSITIVE_INFINITY,
-		// refetchInterval: 3_000,
 	})
 }

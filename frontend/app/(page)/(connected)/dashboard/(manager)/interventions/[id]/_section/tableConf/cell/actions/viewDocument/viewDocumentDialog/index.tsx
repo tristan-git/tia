@@ -21,9 +21,6 @@ const DocumentItem = ({ doc, dataIntervention, index, users }: any) => {
 	const { firstName, lastName } = users?.filter(({ id }) => documents?.[index]?.createdBy == id)?.[0] || {}
 	const fileExtension = documents?.[index]?.fileExtension
 
-	console.log('dataIntervention')
-	console.log(doc)
-
 	const file = `${bucketPath}/${estateManagerId}/${tokenId}/interventions/${indexIntervention}/${doc?.documentHash?.slice(
 		2
 	)}.${fileExtension}`
@@ -95,7 +92,7 @@ const ViewDocumentDialog = ({ dataInter, disabled }: ViewDocumentDialogProps) =>
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-				<Button variant='outline' size='xs'>
+				<Button variant='outline' size='xs' disabled={!data?.[dataInter?.indexIntervention]?.documents?.length}>
 					<ReaderIcon />
 					{`${data?.[dataInter?.indexIntervention]?.documents?.length} Documents`}
 				</Button>

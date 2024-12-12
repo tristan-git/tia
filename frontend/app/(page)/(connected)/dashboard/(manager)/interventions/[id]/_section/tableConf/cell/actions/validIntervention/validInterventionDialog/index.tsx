@@ -67,7 +67,15 @@ const DocumentItem = ({ doc, dataIntervention, index, users }: any) => {
 				</div>
 			</div>
 
-			<Button variant='outlineDefault' size='icon' onClick={openImageInNewTab}>
+			<Button
+				variant='outlineDefault'
+				size='icon'
+				onClick={(event) => {
+					event.stopPropagation()
+					event.preventDefault()
+					openImageInNewTab()
+				}}
+			>
 				<UploadIcon />
 			</Button>
 		</div>
@@ -240,10 +248,6 @@ const ValidInterventionDialog = ({ dataIntervention, disabled }: ValidInterventi
 						</form>
 					</Form>
 				</div>
-
-
-
-				
 			</DialogContent>
 		</Dialog>
 	)

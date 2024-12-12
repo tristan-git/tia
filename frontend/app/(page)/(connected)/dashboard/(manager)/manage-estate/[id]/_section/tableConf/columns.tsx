@@ -7,7 +7,7 @@ import { RowActionsCell } from './cell/actions'
 import { DataTableColumnHeader } from '@/components/shared/dataTable/data-table-column-header'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
-import { PersonIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons'
+import { PersonIcon, ExclamationTriangleIcon, CubeIcon } from '@radix-ui/react-icons'
 
 export const columns: ColumnDef<Vote>[] = [
 	{
@@ -68,9 +68,10 @@ export const columns: ColumnDef<Vote>[] = [
 			const nbModule = row.getValue('modules')
 
 			return nbModule?.length ? (
-				<div className=' text-xs'>
-					<Badge variant='outline'>Intervention</Badge>
-				</div>
+				<Badge variant='outline' className='flex space-x-1'>
+					<CubeIcon className='h-4 w-3 ' />
+					<div>Intervention</div>
+				</Badge>
 			) : (
 				<Badge variant='red'>Aucun module assigné</Badge>
 			)
@@ -88,7 +89,7 @@ export const columns: ColumnDef<Vote>[] = [
 					<div>{`${interventions?.length}`}</div>
 				</div>
 			) : (
-				<div className='flex items-center text-xs'>
+				<div className='flex items-center text-xs opacity-40'>
 					<div>0</div>
 				</div>
 			)

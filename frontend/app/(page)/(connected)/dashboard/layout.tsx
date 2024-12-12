@@ -5,7 +5,7 @@ import Dashboard from '@/components/shared/dashboard'
 import DashboardContent from './_sections/dashboard/content'
 import DashboardSideBar from './_sections/dashboard/sideBar'
 import DashboardHeader from './_sections/dashboard/header'
-import { CubeIcon ,PersonIcon} from '@radix-ui/react-icons'
+import { CubeIcon, PersonIcon, FileIcon, ClipboardIcon, HomeIcon } from '@radix-ui/react-icons'
 
 /////////////////////////////////////////////////////////
 // dashboard Config
@@ -57,6 +57,31 @@ const dashboardConfig = {
 					// 	{ title: 'Votes', url: '/dashboard/votes' },
 					// 	{ title: 'subnav2', url: '#' },
 					// ],
+				},
+			],
+		},
+		/////////////////////////////////////////////////////////
+		// Manager
+		/////////////////////////////////////////////////////////
+
+		{
+			label: 'Administration',
+			roleAccess: 'admin',
+			navMain: [
+				{
+					title: 'Bien immobilier',
+					url: '/dashboard/admin-manage-estate',
+					icon: HomeIcon,
+				},
+				{
+					title: 'Interventions',
+					url: '/dashboard/manage-users',
+					icon: ClipboardIcon,
+				},
+				{
+					title: 'Documents',
+					url: '/dashboard/admin-manage-estate',
+					icon: FileIcon,
 				},
 			],
 		},

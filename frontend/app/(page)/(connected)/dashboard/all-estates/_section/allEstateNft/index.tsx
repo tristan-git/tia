@@ -1,8 +1,8 @@
 import React from 'react'
 import { useAccount } from 'wagmi'
-import { DataTableToolbar } from '../tableConf/toolBar'
+import { DataTableToolbar } from './tableConf/toolBar'
 import { DataTable } from '@/components/shared/dataTable/data-table'
-import { columns } from '../tableConf/columns'
+import { columns } from './tableConf/columns'
 import { useGetAllEstate } from '@/hooks/queries/all-estates/useGetAllEstate'
 
 const config = {

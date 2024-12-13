@@ -1,7 +1,7 @@
 'use server'
 
 import { db } from '@/drizzle/db'
-import { documentsTable, usersTable } from '@/drizzle/schema'
+import { documentsTable, estateManagersTable, interventionsTable, userInterventionAccessDocumentTable, usersTable } from '@/drizzle/schema'
 import { sql } from 'drizzle-orm'
 
 export async function createDocument(createDocumentData: {
@@ -26,9 +26,72 @@ export async function createDocument(createDocumentData: {
 			fileExtension: createDocumentData?.fileExtension || 'png',
 		})
 
-		return { success: true, message: 'intervention created successfully' }
+		const [intervention] = await db
+			.select()
+			.from(interventionsTable)
+			.where(sql`${interventionsTable.id} = ${createDocumentData.interventionId}`)
+
+		// Récupérer le managerId depuis estateManagersTable
+		const [estateManager] = await db
+			.select({ managerId: estateManagersTable.managerId })
+			.from(estateManagersTable)
+			.where(sql`${estateManagersTable.id} = ${intervention.estateManagerId}`)
+
+		await db
+			.insert(userInterventionAccessDocumentTable)
+			.values({
+				interventionId: intervention.id,
+				tokenId: BigInt(intervention.tokenId),
+				indexIntervention: intervention.indexIntervention,
+				estateManagerId: intervention.estateManagerId,
+				userId: user[0].id,
+				changedBy: user[0].id,
+				hasAccess: true,
+				changedAtTimestamp: new Date(),
+			})
+			.onConflictDoUpdate({
+				target: [
+					userInterventionAccessDocumentTable.interventionId,
+					userInterventionAccessDocumentTable.userId,
+					userInterventionAccessDocumentTable.estateManagerId,
+				],
+				set: {
+					hasAccess: true,
+					changedBy: user[0].id,
+					userId: user[0].id,
+					changedAtTimestamp: new Date(),
+				},
+			})
+
+		await db
+			.insert(userInterventionAccessDocumentTable)
+			.values({
+				interventionId: intervention.id,
+				tokenId: BigInt(intervention.tokenId),
+				indexIntervention: intervention.indexIntervention,
+				estateManagerId: intervention.estateManagerId,
+				userId: estateManager.managerId,
+				changedBy: user[0].id,
+				hasAccess: true,
+				changedAtTimestamp: new Date(),
+			})
+			.onConflictDoUpdate({
+				target: [
+					userInterventionAccessDocumentTable.interventionId,
+					userInterventionAccessDocumentTable.userId,
+					userInterventionAccessDocumentTable.estateManagerId,
+				],
+				set: {
+					hasAccess: true,
+					changedBy: user[0].id,
+					userId: estateManager.managerId,
+					changedAtTimestamp: new Date(),
+				},
+			})
+
+		return { success: true, message: 'document add successfully' }
 	} catch (error) {
-		console.error('Error assigning permission:', error)
-		return { success: false, message: 'Error created intervention', error }
+		console.error('Error document added:', error)
+		return { success: false, message: 'Error document added:', error }
 	}
 }

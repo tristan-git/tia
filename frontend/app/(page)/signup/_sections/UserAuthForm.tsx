@@ -73,7 +73,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 							groups: [
 								{
 									values: [
-										{ value: '1', text: 'Administrateur' },
+										{ value: '1', text: 'Administrateur TIA' },
 										{ value: '2', text: 'Gestionnaire' },
 										{ value: '3', text: 'Prestataire' },
 										{ value: '4', text: 'Lecteur' },

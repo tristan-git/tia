@@ -18,7 +18,7 @@ VALUES
 INSERT INTO
 	"users" ("firstName", "lastName", "walletAddress", "accountRoleId")
 VALUES
-	('Tristan', 'Admin', '0x734cEf8774dEB4FD18DFe57f010b842941012BBB', 1), -- admin
+	('Tristan', 'Admin TIA', '0x734cEf8774dEB4FD18DFe57f010b842941012BBB', 1), -- admin
 	('Bob', 'Gestionnaire', '0x0BeC14837e54F84C4815574967F802a8c3a64d7b', 2), -- manager
 	(
 		'Charlie',

@@ -45,6 +45,7 @@ export async function updateDocumentPermission(permissionDocumentData: {
 				set: {
 					hasAccess: permissionDocumentData.granted,
 					changedBy: userValidatedBy[0].id,
+					userId: userAccountGranted[0].id,
 					changedAtTimestamp: new Date(),
 				},
 			})

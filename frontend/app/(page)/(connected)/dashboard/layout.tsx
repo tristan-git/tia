@@ -1,4 +1,3 @@
-import { SquareTerminal } from 'lucide-react'
 import { Share1Icon } from '@radix-ui/react-icons'
 
 import Dashboard from '@/components/shared/dashboard'
@@ -24,10 +23,21 @@ const dashboardConfig = {
 					title: 'Réseaux immobilier',
 					url: '/dashboard/manage-estate',
 					icon: Share1Icon,
-					// subNav: [
-					// 	{ title: 'Votes', url: '/dashboard/votes' },
-					// 	{ title: 'subnav2', url: '#' },
-					// ],
+				},
+				{
+					title: 'Proprietées immobilier',
+					url: '/dashboard/all-estates',
+					icon: HomeIcon,
+				},
+				{
+					title: 'Interventions',
+					url: '/dashboard/all-interventions',
+					icon: ClipboardIcon,
+				},
+				{
+					title: 'Documents',
+					url: '/dashboard/all-documents',
+					icon: FileIcon,
 				},
 			],
 		},
@@ -41,60 +51,17 @@ const dashboardConfig = {
 			roleAccess: 'admin',
 			navMain: [
 				{
+					title: 'Authorisations module',
+					url: '/dashboard/admin-manage-estate',
+					icon: CubeIcon,
+				},
+				{
 					title: 'utilisateurs',
 					url: '/dashboard/manage-users',
 					icon: PersonIcon,
-					// subNav: [
-					// 	{ title: 'Votes', url: '/dashboard/votes' },
-					// 	{ title: 'subnav2', url: '#' },
-					// ],
-				},
-				{
-					title: 'Assigner module',
-					url: '/dashboard/admin-manage-estate',
-					icon: CubeIcon,
-					// subNav: [
-					// 	{ title: 'Votes', url: '/dashboard/votes' },
-					// 	{ title: 'subnav2', url: '#' },
-					// ],
 				},
 			],
 		},
-		/////////////////////////////////////////////////////////
-		// Manager
-		/////////////////////////////////////////////////////////
-
-		{
-			label: 'Administration',
-			roleAccess: 'admin',
-			navMain: [
-				{
-					title: 'Bien immobilier',
-					url: '/dashboard/admin-manage-estate',
-					icon: HomeIcon,
-				},
-				{
-					title: 'Interventions',
-					url: '/dashboard/manage-users',
-					icon: ClipboardIcon,
-				},
-				{
-					title: 'Documents',
-					url: '/dashboard/admin-manage-estate',
-					icon: FileIcon,
-				},
-			],
-		},
-		// {
-		// 	label: 'Block explorer',
-		// 	navMain: [
-		// 		{
-		// 			title: 'event ChestOpened',
-		// 			url: '/dashboard/viem',
-		// 			icon: SquareTerminal,
-		// 		},
-		// 	],
-		// },
 	],
 }
 

@@ -7,6 +7,7 @@ import '@openzeppelin/contracts/access/IAccessControl.sol';
 
 contract InterventionManager {
 	address private immutable estateManagerContract;
+	address private immutable manager;
 	bytes32 public constant ESTATE_MANAGER_ROLE = keccak256('ESTATE_MANAGER_ROLE');
 
 	struct Document {
@@ -38,9 +39,11 @@ contract InterventionManager {
 		bool granted
 	);
 
-	constructor(address _realEstateNFTContract) {
+	constructor(address _realEstateNFTContract, address _manager) {
 		require(_realEstateNFTContract != address(0), 'Invalid estateManagerContract address');
+		require(_manager != address(0), 'Invalid manager address');
 		estateManagerContract = _realEstateNFTContract;
+		manager = _manager;
 
 		emit InterventionManagerInitialized(_realEstateNFTContract, msg.sender, block.timestamp);
 	}
@@ -80,11 +83,7 @@ contract InterventionManager {
 		uint256 newIndex = interventions[_tokenId][_from].length - 1;
 		interventions[_tokenId][_from][newIndex].title = _title;
 
-		// celui qui creer l'intervention a access a lintervention
-		interventionAccess[_tokenId][newIndex][_from] = true;
-
 		emit InterventionAdded(_tokenId, _title, block.timestamp, _from, newIndex);
-		emit InterventionAccessChanged(_tokenId, newIndex, _from, _from, true);
 	}
 
 	// Ajouter un document à une intervention spécifique
@@ -98,6 +97,12 @@ contract InterventionManager {
 
 		interventions[_tokenId][_from][_interventionIndex].documents.push(Document({documentHash: _documentHash, title: _title}));
 
+		// donne acces a la lecture au manager et prestataire
+		interventionAccess[_tokenId][_interventionIndex][_from] = true;
+		interventionAccess[_tokenId][_interventionIndex][manager] = true;
+
+		emit InterventionAccessChanged(_tokenId, _interventionIndex, _from, _from, true);
+		emit InterventionAccessChanged(_tokenId, _interventionIndex, manager, _from, true);
 		emit DocumentAdded(_tokenId, _interventionIndex, _documentHash, _title, _from);
 	}
 

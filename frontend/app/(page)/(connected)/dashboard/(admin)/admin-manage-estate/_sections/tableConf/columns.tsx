@@ -69,7 +69,7 @@ export const columns: ColumnDef<Vote>[] = [
 
 	{
 		accessorKey: 'manager',
-		header: ({ column }) => <DataTableColumnHeader column={column} title='Manager' />,
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Gestionnaire' />,
 		cell: ({ row }) => {
 			return <div className=' text-xs'>{`${row.getValue('manager').firstName} ${row.getValue('manager').lastName}`}</div>
 		},

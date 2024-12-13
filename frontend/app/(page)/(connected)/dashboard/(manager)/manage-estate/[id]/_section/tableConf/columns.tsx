@@ -120,7 +120,7 @@ export const columns: ColumnDef<Vote>[] = [
 
 	{
 		accessorKey: 'mintedByDetail',
-		header: ({ column }) => <DataTableColumnHeader column={column} title='Manager' />,
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Gestionnaire' />,
 		cell: ({ row }) => {
 			const { firstName, lastName } = row.getValue('mintedByDetail') || {}
 			return (

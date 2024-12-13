@@ -69,7 +69,7 @@ export const columns = [
 
 	{
 		accessorKey: 'managerDetail',
-		header: ({ column }) => <DataTableColumnHeader column={column} title='Manager' />,
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Gestionnaire' />,
 		cell: ({ row }) => {
 			const managerDetail = row.getValue('managerDetail')
 			return <div className='flex text-xs'>{`${managerDetail?.firstName} ${managerDetail?.lastName}`}</div>

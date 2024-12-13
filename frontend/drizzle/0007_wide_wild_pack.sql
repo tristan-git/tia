@@ -1,0 +1,1 @@
+ALTER TABLE "estate_managers" ADD COLUMN "networkTypes" varchar(255) NOT NULL;

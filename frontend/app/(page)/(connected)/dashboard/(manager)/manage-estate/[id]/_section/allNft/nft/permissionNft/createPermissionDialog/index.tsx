@@ -12,7 +12,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } fr
 import { Button } from '@/components/ui/button'
 import InputFORM from '@/components/shared/form/InputFORM'
 import SelectFORM from '@/components/shared/form/SelectFORM'
-import { useGetManagersUsers } from '@/hooks/queries/manager/managerGetUsers'
+import { useGetManagersUsers } from '@/hooks/queries/users/managerGetUsers'
 import { EstateManagerFactoryArtifact } from '@/constants/artifacts/EstateManagerFactory'
 import { addressEstateFactory } from '@/constants/contract'
 import { createEstateManager } from '@/actions/manager/createEstateManager'
@@ -46,7 +46,6 @@ const CreatePermissionDialog = ({ idEstate, rnbCode, tokenId }: CreatePermission
 	const queryClient = useQueryClient()
 	const { writeContract, isPending, isSuccess, data: hash, error } = useWriteContract()
 	const { data: dataReceipt } = useTransactionReceipt({ hash })
-	const [isProcessed, setIsProcessed] = useState(false)
 	const [url, setUrl] = useState({})
 
 	const form = useForm<z.infer<typeof FormSchema>>({
@@ -96,8 +95,6 @@ const CreatePermissionDialog = ({ idEstate, rnbCode, tokenId }: CreatePermission
 		}
 	}
 
-	console.log('🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡')
-
 	useEffect(() => {
 		async function handleWrite() {
 			if (isSuccess && hash) {
@@ -117,7 +114,7 @@ const CreatePermissionDialog = ({ idEstate, rnbCode, tokenId }: CreatePermission
 					}
 					await createNft(dataNft)
 					form.reset()
-					queryClient.invalidateQueries({ queryKey: ['useGetManagerEstateNft'] })
+					queryClient.invalidateQueries()
 					toast({ title: 'Bâtiment ajouter', description: 'Le bâtiment est bien ajouté' })
 					setUrl({})
 					setOpen(false)
@@ -133,8 +130,6 @@ const CreatePermissionDialog = ({ idEstate, rnbCode, tokenId }: CreatePermission
 		})
 	}, [isSuccess, hash, form, dataReceipt])
 
-
-	console.log('🤡🤡🤡1111🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡')
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>

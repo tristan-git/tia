@@ -23,13 +23,11 @@ export type TEstateManager = {
 
 export const useGetManagerEstate = () => {
 	return useQuery({
-		queryKey: ['getManagerEstate'],
+		queryKey: ['useGetManagerEstate'],
 		enabled: true,
 		queryFn: async () => {
 			const response = await fetch('/api/manager/get-manager-estate')
 			return response.json()
 		},
-		// staleTime: Number.POSITIVE_INFINITY,
-		// refetchInterval: 3_000,
 	})
 }

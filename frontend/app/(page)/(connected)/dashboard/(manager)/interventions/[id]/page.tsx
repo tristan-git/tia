@@ -6,9 +6,7 @@ import { estateManagersTable, mintedNFTsTable, modulesTable, usersTable } from '
 
 export default async function Interventions({ params }: { params: Promise<{ id: string }> }) {
 	const id = (await params).id
-
 	const nft = await db.select().from(mintedNFTsTable).where(eq(mintedNFTsTable.id, id))
-
 	const estateManagerId = nft?.[0]?.estateManagerId
 	const addressInterventionManager = await db.select().from(modulesTable).where(eq(modulesTable.estateManagerId, estateManagerId))
 

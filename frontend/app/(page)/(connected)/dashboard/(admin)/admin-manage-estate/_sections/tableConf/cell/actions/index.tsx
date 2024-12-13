@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { Row } from '@tanstack/react-table'
 
@@ -12,7 +12,8 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import AssignModule from './assignModule'
+import AssignModuleDialog from './assignModule'
+import { BlockchainContext } from '@/components/provider/blockchainProvider'
 
 interface DataTableRowActionsProps<TData> {
 	row: Row<TData>
@@ -20,6 +21,7 @@ interface DataTableRowActionsProps<TData> {
 
 export function RowActionsCell<TData>({ row }: DataTableRowActionsProps<TData>) {
 	const [open, setOpen] = useState(false)
+	const { userAccount } = useContext(BlockchainContext)
 
 	const handleOpenDialog = (e: React.MouseEvent) => {
 		e.preventDefault()
@@ -35,9 +37,13 @@ export function RowActionsCell<TData>({ row }: DataTableRowActionsProps<TData>) 
 					<span className='sr-only'>Open menu</span>
 				</Button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent align='end' className='w-[160px]'>
-				<DropdownMenuSeparator />
-				<AssignModule setOpenMenu={setOpen} contractAddress={row.original.id as any} />
+			<DropdownMenuContent align='end' className='w-[200px]'>
+				<AssignModuleDialog
+					setOpenMenu={setOpen}
+					contractAddress={row.original.id as any}
+					disabled={userAccount?.roleName !== 'admin'}
+					managerAddress={row?.original?.manager?.walletAddress}
+				/>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem>Close</DropdownMenuItem>
 			</DropdownMenuContent>

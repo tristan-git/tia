@@ -1,0 +1,2 @@
+ALTER TABLE "user_module_access" ALTER COLUMN "assignedAtTimestamp" DROP NOT NULL;--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "user_module_access_unique" ON "user_module_access" USING btree ("moduleName","token_id","estateManagerId","authorizedAddress");

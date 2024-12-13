@@ -18,15 +18,15 @@ VALUES
 INSERT INTO
 	"users" ("firstName", "lastName", "walletAddress", "accountRoleId")
 VALUES
-	('Tristan', 'Admin', '0x734cEf8774dEB4FD18DFe57f010b842941012BBB', 1), -- admin
-	('Bob', 'Manager', '0x0BeC14837e54F84C4815574967F802a8c3a64d7b', 2), -- manager
+	('Tristan', 'Admin TIA', '0x734cEf8774dEB4FD18DFe57f010b842941012BBB', 1), -- admin
+	('Bob', 'Gestionnaire', '0x0BeC14837e54F84C4815574967F802a8c3a64d7b', 2), -- manager
 	(
 		'Charlie',
 		'Prestataire',
 		'0xdD2FD4581271e230360230F9337D5c0430Bf44C0',
 		3
 	), -- prestataire
-	('Dave', 'Viewer', '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266', 4) -- viewer
+	('Dave', 'Lecteur', '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266', 4) -- viewer
 	ON CONFLICT ("walletAddress")
 DO NOTHING;
 

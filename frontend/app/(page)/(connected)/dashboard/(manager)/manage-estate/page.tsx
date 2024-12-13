@@ -23,8 +23,8 @@ export default function ManageEstate() {
 			<div className='container max-w-screen-xl overflow-hidden p-4'>
 				<div className='flex items-center justify-between mb-4'>
 					<div className='space-y-1'>
-						<h2 className='text-2xl font-semibold tracking-tight'>Les dernier bâtiments ajoutés</h2>
-						<p className='text-sm text-muted-foreground'>Manager vos bien immobillier ici</p>
+						<h2 className='text-2xl font-semibold tracking-tight'>Réseaux immobilier</h2>
+						<p className='text-sm text-muted-foreground'>Tous vos groupement immobilier ici</p>
 					</div>
 					<CreateEstate />
 				</div>

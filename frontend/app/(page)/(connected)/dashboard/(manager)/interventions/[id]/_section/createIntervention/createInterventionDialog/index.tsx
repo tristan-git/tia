@@ -17,13 +17,14 @@ import { EstateManagerArtifact } from '@/constants/artifacts/EstateManager'
 import { createIntervention } from '@/actions/intervention/createIntervention'
 import { InterventionManagerArtifact } from '@/constants/artifacts/InterventionManager'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import SelectFORM from '@/components/shared/form/SelectFORM'
 
 /////////////////////////////////////////////////////////
 // ZOD SCHEMA
 /////////////////////////////////////////////////////////
 
 const FormSchema = z.object({
-	title: z.string().min(2, { message: 'Sujet non valide' }).max(20, { message: 'Trop long' }),
+	title: z.string().min(2, { message: 'Requis' }),
 })
 
 /////////////////////////////////////////////////////////
@@ -116,7 +117,7 @@ const CreateInterventionDialog = ({ idEstate, tokenId, addressInterventionManage
 					}
 					await createIntervention(createInterventionData)
 					form.reset()
-					queryClient.invalidateQueries({ queryKey: ['useGetInterventionsByNft'] })
+					queryClient.invalidateQueries()
 					toast({ title: 'Intervention ajouter', description: 'Intervention est bien ajouté' })
 					setOpen(false)
 				}
@@ -139,14 +140,55 @@ const CreateInterventionDialog = ({ idEstate, tokenId, addressInterventionManage
 			<DialogContent className='sm:max-w-[425px]'>
 				<DialogHeader>
 					<DialogTitle>Créer une intervention</DialogTitle>
-					<DialogDescription>Entrer les détail de l'intervention</DialogDescription>
+					<DialogDescription>Entrer le type de l'intervention sur le bâtiment</DialogDescription>
 				</DialogHeader>
 
 				<div className='grid gap-4 py-0'>
 					<Form {...form}>
 						<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
 							<div className='grid w-full items-center gap-4'>
-								<InputFORM form={form} name='title' placeholder="sujet de l'intervention" className='w-full' />
+								<SelectFORM
+									form={form}
+									name='title'
+									placeholder="Type d'intervention"
+									selectGroup={{
+										groups: [
+											{
+												selectLabelText: 'Maintenance et Réparation',
+												values: [
+													{ value: 'Plomberie', text: 'Plomberie' },
+													{ value: 'Électricité', text: 'Électricité' },
+													{ value: 'Chauffage', text: 'Chauffage' },
+													{ value: 'Toiture', text: 'Toiture' },
+												],
+											},
+											{
+												selectLabelText: 'Service Client et Administration',
+												values: [
+													{ value: 'Gestion de contrat', text: 'Gestion de contrat' },
+													{ value: 'Réclamations', text: 'Réclamations' },
+													{ value: 'Demandes administratives', text: 'Demandes administratives' },
+												],
+											},
+											{
+												selectLabelText: 'Inspection et Audit',
+												values: [
+													{ value: 'Inspection technique', text: 'Inspection technique' },
+													{ value: 'Audit énergétique', text: 'Audit énergétique' },
+													{ value: 'Contrôle qualité', text: 'Contrôle qualité' },
+												],
+											},
+											{
+												selectLabelText: 'Nettoyage et Entretien',
+												values: [
+													{ value: 'Nettoyage régulier', text: 'Nettoyage régulier' },
+													{ value: 'Entretien des espaces verts', text: 'Entretien des espaces verts' },
+													{ value: 'Nettoyage après travaux', text: 'Nettoyage après travaux' },
+												],
+											},
+										],
+									}}
+								/>
 							</div>
 							<Button type='submit' className='w-full'>
 								Créer

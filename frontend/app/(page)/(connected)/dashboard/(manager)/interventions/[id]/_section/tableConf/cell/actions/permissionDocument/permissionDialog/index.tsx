@@ -41,7 +41,7 @@ const PermissionDocumentDialog = ({ dataIntervention, disabled }: PermissionDocu
 				</DialogHeader>
 				<div className='grid gap-4 py-0'>
 					<div className='space-y-6'>
-						<ScrollArea className='max-h-96'>
+						<ScrollArea className={users?.length > 3 ? 'h-[305px]' : 'max-h-fit'}>
 							<div className='grid w-full items-center gap-2'>
 								{users?.map((user, i) => (
 									<UpdatePermissionDocument key={i} user={user} dataIntervention={dataIntervention} />

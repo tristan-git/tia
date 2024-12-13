@@ -9,6 +9,7 @@ export async function getManagerEstate() {
 	const estateManagers = await db
 		.select({
 			id: estateManagersTable.id,
+			networkTypes: estateManagersTable.networkTypes,
 			managerId: estateManagersTable.managerId,
 			adminId: estateManagersTable.adminId,
 			rnbCode: estateManagersTable.rnbCode,

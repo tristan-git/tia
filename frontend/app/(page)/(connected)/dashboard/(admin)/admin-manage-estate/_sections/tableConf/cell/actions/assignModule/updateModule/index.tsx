@@ -25,11 +25,14 @@ const FormSchema = z.object({ modulePermission: z.boolean() })
 type UpdateModuleProps = {
 	moduleData: any
 	contractAddress: any
+	managerAddress: any
 }
 
-const UpdateModule = ({ moduleData, contractAddress }: UpdateModuleProps) => {
+const UpdateModule = ({ moduleData, contractAddress, managerAddress }: UpdateModuleProps) => {
 	const { address: currentAccount } = useAccount()
 	const queryClient = useQueryClient()
+
+	console.log(managerAddress)
 
 	const { deployContract, data: hashDeployed, isSuccess: isSuccessDeployed } = useDeployContract()
 	const { data: dataDeployedReceipt } = useTransactionReceipt({ hash: hashDeployed })
@@ -87,7 +90,7 @@ const UpdateModule = ({ moduleData, contractAddress }: UpdateModuleProps) => {
 			try {
 				deployContract({
 					abi: InterventionManagerArtifact.abi,
-					args: [contractAddress],
+					args: [contractAddress, managerAddress],
 					bytecode: InterventionManagerArtifact.bytecode,
 				})
 			} catch (error) {

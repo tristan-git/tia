@@ -38,7 +38,12 @@ export function RowActionsCell<TData>({ row }: DataTableRowActionsProps<TData>) 
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align='end' className='w-[200px]'>
-				<AssignModuleDialog setOpenMenu={setOpen} contractAddress={row.original.id as any} disabled={userAccount?.roleName !== 'admin'} />
+				<AssignModuleDialog
+					setOpenMenu={setOpen}
+					contractAddress={row.original.id as any}
+					disabled={userAccount?.roleName !== 'admin'}
+					managerAddress={row?.original?.manager?.walletAddress}
+				/>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem>Close</DropdownMenuItem>
 			</DropdownMenuContent>

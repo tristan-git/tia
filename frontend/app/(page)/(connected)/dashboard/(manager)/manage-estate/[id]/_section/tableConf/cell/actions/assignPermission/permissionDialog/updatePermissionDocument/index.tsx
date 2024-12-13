@@ -92,6 +92,7 @@ const UpdatePermissionIntervention = ({ user, dataNft }: UpdatePermissionInterve
 
 		try {
 			const tokenId = dataNft?.tokenId
+
 			const moduleName = 'InterventionManager'
 
 			writeContract({

@@ -22,7 +22,6 @@ const MyEstates = ({ idEstate }: MyEstatesProps) => {
 		functionName: 'getRnbCode',
 	})
 
-	// TODO ????????
 	const { data: nextTokenId } = useReadContract({
 		abi: EstateManagerArtifact.abi,
 		address: idEstate,
@@ -43,7 +42,7 @@ const MyEstates = ({ idEstate }: MyEstatesProps) => {
 				<Alert className='mb-6'>
 					<InfoIcon className='h-4 w-4' />
 					<AlertTitle className='font-bold'>Information</AlertTitle>
-					<AlertDescription className='text-xs'>Vous n'ête pas manager du bien, vous ne pouvez pas créer d'intervention</AlertDescription>
+					<AlertDescription className='text-xs'>Vous n'ête pas manager du bien, vous ne pouvez pas ajouter de bâtiment</AlertDescription>
 				</Alert>
 			)}
 

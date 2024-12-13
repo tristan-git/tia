@@ -37,6 +37,8 @@ export async function createDocument(createDocumentData: {
 			.from(estateManagersTable)
 			.where(sql`${estateManagersTable.id} = ${intervention.estateManagerId}`)
 
+		// donne acces au a la lecture des document a intervenant
+
 		await db
 			.insert(userInterventionAccessDocumentTable)
 			.values({
@@ -63,6 +65,7 @@ export async function createDocument(createDocumentData: {
 				},
 			})
 
+		// donne acces au a la lecture des document a manager
 		await db
 			.insert(userInterventionAccessDocumentTable)
 			.values({

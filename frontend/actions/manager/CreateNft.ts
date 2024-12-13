@@ -20,7 +20,7 @@ export async function createNft(nftData: {
 		.from(usersTable)
 		.where(sql`LOWER(${usersTable.walletAddress}) = LOWER(${nftData.fromAddress})`)
 
-	const nextTokenId = BigInt(nftData.tokenId) + BigInt(1)
+	const nextTokenId = BigInt(nftData.tokenId)
 
 	await db.insert(mintedNFTsTable).values({
 		tokenId: nextTokenId,

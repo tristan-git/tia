@@ -44,9 +44,10 @@ type AssignModuleDialogProps = {
 	setOpenMenu?: any
 	contractAddress?: boolean
 	disabled?: boolean
+	managerAddress: any
 }
 
-const AssignModuleDialog = ({ setOpenMenu, contractAddress, disabled }: AssignModuleDialogProps) => {
+const AssignModuleDialog = ({ setOpenMenu, contractAddress, disabled, managerAddress }: AssignModuleDialogProps) => {
 	const [open, setOpen] = useState(false)
 
 	const handleOpenDialog = (e: React.MouseEvent) => {
@@ -71,7 +72,7 @@ const AssignModuleDialog = ({ setOpenMenu, contractAddress, disabled }: AssignMo
 						<ScrollArea className='h-[280px]'>
 							<div className='grid w-full items-center gap-2'>
 								{listModule?.map((moduleData, i) => (
-									<UpdateModule key={i} moduleData={moduleData} contractAddress={contractAddress} />
+									<UpdateModule key={i} moduleData={moduleData} contractAddress={contractAddress} managerAddress={managerAddress} />
 								))}
 							</div>
 						</ScrollArea>

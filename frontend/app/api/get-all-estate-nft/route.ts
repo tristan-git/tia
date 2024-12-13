@@ -101,9 +101,23 @@ export async function POST(request: Request): Promise<NextResponse> {
                 eq(userModuleAccessTable.estateManagerId, mintedNFTsTable.estateManagerId)
             )
         )
-        .where(or(eq(mintedNFTsTable.ownerAddress, userId), eq(userModuleAccessTable.authorizedAddress, userId)))
+        .where(
+            or(
+                eq(mintedNFTsTable.ownerAddress, userId),
+                eq(userModuleAccessTable.authorizedAddress, userId),
+                sql`EXISTS (
+                    SELECT 1
+                    FROM ${userInterventionAccessDocumentTable}
+                    INNER JOIN ${interventionsTable}
+                        ON ${userInterventionAccessDocumentTable.interventionId} = ${interventionsTable.id}
+                    WHERE ${userInterventionAccessDocumentTable.userId} = ${userId}
+                      AND ${userInterventionAccessDocumentTable.hasAccess} = true
+                      AND ${interventionsTable.tokenId} = ${mintedNFTsTable.tokenId}
+                      AND ${interventionsTable.estateManagerId} = ${mintedNFTsTable.estateManagerId}
+                )`
+            )
+        )
         .groupBy(mintedNFTsTable.id, estateManagersTable.id, userModuleAccessTable.authorizedAddress, managerAlias.id);
-    
         
 		const serializedData = serializeBigInt(nfts)
 

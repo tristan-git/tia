@@ -155,25 +155,6 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 								/>
 							</div>
 
-							{/* <SelectFORM
-								form={form}
-								name='adminAddress'
-								formLabel={{ text: 'Administrateur du bâtiment' }}
-								placeholder='Administrateur du bâtiment'
-								selectGroup={{
-									groups: [{ values: formatForSelect(users) }],
-								}}
-							/>
-							<SelectFORM
-								formLabel={{ text: 'Manager du bâtiment' }}
-								form={form}
-								name='managerAddress'
-								placeholder='Manager du bâtiment'
-								selectGroup={{
-									groups: [{ values: formatForSelect(users) }],
-								}}
-							/> */}
-
 							<Button type='submit' className='w-full'>
 								Ajouter
 							</Button>

@@ -153,7 +153,7 @@ const UpdateModule = ({ moduleData, contractAddress, managerAddress }: UpdateMod
 
 					await assignModule(moduleData)
 
-					queryClient.invalidateQueries({ queryKey: ['getManagerEstate'] })
+					queryClient.invalidateQueries()
 					toast({ title: 'Module assigné', description: `MODULE: Intervention Manager` })
 				}
 			}

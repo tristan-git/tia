@@ -10,15 +10,11 @@ export type TUsers = {
 
 export const useGetManagersUsers = () => {
 	return useQuery<TUsers[]>({
-		queryKey: ['adminUsers'],
+		queryKey: ['useGetManagersUsers'],
 		enabled: true,
-		// networkMode: "online",
-		// initialData,
 		queryFn: async () => {
 			const response = await getManagerUser()
 			return response
 		},
-		// staleTime: Number.POSITIVE_INFINITY,
-		// refetchInterval: 3_000,
 	})
 }

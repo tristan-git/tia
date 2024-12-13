@@ -182,7 +182,7 @@ const AddDocumentDialog = ({ dataIntervention, disabled }: AddDocumentDialogProp
 					await createDocument(createDocumentData)
 
 					form.reset()
-					queryClient.invalidateQueries({ queryKey: ['useGetInterventionsByNft', 'usePermissionDocument'] })
+					queryClient.invalidateQueries()
 					toast({ title: 'Document ajouter', description: 'Le document est bien ajouté' })
 					setUrl({})
 					setOpen(false)

@@ -38,45 +38,46 @@ export async function POST(request: Request): Promise<NextResponse> {
 		const role = user?.[0].accountRoleId
 
 		const managerAlias = aliasedTable(usersTable, 'managerId')
-        const nfts = await db
-        .selectDistinct({
-            nftId: mintedNFTsTable.id,
-            tokenId: mintedNFTsTable.tokenId,
-            metadataURI: mintedNFTsTable.metadataURI,
-            createdAtTimestamp: mintedNFTsTable.createdAtTimestamp,
-            address: mintedNFTsTable.address,
-            town: mintedNFTsTable.town,
-            img: mintedNFTsTable.img,
-            role: sql`CASE 
+		const nfts = await db
+			// .selectDistinct({
+			.selectDistinctOn([mintedNFTsTable.id], {
+				nftId: mintedNFTsTable.id,
+				tokenId: mintedNFTsTable.tokenId,
+				metadataURI: mintedNFTsTable.metadataURI,
+				createdAtTimestamp: mintedNFTsTable.createdAtTimestamp,
+				address: mintedNFTsTable.address,
+				town: mintedNFTsTable.town,
+				img: mintedNFTsTable.img,
+				role: sql`CASE 
                 WHEN ${mintedNFTsTable.ownerAddress} = ${userId} THEN 'owner'
                 WHEN ${userModuleAccessTable.authorizedAddress} = ${userId} THEN 'authorized'
                 ELSE NULL 
             END`.as('role'),
-            estateManager: {
-                id: estateManagersTable.id,
-                adminId: estateManagersTable.adminId,
-                managerId: estateManagersTable.managerId,
-                rnbCode: estateManagersTable.rnbCode,
-                networkTypes: estateManagersTable.networkTypes,
-                factoryId: estateManagersTable.factoryId,
-                createdAtBlock: estateManagersTable.createdAtBlock,
-                createdAtTransactionHash: estateManagersTable.createdAtTransactionHash,
-                createdAtTimestamp: estateManagersTable.createdAtTimestamp,
-                managerDetails: {
-                    firstName: managerAlias.firstName,
-                    lastName: managerAlias.lastName,
-                    walletAddress: managerAlias.walletAddress,
-                    accountRoleId: managerAlias.accountRoleId,
-                },
-            },
-            interventionCount: sql`(
+				estateManager: {
+					id: estateManagersTable.id,
+					adminId: estateManagersTable.adminId,
+					managerId: estateManagersTable.managerId,
+					rnbCode: estateManagersTable.rnbCode,
+					networkTypes: estateManagersTable.networkTypes,
+					factoryId: estateManagersTable.factoryId,
+					createdAtBlock: estateManagersTable.createdAtBlock,
+					createdAtTransactionHash: estateManagersTable.createdAtTransactionHash,
+					createdAtTimestamp: estateManagersTable.createdAtTimestamp,
+					managerDetails: {
+						firstName: managerAlias.firstName,
+						lastName: managerAlias.lastName,
+						walletAddress: managerAlias.walletAddress,
+						accountRoleId: managerAlias.accountRoleId,
+					},
+				},
+				interventionCount: sql`(
                 SELECT COUNT(*)
                 FROM ${interventionsTable}
                 WHERE ${interventionsTable.tokenId} = ${mintedNFTsTable.tokenId}
                   AND ${interventionsTable.estateManagerId} = ${mintedNFTsTable.estateManagerId}
                   AND ${interventionsTable.createdBy} = ${userId}
             )`.as('interventionCount'),
-            documentCount: sql`(
+				documentCount: sql`(
                 SELECT COUNT(*)
                 FROM ${documentsTable}
                 INNER JOIN ${userInterventionAccessDocumentTable}
@@ -90,22 +91,22 @@ export async function POST(request: Request): Promise<NextResponse> {
                         AND ${interventionsTable.estateManagerId} = ${mintedNFTsTable.estateManagerId}
                   )
             )`.as('documentCount'),
-        })
-        .from(mintedNFTsTable)
-        .leftJoin(estateManagersTable, eq(mintedNFTsTable.estateManagerId, estateManagersTable.id))
-        .leftJoin(managerAlias, eq(estateManagersTable.managerId, managerAlias.id))
-        .leftJoin(
-            userModuleAccessTable,
-            and(
-                eq(userModuleAccessTable.tokenId, mintedNFTsTable.tokenId),
-                eq(userModuleAccessTable.estateManagerId, mintedNFTsTable.estateManagerId)
-            )
-        )
-        .where(
-            or(
-                eq(mintedNFTsTable.ownerAddress, userId),
-                eq(userModuleAccessTable.authorizedAddress, userId),
-                sql`EXISTS (
+			})
+			.from(mintedNFTsTable)
+			.leftJoin(estateManagersTable, eq(mintedNFTsTable.estateManagerId, estateManagersTable.id))
+			.leftJoin(managerAlias, eq(estateManagersTable.managerId, managerAlias.id))
+			.leftJoin(
+				userModuleAccessTable,
+				and(
+					eq(userModuleAccessTable.tokenId, mintedNFTsTable.tokenId),
+					eq(userModuleAccessTable.estateManagerId, mintedNFTsTable.estateManagerId)
+				)
+			)
+			.where(
+				or(
+					eq(mintedNFTsTable.ownerAddress, userId),
+					eq(userModuleAccessTable.authorizedAddress, userId),
+					sql`EXISTS (
                     SELECT 1
                     FROM ${userInterventionAccessDocumentTable}
                     INNER JOIN ${interventionsTable}
@@ -115,10 +116,17 @@ export async function POST(request: Request): Promise<NextResponse> {
                       AND ${interventionsTable.tokenId} = ${mintedNFTsTable.tokenId}
                       AND ${interventionsTable.estateManagerId} = ${mintedNFTsTable.estateManagerId}
                 )`
-            )
-        )
-        .groupBy(mintedNFTsTable.id, estateManagersTable.id, userModuleAccessTable.authorizedAddress, managerAlias.id);
-        
+				)
+			)
+			.groupBy(
+				mintedNFTsTable.id,
+				estateManagersTable.id,
+				userModuleAccessTable.authorizedAddress,
+				managerAlias.id
+				// userInterventionAccessDocumentTable.interventionId,
+				//interventionsTable.tokenId
+			)
+
 		const serializedData = serializeBigInt(nfts)
 
 		// console.log('🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡')

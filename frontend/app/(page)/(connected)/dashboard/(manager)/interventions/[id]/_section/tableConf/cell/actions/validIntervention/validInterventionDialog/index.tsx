@@ -194,7 +194,7 @@ const ValidInterventionDialog = ({ dataIntervention, disabled }: ValidInterventi
 					}
 					await validIntervention(validInterventionData)
 					form.reset()
-					queryClient.invalidateQueries({ queryKey: ['useGetInterventionsByNft'] })
+					queryClient.invalidateQueries()
 					toast({ title: 'Intervention validé', description: 'Intervention est bien validé' })
 					setOpen(false)
 				}

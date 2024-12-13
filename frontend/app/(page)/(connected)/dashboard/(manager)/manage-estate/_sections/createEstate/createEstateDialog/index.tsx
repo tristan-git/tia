@@ -91,7 +91,7 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 
 					form.reset()
 
-					queryClient.invalidateQueries({ queryKey: ['getManagerEstate'] })
+					queryClient.invalidateQueries()
 
 					toast({ title: 'Le réseau est ajouter', description: `code RNB : ${rnbCode}, type : ${networkTypes}` })
 

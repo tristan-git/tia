@@ -76,7 +76,7 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 
 					form.reset()
 
-					 queryClient.invalidateQueries({ queryKey: ['voting_contracts'] })
+					queryClient.invalidateQueries()
 
 					toast({ title: 'Vote Successful', description: 'The vote was added successfully.' })
 

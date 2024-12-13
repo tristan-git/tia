@@ -117,7 +117,7 @@ const CreateInterventionDialog = ({ idEstate, tokenId, addressInterventionManage
 					}
 					await createIntervention(createInterventionData)
 					form.reset()
-					queryClient.invalidateQueries({ queryKey: ['useGetInterventionsByNft'] })
+					queryClient.invalidateQueries()
 					toast({ title: 'Intervention ajouter', description: 'Intervention est bien ajouté' })
 					setOpen(false)
 				}

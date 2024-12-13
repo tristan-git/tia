@@ -114,7 +114,7 @@ const CreatePermissionDialog = ({ idEstate, rnbCode, tokenId }: CreatePermission
 					}
 					await createNft(dataNft)
 					form.reset()
-					queryClient.invalidateQueries({ queryKey: ['useGetManagerEstateNft'] })
+					queryClient.invalidateQueries()
 					toast({ title: 'Bâtiment ajouter', description: 'Le bâtiment est bien ajouté' })
 					setUrl({})
 					setOpen(false)

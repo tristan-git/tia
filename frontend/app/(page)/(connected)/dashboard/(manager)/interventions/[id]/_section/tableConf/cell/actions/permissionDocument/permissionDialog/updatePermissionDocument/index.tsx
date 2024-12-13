@@ -153,7 +153,7 @@ const UpdatePermissionDocument = ({ user, dataIntervention }: UpdatePermissionDo
 						estateManagerId: dataIntervention?.estateManagerId,
 					}
 					await updateDocumentPermission(permissionDocumentData)
-					queryClient.invalidateQueries({ queryKey: ['useGetInterventionsByNft'] })
+					queryClient.invalidateQueries()
 					toast({ title: 'Permission mis à jours', description: 'Permission mis à jours' })
 				}
 			}

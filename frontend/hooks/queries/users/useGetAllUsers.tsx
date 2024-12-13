@@ -10,7 +10,7 @@ export type TUsers = {
 
 export const useGetAllUsers = () => {
 	return useQuery<TUsers[]>({
-		queryKey: ['adminUsers'],
+		queryKey: ['useGetAllUsers'],
 		enabled: true,
 		queryFn: async () => {
 			const response = await getAllUsers()

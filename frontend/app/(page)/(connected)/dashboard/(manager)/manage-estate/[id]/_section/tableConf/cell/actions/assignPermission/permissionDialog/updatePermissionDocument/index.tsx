@@ -143,7 +143,7 @@ const UpdatePermissionIntervention = ({ user, dataNft }: UpdatePermissionInterve
 					}
 
 					await assignPrestatairePermission(permissionInterventionData)
-					queryClient.invalidateQueries({ queryKey: ['useGetManagerEstateNft'] })
+					queryClient.invalidateQueries()
 					toast({ title: 'Permission mis à jours', description: 'Permission mis à jours' })
 				}
 			}

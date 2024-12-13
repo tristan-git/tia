@@ -23,7 +23,7 @@ export type TEstateManager = {
 
 export const useGetManagerEstate = () => {
 	return useQuery({
-		queryKey: ['getManagerEstate'],
+		queryKey: ['useGetManagerEstate'],
 		enabled: true,
 		queryFn: async () => {
 			const response = await fetch('/api/manager/get-manager-estate')

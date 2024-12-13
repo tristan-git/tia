@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
 
-export const useGetAllEstate = (currentAccount: any) => {
+export const useGetAllInterventions = (currentAccount: any) => {
 	return useQuery({
-		queryKey: ['useGetAllEstate'],
+		queryKey: ['useGetAllInterventions'],
 		enabled: !!currentAccount,
 		queryFn: async () => {
-			const response = await fetch('/api/get-all-estate-nft', {
+			const response = await fetch('/api/get-all-interventions', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

@@ -21,6 +21,7 @@ import { bucketPath } from '@/constants/bucket'
 import { validIntervention } from '@/actions/intervention/validIntervention'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { EyeOpenIcon, FileIcon, UploadIcon } from '@radix-ui/react-icons'
+import { LoadingOverlay } from '@/components/provider/blockchainProvider'
 
 /////////////////////////////////////////////////////////
 // Document Component
@@ -249,6 +250,7 @@ const ValidInterventionDialog = ({ dataIntervention, disabled }: ValidInterventi
 					</Form>
 				</div>
 			</DialogContent>
+			<LoadingOverlay isActive={isPending && !isSuccess && open} />
 		</Dialog>
 	)
 }

@@ -19,6 +19,7 @@ import { createDocument } from '@/actions/intervention/createDocument'
 import SelectFORM from '@/components/shared/form/SelectFORM'
 import { Input } from '@/components/ui/input'
 import { FileIcon } from '@radix-ui/react-icons'
+import { LoadingOverlay } from '@/components/provider/blockchainProvider'
 
 const groups = [
 	{
@@ -236,6 +237,7 @@ const AddDocumentDialog = ({ dataIntervention, disabled }: AddDocumentDialogProp
 					</Form>
 				</div>
 			</DialogContent>
+			<LoadingOverlay isActive={isPending && !isSuccess && open} />
 		</Dialog>
 	)
 }

@@ -22,6 +22,7 @@ import { Input } from '@/components/ui/input'
 import { createNft } from '@/actions/manager/CreateNft'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { Checkbox } from '@/components/ui/checkbox'
+import { LoadingOverlay } from '@/components/provider/blockchainProvider'
 
 /////////////////////////////////////////////////////////
 // ZOD SCHEMA
@@ -182,41 +183,8 @@ const CreatePermissionDialog = ({ idEstate, rnbCode, tokenId }: CreatePermission
 					</Form>
 				</div>
 			</DialogContent>
+			<LoadingOverlay isActive={isPending && !isSuccess && open} />
 		</Dialog>
-
-		// <Dialog open={open} onOpenChange={setOpen}>
-		// 	<DialogTrigger asChild>
-		// 		<Button variant='outline'>Permission</Button>
-		// 	</DialogTrigger>
-		// 	<DialogContent className='sm:max-w-[425px]'>
-		// 		<DialogHeader>
-		// 			<DialogTitle>Ajouter un nouveau batiment</DialogTitle>
-		// 			<DialogDescription>Entrer les détail du batiment</DialogDescription>
-		// 		</DialogHeader>
-		// 		<div className='grid gap-4 py-0'>
-		// 			<Form {...form}>
-		// 				<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-		// 					<div className='grid w-full items-center gap-4'>
-		// 						<div className='flex flex-col space-y-1.5'>
-		// 							<Label htmlFor='address'>Adresse</Label>
-		// 							<Input id='address' placeholder='Adresse du bâtiment' {...form.register('address')} />
-		// 						</div>
-		// 						<div className='flex flex-col space-y-1.5'>
-		// 							<Label htmlFor='ville'>Ville</Label>
-		// 							<Input id='town' placeholder='Ville du bâtiment' {...form.register('town')} />
-		// 						</div>
-
-		// 						<input type='file' {...form.register('file')} />
-		// 					</div>
-
-		// 					<Button type='submit' className='w-full'>
-		// 						Ajouter
-		// 					</Button>
-		// 				</form>
-		// 			</Form>
-		// 		</div>
-		// 	</DialogContent>
-		// </Dialog>
 	)
 }
 

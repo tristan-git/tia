@@ -18,6 +18,7 @@ import { createIntervention } from '@/actions/intervention/createIntervention'
 import { InterventionManagerArtifact } from '@/constants/artifacts/InterventionManager'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import SelectFORM from '@/components/shared/form/SelectFORM'
+import { LoadingOverlay } from '@/components/provider/blockchainProvider'
 
 /////////////////////////////////////////////////////////
 // ZOD SCHEMA
@@ -197,6 +198,7 @@ const CreateInterventionDialog = ({ idEstate, tokenId, addressInterventionManage
 					</Form>
 				</div>
 			</DialogContent>
+			<LoadingOverlay isActive={isPending && !isSuccess && open} />
 		</Dialog>
 	)
 }

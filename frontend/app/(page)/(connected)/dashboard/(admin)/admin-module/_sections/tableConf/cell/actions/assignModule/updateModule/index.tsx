@@ -15,6 +15,7 @@ import { addressEstateFactory } from '@/constants/contract'
 import { assignModule } from '@/actions/admin/assignModule'
 import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
+import { LoadingOverlay } from '@/components/provider/blockchainProvider'
 
 /////////////////////////////////////////////////////////
 // ZOD SCHEMA
@@ -32,11 +33,9 @@ const UpdateModule = ({ moduleData, contractAddress, managerAddress }: UpdateMod
 	const { address: currentAccount } = useAccount()
 	const queryClient = useQueryClient()
 
-	console.log(managerAddress)
-
 	const { deployContract, data: hashDeployed, isSuccess: isSuccessDeployed } = useDeployContract()
 	const { data: dataDeployedReceipt } = useTransactionReceipt({ hash: hashDeployed })
-	const { data: hashWriteContract, isSuccess: isSuccessWrite, writeContract } = useWriteContract()
+	const { data: hashWriteContract, isSuccess: isSuccessWrite, writeContract, isPending } = useWriteContract()
 	const { data: dataWriteReceipt } = useTransactionReceipt({ hash: hashWriteContract })
 	const { id, title, subTitle, Icon, moduleName } = moduleData || {}
 	const [defaultPermission, setDefaultPermission] = useState<boolean>(false)
@@ -200,6 +199,7 @@ const UpdateModule = ({ moduleData, contractAddress, managerAddress }: UpdateMod
 					)}
 				/>
 			</form>
+			<LoadingOverlay isActive={isPending && !isSuccessWrite && open} />
 		</Form>
 	)
 }

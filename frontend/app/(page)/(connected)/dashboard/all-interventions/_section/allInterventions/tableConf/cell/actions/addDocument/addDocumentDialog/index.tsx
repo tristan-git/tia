@@ -19,6 +19,7 @@ import { createDocument } from '@/actions/intervention/createDocument'
 import SelectFORM from '@/components/shared/form/SelectFORM'
 import { Input } from '@/components/ui/input'
 import { FileIcon } from '@radix-ui/react-icons'
+import { LoadingOverlay } from '@/components/provider/blockchainProvider'
 
 const groups = [
 	{
@@ -199,44 +200,48 @@ const AddDocumentDialog = ({ dataIntervention, disabled }: AddDocumentDialogProp
 	}, [isSuccess, hash, form, dataReceipt])
 
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
-			<DropdownMenuItem disabled={disabled} onClick={handleOpenDialog}>
-				Ajouter un document
-			</DropdownMenuItem>
+		<>
+			<Dialog open={open} onOpenChange={setOpen}>
+				<DropdownMenuItem disabled={disabled} onClick={handleOpenDialog}>
+					Ajouter un document
+				</DropdownMenuItem>
 
-			<DialogContent className='sm:max-w-[425px]'>
-				<DialogHeader>
-					<DialogTitle>Ajouter un nouveau document</DialogTitle>
-					<DialogDescription>{`Pour intervention : ${dataIntervention.title}`}</DialogDescription>
-				</DialogHeader>
-				<div className='grid gap-4 py-0'>
-					<Form {...form}>
-						<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-							<div className='grid w-full items-center gap-4'>
+				<DialogContent className='sm:max-w-[425px]'>
+					<DialogHeader>
+						<DialogTitle>Ajouter un nouveau document</DialogTitle>
+						<DialogDescription>{`Pour intervention : ${dataIntervention.title}`}</DialogDescription>
+					</DialogHeader>
+					<div className='grid gap-4 py-0'>
+						<Form {...form}>
+							<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
 								<div className='grid w-full items-center gap-4'>
-									<SelectFORM form={form} name='title' placeholder='Type de document' selectGroup={{ groups }} />
+									<div className='grid w-full items-center gap-4'>
+										<SelectFORM form={form} name='title' placeholder='Type de document' selectGroup={{ groups }} />
+									</div>
+
+									<div
+										className='border-2 border-dashed border-gray-200 rounded-lg flex flex-col gap-1 p-6 items-center cursor-pointer'
+										onClick={() => document.getElementById('file')?.click()}
+									>
+										<FileIcon className='w-12 h-12' />
+										<span className='text-sm font-medium text-gray-500'>Cliquer pour importer un document</span>
+										<span className='text-xs text-gray-500'>PDF, image, video..</span>
+
+										<Input id='file' type='file' placeholder='File' {...form.register('file')} className='hidden' />
+									</div>
 								</div>
 
-								<div
-									className='border-2 border-dashed border-gray-200 rounded-lg flex flex-col gap-1 p-6 items-center cursor-pointer'
-									onClick={() => document.getElementById('file')?.click()}
-								>
-									<FileIcon className='w-12 h-12' />
-									<span className='text-sm font-medium text-gray-500'>Cliquer pour importer un document</span>
-									<span className='text-xs text-gray-500'>PDF, image, video..</span>
+								<Button type='submit' className='w-full'>
+									Ajouter
+								</Button>
+							</form>
+						</Form>
+					</div>
+				</DialogContent>
+			</Dialog>
 
-									<Input id='file' type='file' placeholder='File' {...form.register('file')} className='hidden' />
-								</div>
-							</div>
-
-							<Button type='submit' className='w-full'>
-								Ajouter
-							</Button>
-						</form>
-					</Form>
-				</div>
-			</DialogContent>
-		</Dialog>
+			<LoadingOverlay isActive={isPending && !isSuccess && open} />
+		</>
 	)
 }
 

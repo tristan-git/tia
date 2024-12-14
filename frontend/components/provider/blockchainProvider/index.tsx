@@ -3,6 +3,38 @@
 import { createContext, useEffect, useState } from 'react'
 import { useAccount } from 'wagmi'
 import { useRouter } from 'next/navigation'
+import { useIsFetching } from '@tanstack/react-query'
+
+export const LoadingOverlay = ({ isActive  }: { isActive: boolean }) => {
+	if (!isActive) return null
+
+	return (
+		<span
+			style={{
+				position: 'absolue', // Position absolue sur l'écran
+				top: 0,
+				left: 0,
+				width: '100%', // Largeur de l'écran complet
+				height: '100%', // Hauteur de l'écran complet
+				backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fond noir avec opacité
+				zIndex: 97097, // Priorité maximale pour être devant tout le reste
+				display: 'flex', // Centre le contenu
+				alignItems: 'center',
+				justifyContent: 'center',
+			}}
+		>
+			<div
+				style={{
+					color: 'white',
+					fontSize: '1.5rem',
+					fontWeight: 'bold',
+				}}
+			>
+				En cours...
+			</div>
+		</span>
+	)
+}
 
 /////////////////////////////////////////////////////////
 //  CONTEXT
@@ -66,7 +98,6 @@ const BlockchainProvider = ({
 									: savedRoute
 							)
 						} else {
-							console.log('🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡')
 							localStorage.setItem('targetRoute', targetRoute)
 							router.push(targetRoute)
 						}
@@ -82,7 +113,7 @@ const BlockchainProvider = ({
 		getUser()
 	}, [router, currentAccount, status])
 
-	return <BlockchainContext.Provider value={{ userAccount, currentAccount }}>{children}</BlockchainContext.Provider>
+	return <BlockchainContext.Provider value={{ userAccount, currentAccount }}>{<>{children}</>}</BlockchainContext.Provider>
 }
 
 export default BlockchainProvider

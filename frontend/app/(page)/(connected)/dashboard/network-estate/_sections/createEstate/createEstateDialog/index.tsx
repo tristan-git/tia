@@ -17,6 +17,7 @@ import { addressEstateFactory } from '@/constants/contract'
 import { createEstateManager } from '@/actions/manager/createEstateManager'
 import { Label } from '@/components/ui/label'
 import { useGetAllUsers } from '@/hooks/queries/users/useGetAllUsers'
+import { LoadingOverlay } from '@/components/provider/blockchainProvider'
 
 // Fonction pour générer le RNB aléatoire
 const generateRandomRNB = () => {
@@ -166,6 +167,7 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 					</Form>
 				</div>
 			</DialogContent>
+			<LoadingOverlay isActive={isPending && !isSuccess && open} />
 		</Dialog>
 	)
 }

@@ -13,7 +13,7 @@ export const columns = [
 		cell: ({ row }) => {
 			return (
 				<div className=' text-xs'>
-					<Link href={`/dashboard/manage-estate/${row.getValue('id')}`} className='hover:underline underline-offset-4 '>
+					<Link href={`/dashboard/network-estate/${row.getValue('id')}`} className='hover:underline underline-offset-4 '>
 						{row.getValue('id')}
 					</Link>
 				</div>
@@ -36,7 +36,7 @@ export const columns = [
 		cell: ({ row }) => {
 			return (
 				<div className='flex flex-col text-xs'>
-					<Link href={`/dashboard/manage-estate/${row?.original?.estateManagerId}`} className='hover:underline underline-offset-4 '>
+					<Link href={`/dashboard/network-estate/${row?.original?.estateManagerId}`} className='hover:underline underline-offset-4 '>
 						<div className='truncate max-w-[100px] uppercase text-[12px]'>{row?.original?.rnbCode}</div>
 					</Link>
 				</div>

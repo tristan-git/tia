@@ -1,18 +1,22 @@
 'use client'
 
 import { DataTableColumnHeader } from '@/components/shared/dataTable/data-table-column-header'
+import { Button } from '@/components/ui/button'
+import { EyeOpenIcon } from '@radix-ui/react-icons'
 import Link from 'next/link'
 
 export const columns = [
 	{
-		accessorKey: 'id',
-		header: ({ column }) => <DataTableColumnHeader column={column} title='Id' />,
+		accessorKey: 'rnbCode',
+		header: ({ column }) => <DataTableColumnHeader column={column} title='ID' />,
 		cell: ({ row }) => {
 			return (
-				<div className=' text-xs truncate max-w-32'>
-					<Link href={`/dashboard/manage-estate/${row.getValue('id')}`} className='hover:underline underline-offset-4 '>
-						{row.getValue('id')}
-					</Link>
+				<div className=' text-xs font-bold'>
+					{
+						<Link href={`/dashboard/network-estate/${row.original.id}`} className='hover:underline underline-offset-4 '>
+							{row.getValue('rnbCode')}
+						</Link>
+					}
 				</div>
 			)
 		},
@@ -23,14 +27,6 @@ export const columns = [
 		header: ({ column }) => <DataTableColumnHeader column={column} title='Type de réseaux' />,
 		cell: ({ row }) => {
 			return <div className=' text-xs'>{row.original.networkTypes}</div>
-		},
-	},
-
-	{
-		accessorKey: 'rnbCode',
-		header: ({ column }) => <DataTableColumnHeader column={column} title='Code RNB' />,
-		cell: ({ row }) => {
-			return <div className=' text-xs'>{row.getValue('rnbCode')}</div>
 		},
 	},
 
@@ -57,6 +53,20 @@ export const columns = [
 			console.log(row.getValue('createdAtTimestamp'))
 			const date = new Date(row.getValue('createdAtTimestamp'))
 			return <div className='flex text-xs'>{date.toLocaleString()}</div>
+		},
+	},
+
+	{
+		id: 'actions',
+		cell: ({ row }) => {
+			console.log(row.original)
+			return (
+				<Link href={`/dashboard/network-estate/${row.original.id}`} className='hover:underline underline-offset-4 '>
+					<Button variant='outline' size='icon'>
+						<EyeOpenIcon />
+					</Button>
+				</Link>
+			)
 		},
 	},
 ]

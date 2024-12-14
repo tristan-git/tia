@@ -13,6 +13,7 @@ import InputFORM from '@/components/shared/form/InputFORM'
 import { Form } from '@/components/ui/form'
 import { toast } from '@/hooks/use-toast'
 import { artifactVotes } from '@/constants/artifacts/votes'
+import { LoadingOverlay } from '@/components/provider/blockchainProvider'
 
 /////////////////////////////////////////////////////////
 // ZOD SCHEMA
@@ -111,6 +112,7 @@ const AddProposal = ({ contractAddress, disabled, setOpenMenu }: AddProposalProp
 					</Form>
 				</div>
 			</DialogContent>
+			<LoadingOverlay isActive={isPending && !isSuccess && open} />
 		</Dialog>
 	)
 }

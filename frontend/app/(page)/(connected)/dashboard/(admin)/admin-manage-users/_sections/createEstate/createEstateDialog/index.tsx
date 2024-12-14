@@ -12,6 +12,7 @@ import { Form } from '@/components/ui/form'
 import InputFORM from '@/components/shared/form/InputFORM'
 import { saveDeployment } from '@/actions/saveContract'
 import { artifactVotesFactory } from '@/constants/artifacts/votesFactory'
+import { LoadingOverlay } from '@/components/provider/blockchainProvider'
 
 /////////////////////////////////////////////////////////
 // ZOD SCHEMA
@@ -127,6 +128,7 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 					</Form>
 				</div>
 			</DialogContent>
+			<LoadingOverlay isActive={isPending && !isSuccess && open} />
 		</Dialog>
 	)
 }

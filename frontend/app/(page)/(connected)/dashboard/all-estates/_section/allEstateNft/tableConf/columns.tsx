@@ -27,10 +27,10 @@ export const columns = [
 		cell: ({ row }) => {
 			return (
 				<div className='flex flex-col text-xs'>
-					<Link href={`/dashboard/manage-estate/${row?.original?.estateManager?.id}`} className='hover:underline underline-offset-4 '>
+					<Link href={`/dashboard/network-estate/${row?.original?.estateManager?.id}`} className='hover:underline underline-offset-4 '>
 						<div className='font-bold uppercase text-[12px]'>{row?.original?.estateManager?.rnbCode}</div>
 					</Link>
-					<Link href={`/dashboard/manage-estate/${row?.original?.estateManager?.id}`} className='hover:underline underline-offset-4 '>
+					<Link href={`/dashboard/network-estate/${row?.original?.estateManager?.id}`} className='hover:underline underline-offset-4 '>
 						<div>{row?.original?.estateManager?.networkTypes}</div>
 					</Link>
 				</div>

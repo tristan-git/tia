@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input'
 import { Form } from '@/components/ui/form'
 import { FileIcon } from '@radix-ui/react-icons'
 import SelectFORM from '@/components/shared/form/SelectFORM'
+import { LoadingOverlay } from '@/components/provider/blockchainProvider'
 
 const groups = [
 	{
@@ -268,6 +269,7 @@ const CreateCreateEstateNftDialog = ({ idEstate, rnbCode, tokenId, disabled }: C
 					</Form>
 				</div>
 			</DialogContent>
+			<LoadingOverlay isActive={isPending && !isSuccess && open} />
 		</Dialog>
 	)
 }

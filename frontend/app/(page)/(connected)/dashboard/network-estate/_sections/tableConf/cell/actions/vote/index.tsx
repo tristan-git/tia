@@ -15,6 +15,7 @@ import { useVotingProposal } from '@/hooks/queries/votes/useVotingProposal'
 import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { artifactVotes } from '@/constants/artifacts/votes'
 import { checksumAddress } from 'viem'
+import { LoadingOverlay } from '@/components/provider/blockchainProvider'
 
 /////////////////////////////////////////////////////////
 // ZOD SCHEMA
@@ -160,6 +161,7 @@ const Vote = ({ contractAddress, disabled, dataVote, setOpenMenu }: VoteProps) =
 					</Form>
 				</div>
 			</DialogContent>
+			<LoadingOverlay isActive={isPending && !isSuccess && open} />
 		</Dialog>
 	)
 }

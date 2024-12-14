@@ -49,7 +49,7 @@ export const columns: ColumnDef<Vote>[] = [
 		cell: ({ row }) => {
 			return (
 				<div className=' text-xs'>
-					<Link href={`/dashboard/manage-estate/${row.getValue('id')}`} className='hover:underline underline-offset-4 '>
+					<Link href={`/dashboard/network-estate/${row.getValue('id')}`} className='hover:underline underline-offset-4 '>
 						{row.getValue('id')}
 					</Link>
 				</div>

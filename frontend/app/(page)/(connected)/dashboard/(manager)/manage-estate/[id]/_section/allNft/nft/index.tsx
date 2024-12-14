@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useEffect } from 'react'
+import React from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
@@ -11,19 +11,6 @@ type NftProps = {
 }
 
 const Nft = ({ dataNft, setSelectedNft, selectedNft }: NftProps) => {
-	// {
-	//     "id": 50,
-	//     "tokenId": "25",
-	//     "estateManagerId": "0x155dfdcbb037b853580c1c8671d0c52b767c58bd",
-	//     "ownerAddress": 6,
-	//     "metadataURI": "https://97tjwcygbwqvo2fa.public.blob.vercel-storage.com/0x155dfdcbb037b853580c1c8671d0c52b767c58bd/24/metadata.json",
-	//     "createdAtTimestamp": "2024-12-08T10:59:23.856Z",
-	//     "mintedBy": 6,
-	//     "transactionHash": "0x093db860d0ce8193966ebd1ce7801b8ee7b9b7afe5bcfc761e6125390c6e00fd",
-	//     "address": "dsdsf",
-	//     "town": "sdf",
-	//     "img": "https://97tjwcygbwqvo2fa.public.blob.vercel-storage.com/0x155dfdcbb037b853580c1c8671d0c52b767c58bd/24/57f048b911192f6cea1b7aa9cdca8e4b26424fc06168236c1918dd6d1a5b82c6.png"
-	// }
 	return (
 		<Card className=''>
 			{selectedNft == dataNft?.tokenId && 'selectioner'}

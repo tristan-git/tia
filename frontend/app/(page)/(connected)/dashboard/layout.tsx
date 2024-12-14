@@ -25,7 +25,7 @@ const dashboardConfig = {
 					icon: Share1Icon,
 				},
 				{
-					title: 'Proprietées immobilier',
+					title: 'Propriété foncière',
 					url: '/dashboard/all-estates',
 					icon: HomeIcon,
 				},

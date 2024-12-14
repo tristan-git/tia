@@ -1,10 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { RowActionsCell } from './cell/actions'
 import { DataTableColumnHeader } from '@/components/shared/dataTable/data-table-column-header'
 import { Badge } from '@/components/ui/badge'
-import ViewDocument from './cell/actions/viewDocument'
+import DownloadDocument from './cell/downloadDoc'
 
 export const columns = [
 	{
@@ -22,11 +21,28 @@ export const columns = [
 		enableSorting: false,
 		enableHiding: false,
 	},
+
 	{
 		accessorKey: 'title',
-		header: ({ column }) => <DataTableColumnHeader column={column} title='Type intervention' />,
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Document' />,
 		cell: ({ row }) => {
 			return <div className='font-bold uppercase text-[11px]'>{row.getValue('title')}</div>
+		},
+	},
+
+	{
+		accessorKey: 'titleIntervention',
+		header: ({ column }) => <DataTableColumnHeader column={column} title='intervention' />,
+		cell: ({ row }) => {
+			return <div className=' text-[11px]'>{row.getValue('titleIntervention')}</div>
+		},
+	},
+
+	{
+		accessorKey: 'documentHash',
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Hash' />,
+		cell: ({ row }) => {
+			return <div className='truncate max-w-[80px] text-[11px]'>{row.getValue('documentHash')}</div>
 		},
 	},
 
@@ -50,7 +66,7 @@ export const columns = [
 			return (
 				<div className='flex flex-col text-xs'>
 					<Link href={`/dashboard/manage-estate/${row?.original?.estateManagerId}`} className='hover:underline underline-offset-4 '>
-						<div className='truncate max-w-[100px] uppercase text-[12px]'>{row?.original?.rnbCode}</div>
+						<div className='truncate max-w-[100px] uppercase text-[11px]'>{row?.original?.rnbCode}</div>
 					</Link>
 				</div>
 			)
@@ -78,23 +94,6 @@ export const columns = [
 	},
 
 	{
-		accessorKey: 'documents',
-		header: ({ column }) => <DataTableColumnHeader column={column} title='Documents' />,
-		cell: ({ row }) => {
-			return <ViewDocument data={row?.original} />
-		},
-	},
-
-	{
-		accessorKey: 'managerDetail',
-		header: ({ column }) => <DataTableColumnHeader column={column} title='Gestionnaire' />,
-		cell: ({ row }) => {
-			const managerDetail = row.getValue('managerDetail')
-			return <div className='flex text-xs'>{`${managerDetail?.firstName} ${managerDetail?.lastName}`}</div>
-		},
-	},
-
-	{
 		accessorKey: 'createdByUser',
 		header: ({ column }) => <DataTableColumnHeader column={column} title='Intervenant' />,
 		cell: ({ row }) => {
@@ -102,18 +101,24 @@ export const columns = [
 			return <div className='flex text-xs'>{`${createdByUser?.firstName} ${createdByUser?.lastName}`}</div>
 		},
 	},
-
 	{
 		accessorKey: 'createdAtTimestamp',
 		header: ({ column }) => <DataTableColumnHeader column={column} title='Creer le' />,
 		cell: ({ row }) => {
 			const date = new Date(row.getValue('createdAtTimestamp'))
-			return <div className='flex text-xs'>{date.toLocaleString()}</div>
+			const datePart = date.toLocaleDateString()
+			const timePart = date.toLocaleTimeString()
+			return (
+				<div className='flex flex-col text-xs'>
+					<span className=''>{datePart}</span>
+					<span className='opacity-60'>{timePart}</span>
+				</div>
+			)
 		},
 	},
 
 	{
 		id: 'actions',
-		cell: ({ row }) => <RowActionsCell row={row} />,
+		cell: ({ row }) => <DownloadDocument row={row.original} />,
 	},
 ]

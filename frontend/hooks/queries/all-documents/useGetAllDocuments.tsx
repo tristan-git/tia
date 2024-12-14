@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 
 export const useGetAllDocuments = (currentAccount: any) => {
 	return useQuery({
-		queryKey: ['useGetAllDocuments'],
+		queryKey: [`useGetAllDocuments-${currentAccount}`],
 		enabled: !!currentAccount,
 		queryFn: async () => {
 			const response = await fetch('/api/get-all-documents', {

@@ -1,9 +1,10 @@
 'use client'
 
-import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles, CircleUser } from 'lucide-react'
+import { useContext } from 'react'
 
+import { BadgeCheck, Bell, ChevronsUpDown, LogOut } from 'lucide-react'
+import { useAccount, useDisconnect } from 'wagmi'
 import { Avatar } from '@/components/ui/avatar'
-
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -13,17 +14,15 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar'
-import { useAccount, useDisconnect } from 'wagmi'
+import { useAccountModal, useChainModal } from '@rainbow-me/rainbowkit'
+
 import ButtonWalletConnect from './ButtonWalletConnect'
-import { useAccountModal, useChainModal, useConnectModal } from '@rainbow-me/rainbowkit'
-import { useContext } from 'react'
 import { BlockchainContext } from '@/components/provider/blockchainProvider'
 
 export default function WalletConnect() {
-	const { userAccount } = useContext(BlockchainContext)
-	const { address, isConnected } = useAccount()
+	const { userAccount }: any = useContext(BlockchainContext)
+	const { isConnected } = useAccount()
 	const { openAccountModal } = useAccountModal()
 	const { openChainModal } = useChainModal()
 	const { disconnect } = useDisconnect()

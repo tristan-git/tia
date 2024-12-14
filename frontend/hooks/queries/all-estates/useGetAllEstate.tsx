@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 
 export const useGetAllEstate = (currentAccount: any) => {
 	return useQuery({
-		queryKey: ['useGetAllEstate'],
+		queryKey: [`useGetAllEstate-${currentAccount}`],
 		enabled: !!currentAccount,
 		queryFn: async () => {
 			const response = await fetch('/api/get-all-estate-nft', {

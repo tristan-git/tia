@@ -1,3 +1,5 @@
+'use client'
+
 import { Share1Icon } from '@radix-ui/react-icons'
 
 import Dashboard from '@/components/shared/dashboard'
@@ -5,6 +7,8 @@ import DashboardContent from './_sections/dashboard/content'
 import DashboardSideBar from './_sections/dashboard/sideBar'
 import DashboardHeader from './_sections/dashboard/header'
 import { CubeIcon, PersonIcon, FileIcon, ClipboardIcon, HomeIcon } from '@radix-ui/react-icons'
+import { usePathname, useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 /////////////////////////////////////////////////////////
 // dashboard Config
@@ -17,7 +21,6 @@ const dashboardConfig = {
 	navConf: [
 		{
 			label: 'Management des bien',
-			roleAccess: 'manager',
 			navMain: [
 				{
 					title: 'Réseaux immobilier',
@@ -70,5 +73,10 @@ const dashboardConfig = {
 /////////////////////////////////////////////////////////
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
+	const pathname = usePathname()
+
+	useEffect(() => {
+		localStorage.setItem('targetRoute', pathname)
+	}, [pathname])
 	return <Dashboard config={dashboardConfig}>{children}</Dashboard>
 }

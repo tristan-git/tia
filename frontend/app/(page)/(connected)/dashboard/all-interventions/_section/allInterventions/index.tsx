@@ -22,7 +22,7 @@ const AllInterventions = ({}: AllInterventionsProps) => {
 
 	return (
 		<div className='relative w-full overflow-x-auto'>
-			{/* <DataTable data={data || []} columns={columns} config={config} /> */}
+			<DataTable data={data || []} columns={columns} config={config} />
 		</div>
 	)
 }

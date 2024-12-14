@@ -51,6 +51,14 @@ export async function POST(request: Request): Promise<NextResponse> {
 				createdAtTimestamp: interventionsTable.createdAtTimestamp,
 				isValidated: interventionsTable.isValidated,
 				validateFrom: interventionsTable.validateFrom,
+				indexIntervention: interventionsTable.indexIntervention,
+				moduleId: modulesTable.id,
+				town: mintedNFTsTable.town,
+				address: mintedNFTsTable.address,
+				metadataURI: mintedNFTsTable.metadataURI,
+				rnbCode: estateManagersTable.rnbCode,
+				networkTypes: estateManagersTable.networkTypes,
+				img: mintedNFTsTable.img,
 				createdByUser: {
 					id: createdByUser.id,
 					walletAddress: createdByUser.walletAddress,
@@ -80,6 +88,8 @@ export async function POST(request: Request): Promise<NextResponse> {
 			.leftJoin(createdByUser, eq(interventionsTable.createdBy, createdByUser.id)) // Jointure pour createdByUser
 			.leftJoin(estateManagersTable, eq(estateManagersTable.id, interventionsTable.estateManagerId))
 			.leftJoin(managerUser, eq(managerUser.id, estateManagersTable.managerId))
+			.leftJoin(mintedNFTsTable, eq(mintedNFTsTable.estateManagerId, interventionsTable.estateManagerId))
+			.leftJoin(modulesTable, eq(modulesTable.estateManagerId, interventionsTable.estateManagerId))
 			.where(eq(interventionsTable.createdBy, userId)) // Filtrage par utilisateur
 			.orderBy(interventionsTable.id)
 

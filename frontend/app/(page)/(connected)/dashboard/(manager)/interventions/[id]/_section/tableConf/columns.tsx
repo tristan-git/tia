@@ -41,7 +41,7 @@ export const columns = [
 	},
 	{
 		accessorKey: 'isValidated',
-		header: ({ column }) => <DataTableColumnHeader column={column} title='Valider' />,
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Validation' />,
 		cell: ({ row }) => {
 			return (
 				<div className=' text-xs'>

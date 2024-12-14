@@ -1,10 +1,9 @@
 'use client'
 
 import Image from 'next/image'
-
 import { DataTableColumnHeader } from '@/components/shared/dataTable/data-table-column-header'
 import Link from 'next/link'
-import { PersonIcon, ExclamationTriangleIcon, CubeIcon, ClipboardIcon, EyeOpenIcon } from '@radix-ui/react-icons'
+import { ClipboardIcon, EyeOpenIcon } from '@radix-ui/react-icons'
 import { Button } from '@/components/ui/button'
 
 export const columns = [

@@ -1,6 +1,6 @@
 import React from 'react'
 import { useAccount } from 'wagmi'
-import { useGetInterventionsByNft } from '@/hooks/queries/interventions/useGetInterventionsByNft'
+import { useGetInterventionsByNft } from '@/hooks/queries/interventions-by-nft/useGetInterventionsByNft'
 import { DataTableToolbar } from '../tableConf/toolBar'
 import { DataTable } from '@/components/shared/dataTable/data-table'
 import { columns } from '../tableConf/columns'

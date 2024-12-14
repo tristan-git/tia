@@ -5,7 +5,7 @@ export const useGetInterventionsByNft = (currentAccount: any, idEstate: any, tok
 		queryKey: ['useGetInterventionsByNft'],
 		enabled: !!currentAccount || !!idEstate || !!parseInt(tokenId),
 		queryFn: async () => {
-			const response = await fetch('/api/interventions/by-nft', {
+			const response = await fetch('/api/get-interventions-by-nft', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

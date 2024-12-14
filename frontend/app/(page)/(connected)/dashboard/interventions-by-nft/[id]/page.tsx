@@ -1,8 +1,8 @@
 import InterventionByNft from './_section'
 
 import { db } from '@/drizzle/db'
-import { eq, sql } from 'drizzle-orm'
-import { estateManagersTable, mintedNFTsTable, modulesTable, usersTable } from '@/drizzle/schema'
+import { eq } from 'drizzle-orm'
+import { mintedNFTsTable, modulesTable } from '@/drizzle/schema'
 
 export default async function Interventions({ params }: { params: Promise<{ id: string }> }) {
 	const id = (await params).id

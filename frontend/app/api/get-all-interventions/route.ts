@@ -34,9 +34,6 @@ export async function POST(request: Request): Promise<NextResponse> {
 			return NextResponse.json({ error: 'User not found' }, { status: 404 })
 		}
 
-		// 1 = Admin | 2 gestionnaire | 3 prestataire | 4 lecteur
-		const role = user?.[0].accountRoleId
-
 		// Alias pour les utilisateurs
 		const createdByUser = aliasedTable(usersTable, 'createdByUser')
 		const managerUser = aliasedTable(usersTable, 'managerUser')

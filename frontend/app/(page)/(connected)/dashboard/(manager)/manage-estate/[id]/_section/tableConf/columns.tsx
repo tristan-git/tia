@@ -16,7 +16,7 @@ export const columns: ColumnDef<Vote>[] = [
 		cell: ({ row }) => {
 			return (
 				<div className=' text-xs'>
-					<Link href={`/dashboard/interventions/${row.getValue('id')}`} className='hover:underline underline-offset-4 '>
+					<Link href={`/dashboard/interventions-by-nft/${row.getValue('id')}`} className='hover:underline underline-offset-4 '>
 						{row.getValue('id')}
 					</Link>
 				</div>
@@ -32,7 +32,7 @@ export const columns: ColumnDef<Vote>[] = [
 		cell: ({ row }) => {
 			return (
 				<div className=' text-xs'>
-					<Link href={`/dashboard/interventions/${row.getValue('id')}`} className='hover:underline underline-offset-4 '>
+					<Link href={`/dashboard/interventions-by-nft/${row.getValue('id')}`} className='hover:underline underline-offset-4 '>
 						<Image src={row.getValue('img')} width={80} height={80} className='object-none h-12 w-12 rounded-sm' />
 					</Link>
 				</div>

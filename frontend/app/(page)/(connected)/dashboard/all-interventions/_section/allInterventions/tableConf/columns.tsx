@@ -31,19 +31,6 @@ export const columns = [
 	},
 
 	{
-		accessorKey: 'address',
-		header: ({ column }) => <DataTableColumnHeader column={column} title='Address' />,
-		cell: ({ row }) => {
-			return (
-				<div className='flex flex-col text-xs'>
-					<div className='font-bold uppercase text-[10px]'>{row?.original?.town}</div>
-					<div>{row.getValue('address')}</div>
-				</div>
-			)
-		},
-	},
-
-	{
 		accessorKey: 'estateManager',
 		header: ({ column }) => <DataTableColumnHeader column={column} title='Réseaux' />,
 		cell: ({ row }) => {
@@ -52,6 +39,19 @@ export const columns = [
 					<Link href={`/dashboard/manage-estate/${row?.original?.estateManagerId}`} className='hover:underline underline-offset-4 '>
 						<div className='truncate max-w-[100px] uppercase text-[12px]'>{row?.original?.rnbCode}</div>
 					</Link>
+				</div>
+			)
+		},
+	},
+
+	{
+		accessorKey: 'address',
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Address' />,
+		cell: ({ row }) => {
+			return (
+				<div className='flex flex-col text-xs'>
+					<div className='font-bold uppercase text-[10px]'>{row?.original?.town}</div>
+					<div>{row.getValue('address')}</div>
 				</div>
 			)
 		},

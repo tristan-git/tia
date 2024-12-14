@@ -13,7 +13,7 @@ export const columns = [
 		cell: ({ row }) => {
 			return (
 				<div className=' text-xs'>
-					<Link href={`/dashboard/interventions/${row?.original?.nftId}`} className='hover:underline underline-offset-4 '>
+					<Link href={`/dashboard/interventions-by-nft/${row?.original?.nftId}`} className='hover:underline underline-offset-4 '>
 						<Image src={row.getValue('img')} width={80} height={80} className='object-none h-12 w-12 rounded-sm' />
 					</Link>
 				</div>
@@ -59,7 +59,7 @@ export const columns = [
 
 			return interventions ? (
 				<div className='flex items-center text-xs'>
-					<Link href={`/dashboard/interventions/${row?.original?.nftId}`} className='hover:underline underline-offset-4 '>
+					<Link href={`/dashboard/interventions-by-nft/${row?.original?.nftId}`} className='hover:underline underline-offset-4 '>
 						<div className='flex space-x-1'>
 							<ClipboardIcon />
 							{`${interventions} intervention${interventions > 1 ? 's' : ''}`}
@@ -81,7 +81,7 @@ export const columns = [
 
 			return documentCount ? (
 				<div className='flex items-center text-xs'>
-					<Link href={`/dashboard/interventions/${row?.original?.nftId}`} className='hover:underline underline-offset-4 '>
+					<Link href={`/dashboard/interventions-by-nft/${row?.original?.nftId}`} className='hover:underline underline-offset-4 '>
 						<div className='flex space-x-1'>
 							<ClipboardIcon />
 							{`${documentCount} document${documentCount > 1 ? 's' : ''}`}
@@ -121,7 +121,7 @@ export const columns = [
 	{
 		id: 'actions',
 		cell: ({ row }) => (
-			<Link href={`/dashboard/interventions/${row?.original?.nftId}`} className='hover:underline underline-offset-4 '>
+			<Link href={`/dashboard/interventions-by-nft/${row?.original?.nftId}`} className='hover:underline underline-offset-4 '>
 				<Button variant='outline' size='icon'>
 					<EyeOpenIcon />
 				</Button>

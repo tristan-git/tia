@@ -1,4 +1,5 @@
 import React from 'react'
+
 import { useAccount } from 'wagmi'
 import { DataTableToolbar } from './tableConf/toolBar'
 import { DataTable } from '@/components/shared/dataTable/data-table'
@@ -16,12 +17,9 @@ const AllDocuments = ({}: AllDocumentsProps) => {
 	const { address: currentAccount } = useAccount()
 	const { data } = useGetAllDocuments(currentAccount)
 
-	console.log('🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡')
-	console.log(data)
-
 	return (
 		<div className='relative w-full overflow-x-auto'>
-			<DataTable data={data || []} columns={columns} config={config} />{' '}
+			<DataTable data={data || []} columns={columns} config={config} />
 		</div>
 	)
 }

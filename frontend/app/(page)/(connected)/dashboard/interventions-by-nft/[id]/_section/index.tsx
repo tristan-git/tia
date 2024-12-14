@@ -1,16 +1,13 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 
-import { useAccount, useReadContract } from 'wagmi'
-import { EstateManagerArtifact } from '@/constants/artifacts/EstateManager'
-import { useGetManagerEstateNft } from '@/hooks/queries/manager/useGetManagerEstateNft'
+import { useAccount } from 'wagmi'
 import InterventionsByNft from './interventionsByNft'
 import CreateIntervention from './createIntervention'
-import { InterventionManagerArtifact } from '@/constants/artifacts/InterventionManager'
 import { useHaveAccessModule } from '@/hooks/queries/role/usehaveAccessModule'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Terminal ,InfoIcon} from 'lucide-react'
+import { InfoIcon } from 'lucide-react'
 
 type MyEstatesProps = {
 	idNft: `0x${string}`
@@ -26,20 +23,6 @@ const InterventionByNft = ({ idNft, dataNft, addressInterventionManager }: MyEst
 		tokenId: dataNft?.tokenId,
 		userAddress: currentAccount as `0x${string}`,
 	})
-
-	// const { data } = useReadContract({
-	// 	abi: InterventionManagerArtifact.abi,
-	// 	address: addressInterventionManager,
-	// 	functionName: 'getInterventions',
-	// 	args: [BigInt(dataNft?.tokenId), currentAccount],
-	// 	account: currentAccount,
-	// })
-	// const { data: tt } = useReadContract({
-	// 	abi: InterventionManagerArtifact.abi,
-	// 	address: addressInterventionManager,
-	// 	functionName: 'getTest',
-	// 	account: currentAccount,
-	// })
 
 	return (
 		<>

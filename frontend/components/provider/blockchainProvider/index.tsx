@@ -5,13 +5,13 @@ import { useAccount } from 'wagmi'
 import { useRouter } from 'next/navigation'
 import { useIsFetching } from '@tanstack/react-query'
 
-export const LoadingOverlay = ({ isActive  }: { isActive: boolean }) => {
+export const LoadingOverlay = ({ isActive }: { isActive: boolean }) => {
 	if (!isActive) return null
 
 	return (
 		<span
 			style={{
-				position: 'absolue', // Position absolue sur l'écran
+				position: 'absolute', // Position absolue sur l'écran
 				top: 0,
 				left: 0,
 				width: '100%', // Largeur de l'écran complet

@@ -1,48 +1,11 @@
 'use client'
 
-import { ColumnDef } from '@tanstack/react-table'
-
-import { Badge } from '@/components/ui/badge'
-import { Vote, voteSchema } from './schema'
-import OwnerCell from './cell/OwnerCell'
-import { statusVotes } from '@/constants/statusVotes'
+import Link from 'next/link'
 import CustomBadge from '@/components/shared/_ui/badge'
 import { RowActionsCell } from './cell/actions'
-import { WorkflowStatus } from '@/lib/enum'
-import NbVotersCell from './cell/NbVotersCell'
-import WinnerDisplay from './cell/winnerDisplay'
-import { checksumAddress } from 'viem'
-import { Cross2Icon } from '@radix-ui/react-icons'
 import { DataTableColumnHeader } from '@/components/shared/dataTable/data-table-column-header'
-import Link from 'next/link'
 
-export const columns: ColumnDef<Vote>[] = [
-	// {
-	// 	id: 'select',
-	// 	header: ({ table }) => (
-	// 		<Checkbox
-	// 			checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
-	// 			onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-	// 			aria-label='Select all'
-	// 			className='translate-y-[2px]'
-	// 		/>
-	// 	),
-	// 	cell: ({ row }) => (
-	// 		<Checkbox
-	// 			checked={row.getIsSelected()}
-	// 			onCheckedChange={(value) => row.toggleSelected(!!value)}
-	// 			aria-label='Select row'
-	// 			className='translate-y-[2px]'
-	// 		/>
-	// 	),
-	// 	enableSorting: false,
-	// 	enableHiding: false,
-	// },
-
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// TEST
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+export const columns: any = [
 	{
 		accessorKey: 'id',
 		header: ({ column }) => <DataTableColumnHeader column={column} title='Id' />,
@@ -83,76 +46,6 @@ export const columns: ColumnDef<Vote>[] = [
 		},
 	},
 
-	// {
-	// 	accessorKey: 'owner',
-	// 	header: ({ column }) => <DataTableColumnHeader column={column} title='owner' />,
-	// 	cell: ({ row }) => {
-	// 		return (
-	// 			<div className='flex space-x-2'>
-	// 				<OwnerCell addressOwner={row.getValue('owner')} />
-	// 			</div>
-	// 		)
-	// 	},
-	// },
-
-	// {
-	// 	accessorKey: 'userVoters',
-	// 	header: ({ column }) => <DataTableColumnHeader column={column} title='voters' />,
-	// 	cell: ({ row }) => {
-	// 		return (
-	// 			<div className='flex text-xs'>
-	// 				<NbVotersCell voters={row.getValue('userVoters')} />
-	// 			</div>
-	// 		)
-	// 	},
-	// },
-
-	// {
-	// 	accessorKey: 'proposals',
-	// 	header: ({ column }) => <DataTableColumnHeader column={column} title='proposals' />,
-	// 	cell: ({ row }) => {
-	// 		return (
-	// 			<div className='flex text-xs'>
-	// 				{row.getValue('proposals')?.length ? row.getValue('proposals')?.length : '-'}
-	// 				{/* {row.getValue('proposals')?.length ? <CustomBadge text={row.getValue('proposals')?.length} variant='outline' /> : '-'} */}
-	// 			</div>
-	// 		)
-	// 	},
-	// },
-
-	// {
-	// 	accessorKey: 'proposals',
-	// 	header: ({ column }) => <DataTableColumnHeader column={column} title='votes' />,
-	// 	cell: ({ row }) => {
-	// 		const proposal = row.getValue('proposals')
-	// 		const totalVotes = proposal?.reduce((sum, item) => sum + item.voteCount, 0)
-
-	// 		return (
-	// 			<div className='flex text-xs'>
-	// 				{
-	// 					proposal?.length ? totalVotes : '-'
-	// 					// proposal?.length ? <CustomBadge text={totalVotes} variant='outline' /> : '-'
-	// 				}
-	// 			</div>
-	// 		)
-	// 	},
-	// },
-	// {
-	// 	accessorKey: 'winningProposalID',
-	// 	header: ({ column }) => <DataTableColumnHeader column={column} title='Winner' />,
-	// 	cell: ({ row }) => {
-	// 		const winningProposalID = row.getValue('winningProposalID')
-	// 		const address = row.getValue('id')
-	// 		const data = voteSchema.parse(row.original)
-
-	// 		return (
-	// 			<div className='flex text-xs'>
-	// 				{winningProposalID ? <WinnerDisplay winningProposalID={winningProposalID} address={address} data={data} /> : '-'}
-	// 			</div>
-	// 		)
-	// 	},
-	// },
-
 	{
 		accessorKey: 'createdAtTimestamp',
 		header: ({ column }) => <DataTableColumnHeader column={column} title='Creer le' />,
@@ -166,17 +59,16 @@ export const columns: ColumnDef<Vote>[] = [
 		accessorKey: 'modules',
 		header: ({ column }) => <DataTableColumnHeader column={column} title='Modules' />,
 		cell: ({ row }) => {
-			const modules = row.getValue('modules')
-			console.log(modules)
+			const modules = row.original?.modules
 			return <div className='flex  items-center'>{modules?.moduleName && <CustomBadge text={modules?.moduleName} />}</div>
 		},
-		filterFn: (row, id, value) => {
+		filterFn: (row, id, value): any => {
 			return value.includes(row.getValue(id))
 		},
 	},
 
 	{
 		id: 'actions',
-		cell: ({ row }) => <RowActionsCell row={row} />,
+		cell: ({ row }: any ) => <RowActionsCell row={row} />,
 	},
 ]

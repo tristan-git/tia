@@ -9,7 +9,7 @@ import { z } from 'zod'
 
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, Form } from '@/components/ui/form'
 import { assignPrestatairePermission } from '@/actions/users/assignPrestatairePermission'
-import { useHaveAccessModule } from '@/hooks/queries/role/usehaveAccessModule'
+import { useHaveAccessModule } from '@/hooks/role/usehaveAccessModule'
 import { EstateManagerArtifact } from '@/constants/artifacts/EstateManager'
 import { Switch } from '@/components/ui/switch'
 import { toast } from '@/hooks/use-toast'

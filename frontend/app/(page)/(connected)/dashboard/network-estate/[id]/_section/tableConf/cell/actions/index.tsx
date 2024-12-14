@@ -13,9 +13,9 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import PermissionIntervention from './assignPermission'
-import { useIsManager } from '@/hooks/queries/role/useIsManager'
+import { useIsManager } from '@/hooks/role/useIsManager'
 import { useAccount } from 'wagmi'
-import { useHaveAccessModule } from '@/hooks/queries/role/usehaveAccessModule'
+import { useHaveAccessModule } from '@/hooks/role/usehaveAccessModule'
 
 interface DataTableRowActionsProps<TData> {
 	row: Row<TData>

@@ -1,9 +1,9 @@
 'use client'
 
 import { DataTableToolbar } from './_sections/tableConf/toolBar'
-import { useGetManagerEstate } from '@/hooks/queries/manager/useGetManagerEstate'
 import { DataTable } from '@/components/shared/dataTable/data-table'
 import { columns } from './_sections/tableConf/columns'
+import { useGetAllEstateNetwork } from '@/hooks/queries/all-estate-network/useGetManagerEstate'
 
 const config = {
 	DataTableToolbar: DataTableToolbar,
@@ -15,7 +15,7 @@ const config = {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 export default function ManageEstate() {
-	const { data } = useGetManagerEstate()
+	const { data } = useGetAllEstateNetwork()
 
 	return (
 		<>

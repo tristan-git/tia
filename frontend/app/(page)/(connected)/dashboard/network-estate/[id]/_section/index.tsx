@@ -6,7 +6,7 @@ import { useAccount, useReadContract } from 'wagmi'
 import { EstateManagerArtifact } from '@/constants/artifacts/EstateManager'
 import AllNft from './allNft'
 import AddEstate from './createNft'
-import { useIsManager } from '@/hooks/queries/role/useIsManager'
+import { useIsManager } from '@/hooks/role/useIsManager'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { InfoIcon } from 'lucide-react'
 

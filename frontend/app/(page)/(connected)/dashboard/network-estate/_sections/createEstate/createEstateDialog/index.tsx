@@ -12,26 +12,23 @@ import { Button } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
 import InputFORM from '@/components/shared/form/InputFORM'
 import SelectFORM from '@/components/shared/form/SelectFORM'
-import { useGetManagersUsers } from '@/hooks/queries/users/managerGetUsers'
 import { EstateManagerFactoryArtifact } from '@/constants/artifacts/EstateManagerFactory'
 import { addressEstateFactory } from '@/constants/contract'
 import { createEstateManager } from '@/actions/manager/createEstateManager'
 import { Label } from '@/components/ui/label'
 import { useGetAllUsers } from '@/hooks/queries/users/useGetAllUsers'
 
-const formatForSelect = (users: any) =>
-	users?.map((user: any) => ({
-		value: user.walletAddress,
-		text: `${user.firstName} ${user.lastName}`,
-	}))
+// Fonction pour générer le RNB aléatoire
+const generateRandomRNB = () => {
+	const randomNumber = Math.floor(100000 + Math.random() * 900000) // Générer un nombre aléatoire à 6 chiffres
+	return `RNB-${randomNumber}`
+}
 
 /////////////////////////////////////////////////////////
 // ZOD SCHEMA
 /////////////////////////////////////////////////////////
 
 const FormSchema = z.object({
-	// adminAddress: z.string().refine((value) => /^0x[a-fA-F0-9]{40}$/.test(value), { message: 'Adresse Ethereum non valide' }),
-	// managerAddress: z.string().refine((value) => /^0x[a-fA-F0-9]{40}$/.test(value), { message: 'Adresse Ethereum non valide' }),
 	rnbCode: z.string().min(2, { message: 'rnb non valide' }),
 	networkTypes: z.string().min(2, { message: 'requis' }),
 })
@@ -40,7 +37,6 @@ const FormSchema = z.object({
 /////////////////////////////////////////////////////////
 
 type CreateVoteDialogProps = {}
-
 const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 	const { data: users } = useGetAllUsers()
 	const { address } = useAccount()
@@ -51,11 +47,13 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
-		defaultValues: { rnbCode: '' },
+		defaultValues: {
+			rnbCode: generateRandomRNB(), // Définir la valeur par défaut
+			networkTypes: '',
+		},
 	})
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
-		//const { adminAddress, managerAddress, rnbCode } = data
 		const { rnbCode } = data
 		writeContract({
 			address: addressEstateFactory,
@@ -71,7 +69,6 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 		async function handleDeploymentReceipt() {
 			if (isSuccess && hash) {
 				if (dataReceipt && dataReceipt.logs[0]?.address) {
-					// const { adminAddress, managerAddress, rnbCode } = form.getValues()
 					const { rnbCode, networkTypes } = form.getValues()
 
 					const deployment = {
@@ -93,7 +90,7 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 
 					queryClient.invalidateQueries()
 
-					toast({ title: 'Le réseau est ajouter', description: `code RNB : ${rnbCode}, type : ${networkTypes}` })
+					toast({ title: 'Le réseau est ajouté', description: `code RNB : ${rnbCode}, type : ${networkTypes}` })
 
 					setOpen(false)
 				}
@@ -120,6 +117,13 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 		}
 	}, [error])
 
+	useEffect(() => {
+		if (open) {
+			const newRnbCode = generateRandomRNB()
+			form.reset({ rnbCode: newRnbCode, networkTypes: '' }) // Réinitialise le formulaire avec le nouveau code
+		}
+	}, [open])
+
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
@@ -133,7 +137,7 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 				<div className='grid gap-4 py-0'>
 					<Form {...form}>
 						<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-							<InputFORM formLabel={{ text: 'Code RNB' }} form={form} name='rnbCode' placeholder='Code RNB' className='w-full' />
+							<InputFORM formLabel={{ text: 'Code RNB' }} form={form} name='rnbCode' placeholder='Code RNB' className='w-full' readOnly />
 
 							<div className='flex flex-col space-y-1.5'>
 								<Label htmlFor='ville'>Type de réseau immobilier</Label>

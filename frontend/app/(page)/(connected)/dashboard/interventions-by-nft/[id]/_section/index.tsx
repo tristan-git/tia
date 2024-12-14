@@ -5,7 +5,7 @@ import React from 'react'
 import { useAccount } from 'wagmi'
 import InterventionsByNft from './interventionsByNft'
 import CreateIntervention from './createIntervention'
-import { useHaveAccessModule } from '@/hooks/queries/role/usehaveAccessModule'
+import { useHaveAccessModule } from '@/hooks/role/usehaveAccessModule'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { InfoIcon } from 'lucide-react'
 

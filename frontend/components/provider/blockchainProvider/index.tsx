@@ -45,7 +45,7 @@ const BlockchainProvider = ({
 
 				if (data?.length) {
 					setUserAccount(data[0])
-					router.push('/dashboard/manage-estate')
+					router.push('/dashboard/network-estate')
 				}
 			} catch (error) {
 				console.error('Erreur lors de la récupération des données:', error.message)

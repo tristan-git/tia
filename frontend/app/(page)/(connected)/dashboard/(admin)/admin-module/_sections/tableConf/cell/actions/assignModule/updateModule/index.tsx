@@ -8,7 +8,7 @@ import { toast } from '@/hooks/use-toast'
 import { z } from 'zod'
 
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, Form } from '@/components/ui/form'
-import { useHaveModuleRegistered } from '@/hooks/queries/role/useHaveModuleRegistered'
+import { useHaveModuleRegistered } from '@/hooks/role/useHaveModuleRegistered'
 import { InterventionManagerArtifact } from '@/constants/artifacts/InterventionManager'
 import { EstateManagerFactoryArtifact } from '@/constants/artifacts/EstateManagerFactory'
 import { addressEstateFactory } from '@/constants/contract'

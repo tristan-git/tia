@@ -15,8 +15,8 @@ import {
 import { useAccount } from 'wagmi'
 import AddDocument from './addDocument'
 import ValidIntervention from './validIntervention'
-import { useIsManager } from '@/hooks/queries/role/useIsManager'
-import { useIsInterventionPrestataire } from '@/hooks/queries/role/useIsInterventionPrestataire'
+import { useIsManager } from '@/hooks/role/useIsManager'
+import { useIsInterventionPrestataire } from '@/hooks/role/useIsInterventionPrestataire'
 import PermissionDocument from './permissionDocument'
 
 interface DataTableRowActionsProps<TData> {

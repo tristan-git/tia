@@ -21,7 +21,7 @@ const dashboardConfig = {
 			navMain: [
 				{
 					title: 'Réseaux immobilier',
-					url: '/dashboard/manage-estate',
+					url: '/dashboard/network-estate',
 					icon: Share1Icon,
 				},
 				{
@@ -52,7 +52,7 @@ const dashboardConfig = {
 			navMain: [
 				{
 					title: 'Authorisations module',
-					url: '/dashboard/admin-manage-estate',
+					url: '/dashboard/admin-module',
 					icon: CubeIcon,
 				},
 				{

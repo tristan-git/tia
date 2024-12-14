@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { Button } from '@/components/ui/button'
-import { usePermissionDocument } from '@/hooks/queries/role/usePermissionDocument'
+import { usePermissionDocument } from '@/hooks/role/usePermissionDocument'
 import { DownloadIcon } from '@radix-ui/react-icons'
 import { useAccount } from 'wagmi'
 import { bucketPath } from '@/constants/bucket'

@@ -1,6 +1,6 @@
 import React from 'react'
 import ViewDocumentDialog from './viewDocumentDialog'
-import { usePermissionDocument } from '@/hooks/queries/role/usePermissionDocument'
+import { usePermissionDocument } from '@/hooks/role/usePermissionDocument'
 import { useAccount } from 'wagmi'
 import { CircleBackslashIcon } from '@radix-ui/react-icons'
 import { Button } from '@/components/ui/button'

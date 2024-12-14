@@ -13,7 +13,7 @@ import { EstateManagerArtifact } from '@/constants/artifacts/EstateManager'
 import { ethers } from 'ethers'
 import { InterventionManagerArtifact } from '@/constants/artifacts/InterventionManager'
 import { updateDocumentPermission } from '@/actions/intervention/updateDocumentPermission'
-import { usePermissionDocument } from '@/hooks/queries/role/usePermissionDocument'
+import { usePermissionDocument } from '@/hooks/role/usePermissionDocument'
 
 /////////////////////////////////////////////////////////
 // ZOD SCHEMA

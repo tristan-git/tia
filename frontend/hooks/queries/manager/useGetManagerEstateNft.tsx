@@ -23,7 +23,7 @@ export type TEstateManager = {
 
 export const useGetManagerEstateNft = (currentAccount: any, idEstate: any) => {
 	return useQuery({
-		queryKey: ['useGetManagerEstateNft'],
+		queryKey: [`useGetManagerEstateNft-${currentAccount}`],
 		enabled: !!currentAccount || !!idEstate,
 		queryFn: async () => {
 			const response = await fetch('/api/manager/get-manager-estate-nft', {

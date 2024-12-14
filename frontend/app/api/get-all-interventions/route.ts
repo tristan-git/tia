@@ -34,9 +34,6 @@ export async function POST(request: Request): Promise<NextResponse> {
 			return NextResponse.json({ error: 'User not found' }, { status: 404 })
 		}
 
-		// 1 = Admin | 2 gestionnaire | 3 prestataire | 4 lecteur
-		const role = user?.[0].accountRoleId
-
 		// Alias pour les utilisateurs
 		const createdByUser = aliasedTable(usersTable, 'createdByUser')
 		const managerUser = aliasedTable(usersTable, 'managerUser')
@@ -51,6 +48,13 @@ export async function POST(request: Request): Promise<NextResponse> {
 				createdAtTimestamp: interventionsTable.createdAtTimestamp,
 				isValidated: interventionsTable.isValidated,
 				validateFrom: interventionsTable.validateFrom,
+				indexIntervention: interventionsTable.indexIntervention,
+				moduleId: modulesTable.id,
+				town: mintedNFTsTable.town,
+				address: mintedNFTsTable.address,
+				rnbCode: estateManagersTable.rnbCode,
+				networkTypes: estateManagersTable.networkTypes,
+				img: mintedNFTsTable.img,
 				createdByUser: {
 					id: createdByUser.id,
 					walletAddress: createdByUser.walletAddress,
@@ -64,28 +68,64 @@ export async function POST(request: Request): Promise<NextResponse> {
 					lastName: managerUser.lastName,
 				},
 				documents: sql`(
-				SELECT json_agg(json_build_object(
-					'id', ${documentsTable.id},
-					'title', ${documentsTable.title},
-					'documentHash', ${documentsTable.documentHash},
-					'fileExtension', ${documentsTable.fileExtension},
-					'createdAtTimestamp', ${documentsTable.createdAtTimestamp},
-					'createdBy', ${documentsTable.createdBy}
-				))
-				FROM ${documentsTable}
-				WHERE ${documentsTable.interventionId} = ${interventionsTable.id}
-			)`.as('documents'),
+					SELECT json_agg(json_build_object(
+						'id', ${documentsTable.id},
+						'title', ${documentsTable.title},
+						'documentHash', ${documentsTable.documentHash},
+						'fileExtension', ${documentsTable.fileExtension},
+						'createdAtTimestamp', ${documentsTable.createdAtTimestamp},
+						'createdBy', ${documentsTable.createdBy}
+					))
+					FROM ${documentsTable}
+					WHERE ${documentsTable.interventionId} = ${interventionsTable.id}
+				)`.as('documents'),
 			})
 			.from(interventionsTable)
 			.leftJoin(createdByUser, eq(interventionsTable.createdBy, createdByUser.id)) // Jointure pour createdByUser
 			.leftJoin(estateManagersTable, eq(estateManagersTable.id, interventionsTable.estateManagerId))
 			.leftJoin(managerUser, eq(managerUser.id, estateManagersTable.managerId))
-			.where(eq(interventionsTable.createdBy, userId)) // Filtrage par utilisateur
+			.leftJoin(mintedNFTsTable, eq(mintedNFTsTable.estateManagerId, interventionsTable.estateManagerId))
+			.leftJoin(modulesTable, eq(modulesTable.estateManagerId, interventionsTable.estateManagerId))
+			.leftJoin(userInterventionAccessDocumentTable, eq(userInterventionAccessDocumentTable.interventionId, interventionsTable.id))
+			.where(
+				or(
+					eq(interventionsTable.createdBy, userId),
+					and(
+						eq(userInterventionAccessDocumentTable.userId, userId),
+						eq(userInterventionAccessDocumentTable.hasAccess, true),
+						eq(userInterventionAccessDocumentTable.indexIntervention, interventionsTable.indexIntervention),
+						eq(userInterventionAccessDocumentTable.estateManagerId, interventionsTable.estateManagerId),
+						eq(userInterventionAccessDocumentTable.tokenId, interventionsTable.tokenId)
+					)
+				)
+			)
+			.groupBy(
+				interventionsTable.id,
+				interventionsTable.tokenId,
+				interventionsTable.title,
+				interventionsTable.estateManagerId,
+				interventionsTable.createdBy,
+				interventionsTable.createdAtTimestamp,
+				interventionsTable.isValidated,
+				interventionsTable.validateFrom,
+				interventionsTable.indexIntervention,
+				modulesTable.id,
+				mintedNFTsTable.town,
+				mintedNFTsTable.address,
+				mintedNFTsTable.metadataURI,
+				estateManagersTable.rnbCode,
+				estateManagersTable.networkTypes,
+				mintedNFTsTable.img,
+				createdByUser.id,
+				createdByUser.walletAddress,
+				createdByUser.firstName,
+				createdByUser.lastName,
+				managerUser.id,
+				managerUser.walletAddress,
+				managerUser.firstName,
+				managerUser.lastName
+			)
 			.orderBy(interventionsTable.id)
-
-		console.log('🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡')
-		console.log('interventions')
-		console.log(interventions)
 
 		const serializedData = serializeBigInt(interventions)
 

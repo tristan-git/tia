@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 
 export const useGetAllInterventions = (currentAccount: any) => {
 	return useQuery({
-		queryKey: ['useGetAllInterventions'],
+		queryKey: [`useGetAllInterventions-${currentAccount}`],
 		enabled: !!currentAccount,
 		queryFn: async () => {
 			const response = await fetch('/api/get-all-interventions', {

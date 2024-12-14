@@ -37,9 +37,9 @@ const DashboardSideBarGroup = ({ label, navMain }: nameProps) => {
 										<SidebarMenuSub>
 											{item.subNav?.map((subItem) => (
 												<SidebarMenuSubItem key={subItem.title}>
-													<SidebarMenuSubButton asChild>
-														<Link href={item.url}>{item.title}</Link>
-													</SidebarMenuSubButton>
+													<Link href={item.url}>
+														<SidebarMenuSubButton asChild>{item.title}</SidebarMenuSubButton>
+													</Link>
 												</SidebarMenuSubItem>
 											))}
 										</SidebarMenuSub>
@@ -48,10 +48,13 @@ const DashboardSideBarGroup = ({ label, navMain }: nameProps) => {
 							</Collapsible>
 						) : (
 							<SidebarMenuItem key={item.title}>
-								<SidebarMenuButton className=''>
-									{item.icon && <item.icon />}
-									<Link href={item.url}>{item.title}</Link>
-								</SidebarMenuButton>
+								{' '}
+								<Link href={item.url}>
+									<SidebarMenuButton className=''>
+										{item.icon && <item.icon />}
+										{item.title}
+									</SidebarMenuButton>
+								</Link>
 							</SidebarMenuItem>
 						)
 					)}

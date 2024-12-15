@@ -19,9 +19,6 @@ export default function ManageEstate() {
 	const { address: currentAccount } = useAccount()
 	const { data } = useGetAllEstateNetwork(currentAccount)
 
-	console.log('🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡')
-	console.log(data)
-
 	return (
 		<>
 			<div className='container max-w-screen-xl overflow-hidden p-4'>

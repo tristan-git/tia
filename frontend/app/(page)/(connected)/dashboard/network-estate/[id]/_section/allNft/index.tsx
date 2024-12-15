@@ -18,9 +18,6 @@ const AllNft = ({ idEstate }: AllNftProps) => {
 	const { address: currentAccount } = useAccount()
 	const { data } = useGetManagerEstateNft(currentAccount, idEstate)
 
-	console.log('🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡')
-	console.log(data)
-
 	return (
 		<div className='relative w-full overflow-x-auto'>
 			<DataTable data={data || []} columns={columns} config={config} />

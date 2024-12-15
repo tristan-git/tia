@@ -28,8 +28,8 @@ const InterventionByNft = ({ idNft, dataNft, addressInterventionManager }: MyEst
 		<>
 			<div className='flex items-center justify-between mb-4'>
 				<div className='space-y-1'>
-					<h2 className='text-2xl font-semibold tracking-tight'>{`Intervention du Batiement #${idNft}`}</h2>
-					<p className='text-sm text-muted-foreground'>Manager vos bien immobillier ici</p>
+					<h2 className='text-2xl font-semibold tracking-tight'>{`Intervention du bâtiment #${idNft}`}</h2>
+					<p className='text-sm text-muted-foreground'>{`Localisation : ${dataNft?.town} ${dataNft?.address}`}</p>
 				</div>
 				<CreateIntervention
 					idEstate={dataNft?.estateManagerId}

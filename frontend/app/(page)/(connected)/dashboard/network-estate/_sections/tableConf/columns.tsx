@@ -1,11 +1,10 @@
 'use client'
 
-import CustomBadge from '@/components/shared/_ui/badge'
+import Link from 'next/link'
+import { CubeIcon, EyeOpenIcon } from '@radix-ui/react-icons'
 import { DataTableColumnHeader } from '@/components/shared/dataTable/data-table-column-header'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { CubeIcon, EyeOpenIcon } from '@radix-ui/react-icons'
-import Link from 'next/link'
 
 export const columns = [
 	{

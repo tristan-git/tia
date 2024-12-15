@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import CustomBadge from '@/components/shared/_ui/badge'
 import { RowActionsCell } from './cell/actions'
 import { DataTableColumnHeader } from '@/components/shared/dataTable/data-table-column-header'
 import { Button } from '@/components/ui/button'

@@ -265,7 +265,7 @@ const CreateCreateEstateNftDialog = ({ idEstate, rnbCode, tokenId, disabled }: C
 									>
 										<FileIcon className='w-12 h-12' />
 										<span className='text-sm font-medium text-gray-500'>Cliquer pour importer un la photos</span>
-										<span className='text-xs text-gray-500'>PDF, image, video..</span>
+										<span className='text-xs text-gray-500'>image uniquement</span>
 
 										<Input id='file' type='file' placeholder='File' {...form.register('file')} className='hidden' />
 									</div>

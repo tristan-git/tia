@@ -1,10 +1,10 @@
 'use client'
 
+import { useAccount } from 'wagmi'
 import { DataTableToolbar } from './_sections/tableConf/toolBar'
 import { DataTable } from '@/components/shared/dataTable/data-table'
 import { columns } from './_sections/tableConf/columns'
 import { useGetAllEstateNetwork } from '@/hooks/queries/all-estate-network/useGetManagerEstate'
-import { useAccount } from 'wagmi'
 
 const config = {
 	DataTableToolbar: DataTableToolbar,

@@ -23,6 +23,8 @@ const PermissionInterventionDialog = ({ dataNft, disabled }: PermissionIntervent
 	const [open, setOpen] = useState(false)
 	const { data: users } = useGetAllUsers()
 
+	const filteredUsers = users?.filter((user) => user.accountRoleId === 3)
+
 	const handleOpenDialog = (e: React.MouseEvent) => {
 		e.preventDefault()
 		e.stopPropagation()
@@ -38,13 +40,13 @@ const PermissionInterventionDialog = ({ dataNft, disabled }: PermissionIntervent
 			<DialogContent className='sm:max-w-[700px]'>
 				<DialogHeader>
 					<DialogTitle>Permissions interventions</DialogTitle>
-					<DialogDescription>Sélectionner les utilisateurs qui peuvent créer des interventions</DialogDescription>
+					<DialogDescription>Sélectionner les prestataires qui peuvent créer des interventions</DialogDescription>
 				</DialogHeader>
 				<div className='grid gap-4 py-0'>
 					<div className='space-y-6'>
-						<ScrollArea className={users?.length > 3 ? 'h-[305px]' : 'max-h-fit'}>
+						<ScrollArea className={filteredUsers?.length > 3 ? 'h-[305px]' : 'max-h-fit'}>
 							<div className='grid w-full items-center gap-2'>
-								{users?.map((user, i) => (
+								{filteredUsers?.map((user, i) => (
 									<UpdatePermissionIntervention key={i} user={user} dataNft={dataNft} />
 								))}
 							</div>

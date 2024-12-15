@@ -4,6 +4,9 @@ import Link from 'next/link'
 import CustomBadge from '@/components/shared/_ui/badge'
 import { RowActionsCell } from './cell/actions'
 import { DataTableColumnHeader } from '@/components/shared/dataTable/data-table-column-header'
+import { Button } from '@/components/ui/button'
+import { CubeIcon, EyeOpenIcon } from '@radix-ui/react-icons'
+import { Badge } from '@/components/ui/badge'
 
 export const columns: any = [
 	{
@@ -11,7 +14,7 @@ export const columns: any = [
 		header: ({ column }) => <DataTableColumnHeader column={column} title='Id' />,
 		cell: ({ row }) => {
 			return (
-				<div className=' text-xs'>
+				<div className='truncate text-xs max-w-[120px]'>
 					<Link href={`/dashboard/network-estate/${row.getValue('id')}`} className='hover:underline underline-offset-4 '>
 						{row.getValue('id')}
 					</Link>
@@ -27,6 +30,23 @@ export const columns: any = [
 		header: ({ column }) => <DataTableColumnHeader column={column} title='Code RNB' />,
 		cell: ({ row }) => {
 			return <div className=' text-xs'>{row.getValue('rnbCode')}</div>
+		},
+	},
+
+	{
+		accessorKey: 'modules',
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Module' />,
+		cell: ({ row }) => {
+			const modules = row.original?.moduleName
+
+			return modules ? (
+				<Badge variant='outline' className='flex space-x-1  w-fit'>
+					<CubeIcon className='h-4 w-3 ' />
+					<div>Intervention</div>
+				</Badge>
+			) : (
+				<Badge variant='red'>Aucun module assigné</Badge>
+			)
 		},
 	},
 
@@ -56,19 +76,16 @@ export const columns: any = [
 	},
 
 	{
-		accessorKey: 'modules',
-		header: ({ column }) => <DataTableColumnHeader column={column} title='Modules' />,
-		cell: ({ row }) => {
-			const modules = row.original?.modules
-			return <div className='flex  items-center'>{modules?.moduleName && <CustomBadge text={modules?.moduleName} />}</div>
-		},
-		filterFn: (row, id, value): any => {
-			return value.includes(row.getValue(id))
-		},
-	},
-
-	{
 		id: 'actions',
-		cell: ({ row }: any ) => <RowActionsCell row={row} />,
+		cell: ({ row }: any) => (
+			<div className='flex space-x-1'>
+				<Link href={`/dashboard/network-estate/${row.original.id}`} className='hover:underline underline-offset-4 '>
+					<Button variant='outline' size='icon'>
+						<EyeOpenIcon />
+					</Button>
+				</Link>
+				<RowActionsCell row={row} />
+			</div>
+		),
 	},
 ]

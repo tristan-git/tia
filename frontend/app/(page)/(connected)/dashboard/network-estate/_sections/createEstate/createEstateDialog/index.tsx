@@ -19,6 +19,24 @@ import { Label } from '@/components/ui/label'
 import { useGetAllUsers } from '@/hooks/queries/users/useGetAllUsers'
 import { LoadingOverlay } from '@/components/provider/blockchainProvider'
 
+const formatForSelect = (users: any) => {
+	const tmp = users?.filter((user: any) => {
+		if (user?.accountRoleId == 1) {
+			return {
+				value: user.walletAddress,
+				text: `${user.firstName} ${user.lastName}`,
+			}
+		}
+	})
+
+	return tmp?.map((t) => {
+		return {
+			value: t.walletAddress,
+			text: `${t.firstName} ${t.lastName}`,
+		}
+	})
+}
+
 // Fonction pour générer le RNB aléatoire
 const generateRandomRNB = () => {
 	const randomNumber = Math.floor(100000 + Math.random() * 900000) // Générer un nombre aléatoire à 6 chiffres
@@ -30,6 +48,7 @@ const generateRandomRNB = () => {
 /////////////////////////////////////////////////////////
 
 const FormSchema = z.object({
+	adminAddress: z.string().refine((value) => /^0x[a-fA-F0-9]{40}$/.test(value), { message: 'Adresse Ethereum non valide' }),
 	rnbCode: z.string().min(2, { message: 'rnb non valide' }),
 	networkTypes: z.string().min(2, { message: 'requis' }),
 })
@@ -56,12 +75,12 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
 		setIsSubmitting(true)
-		const { rnbCode } = data
+		const { rnbCode, adminAddress } = data
 		writeContract({
 			address: addressEstateFactory,
 			abi: EstateManagerFactoryArtifact.abi,
 			functionName: 'createEstateManager',
-			args: ['0x734cEf8774dEB4FD18DFe57f010b842941012BBB' as `0x${string}`, address as `0x${string}`, rnbCode],
+			args: [adminAddress as `0x${string}`, address as `0x${string}`, rnbCode],
 		})
 	}
 
@@ -71,12 +90,12 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 		async function handleDeploymentReceipt() {
 			if (isSuccess && hash) {
 				if (dataReceipt && dataReceipt.logs[0]?.address) {
-					const { rnbCode, networkTypes } = form.getValues()
+					const { rnbCode, networkTypes, adminAddress } = form.getValues()
 
 					const deployment = {
 						id: dataReceipt.logs[0]?.address,
 						managerId: users?.filter(({ walletAddress }) => walletAddress == address)?.[0]?.id,
-						adminId: users?.filter(({ walletAddress }) => walletAddress == '0x734cEf8774dEB4FD18DFe57f010b842941012BBB')?.[0]?.id,
+						adminId: users?.filter(({ walletAddress }) => walletAddress == adminAddress)?.[0]?.id,
 						rnbCode: rnbCode,
 						factoryId: addressEstateFactory,
 						blockHash: dataReceipt.blockHash,
@@ -167,6 +186,21 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 								/>
 							</div>
 
+							{users && (
+								<SelectFORM
+									form={form}
+									name='adminAddress'
+									formLabel={{ text: 'Administrateur TIA' }}
+									placeholder='Administrateur TIA'
+									selectGroup={{
+										groups: [
+											{
+												values: formatForSelect(users),
+											},
+										],
+									}}
+								/>
+							)}
 							<Button type='submit' className='w-full' disabled={isSubmitting}>
 								{isSubmitting ? 'En cours...' : 'Ajouter'}
 							</Button>

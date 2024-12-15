@@ -1,11 +1,18 @@
 import { useQuery } from '@tanstack/react-query'
 
-export const useGetAllEstateNetwork = () => {
+export const useGetAllEstateNetwork = (currentAccount: any) => {
 	return useQuery({
-		queryKey: ['useGetAllEstateNetwork'],
-		enabled: true,
+		queryKey: [`useGetAllEstateNetwork-${currentAccount}`],
+		enabled: !!currentAccount,
 		queryFn: async () => {
-			const response = await fetch('/api/get-all-estate-network') // 
+			const response = await fetch('/api/get-all-estate-network', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ currentAccount }),
+			})
+
 			return response.json()
 		},
 	})

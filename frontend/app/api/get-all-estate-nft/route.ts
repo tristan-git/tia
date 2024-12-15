@@ -104,6 +104,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 			)
 			.where(
 				or(
+					eq(estateManagersTable.adminId, userId),
 					eq(mintedNFTsTable.ownerAddress, userId),
 					eq(userModuleAccessTable.authorizedAddress, userId),
 					sql`EXISTS (
@@ -118,20 +119,9 @@ export async function POST(request: Request): Promise<NextResponse> {
                 )`
 				)
 			)
-			.groupBy(
-				mintedNFTsTable.id,
-				estateManagersTable.id,
-				userModuleAccessTable.authorizedAddress,
-				managerAlias.id
-				// userInterventionAccessDocumentTable.interventionId,
-				//interventionsTable.tokenId
-			)
+			.groupBy(mintedNFTsTable.id, estateManagersTable.id, userModuleAccessTable.authorizedAddress, managerAlias.id)
 
 		const serializedData = serializeBigInt(nfts)
-
-		// console.log('🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡')
-		// console.log('nftsOwned')
-		// console.log(nfts)
 
 		return NextResponse.json(serializedData)
 	} catch (error) {

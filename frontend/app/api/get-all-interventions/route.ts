@@ -89,6 +89,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 			.leftJoin(userInterventionAccessDocumentTable, eq(userInterventionAccessDocumentTable.interventionId, interventionsTable.id))
 			.where(
 				or(
+					eq(estateManagersTable.adminId, userId),
 					eq(interventionsTable.createdBy, userId),
 					and(
 						eq(userInterventionAccessDocumentTable.userId, userId),

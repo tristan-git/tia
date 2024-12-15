@@ -1,8 +1,10 @@
 'use client'
 
+import CustomBadge from '@/components/shared/_ui/badge'
 import { DataTableColumnHeader } from '@/components/shared/dataTable/data-table-column-header'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { EyeOpenIcon } from '@radix-ui/react-icons'
+import { CubeIcon, EyeOpenIcon } from '@radix-ui/react-icons'
 import Link from 'next/link'
 
 export const columns = [
@@ -27,6 +29,23 @@ export const columns = [
 		header: ({ column }) => <DataTableColumnHeader column={column} title='Type de réseaux' />,
 		cell: ({ row }) => {
 			return <div className=' text-xs'>{row.original.networkTypes}</div>
+		},
+	},
+
+	{
+		accessorKey: 'modules',
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Module' />,
+		cell: ({ row }) => {
+			const modules = row.original?.moduleName
+
+			return modules ? (
+				<Badge variant='outline' className='flex space-x-1 w-fit'>
+					<CubeIcon className='h-4 w-3 ' />
+					<div>Intervention</div>
+				</Badge>
+			) : (
+				<Badge variant='red'>Aucun module assigné</Badge>
+			)
 		},
 	},
 

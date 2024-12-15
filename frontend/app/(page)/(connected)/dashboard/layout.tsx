@@ -28,7 +28,7 @@ const dashboardConfig = {
 					icon: Share1Icon,
 				},
 				{
-					title: 'Propriété foncière',
+					title: 'Bâtiments',
 					url: '/dashboard/all-estates',
 					icon: HomeIcon,
 				},
@@ -54,7 +54,7 @@ const dashboardConfig = {
 			roleAccess: 'admin',
 			navMain: [
 				{
-					title: 'Authorisations module',
+					title: 'Autorisations module',
 					url: '/dashboard/admin-module',
 					icon: CubeIcon,
 				},

@@ -226,7 +226,7 @@ const AddDocumentDialog = ({ dataIntervention, disabled }: AddDocumentDialogProp
 										<SelectFORM form={form} name='title' placeholder='Type de document' selectGroup={{ groups }} />
 									</div>
 
-									{!!form.getValues().file?.[0]?.name && (
+									{!form.getValues().file?.[0]?.name && (
 										<div
 											className='border-2 border-dashed border-gray-200 rounded-lg flex flex-col gap-1 p-6 items-center cursor-pointer'
 											onClick={() => document.getElementById('file')?.click()}

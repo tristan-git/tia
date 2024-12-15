@@ -57,11 +57,6 @@ const dashboardConfig = {
 					url: '/dashboard/admin-module',
 					icon: CubeIcon,
 				},
-				// {
-				// 	title: 'utilisateurs',
-				// 	url: '/dashboard/manage-users',
-				// 	icon: PersonIcon,
-				// },
 			],
 		},
 	],

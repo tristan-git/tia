@@ -7,7 +7,8 @@ import { RowActionsCell } from './cell/actions'
 import { DataTableColumnHeader } from '@/components/shared/dataTable/data-table-column-header'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
-import { PersonIcon, ExclamationTriangleIcon, CubeIcon } from '@radix-ui/react-icons'
+import { PersonIcon, ExclamationTriangleIcon, CubeIcon, EyeOpenIcon } from '@radix-ui/react-icons'
+import { Button } from '@/components/ui/button'
 
 export const columns: ColumnDef<Vote>[] = [
 	{
@@ -40,13 +41,13 @@ export const columns: ColumnDef<Vote>[] = [
 		},
 	},
 
-	{
-		accessorKey: 'tokenId',
-		header: ({ column }) => <DataTableColumnHeader column={column} title='Token ID' />,
-		cell: ({ row }) => {
-			return <div className=' text-xs'>#{row.getValue('tokenId')}</div>
-		},
-	},
+	// {
+	// 	accessorKey: 'tokenId',
+	// 	header: ({ column }) => <DataTableColumnHeader column={column} title='Token ID' />,
+	// 	cell: ({ row }) => {
+	// 		return <div className=' text-xs'>#{row.getValue('tokenId')}</div>
+	// 	},
+	// },
 
 	{
 		accessorKey: 'address',
@@ -142,6 +143,15 @@ export const columns: ColumnDef<Vote>[] = [
 
 	{
 		id: 'actions',
-		cell: ({ row }) => <RowActionsCell row={row} />,
+		cell: ({ row }: any) => (
+			<div className='flex space-x-1'>
+				<Link href={`/dashboard/interventions-by-nft/${row.getValue('id')}`} className='hover:underline underline-offset-4 '>
+					<Button variant='outline' size='icon'>
+						<EyeOpenIcon />
+					</Button>
+				</Link>
+				<RowActionsCell row={row} />
+			</div>
+		),
 	},
 ]

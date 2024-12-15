@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { Row } from '@tanstack/react-table'
+import { useAccount } from 'wagmi'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -14,7 +15,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import PermissionIntervention from './assignPermission'
 import { useIsManager } from '@/hooks/role/useIsManager'
-import { useAccount } from 'wagmi'
 import { useHaveAccessModule } from '@/hooks/role/usehaveAccessModule'
 
 interface DataTableRowActionsProps<TData> {
@@ -37,10 +37,6 @@ export function RowActionsCell<TData>({ row }: DataTableRowActionsProps<TData>) 
 		setOpen(true)
 	}
 
-	console.log('address=======', address)
-	console.log(isManager)
-	console.log(haveAccessModule)
-
 	return (
 		<DropdownMenu open={open} onOpenChange={setOpen}>
 			<DropdownMenuTrigger asChild onClick={handleOpenDialog}>
@@ -51,10 +47,7 @@ export function RowActionsCell<TData>({ row }: DataTableRowActionsProps<TData>) 
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align='end' className='w-[200px]'>
 				<DropdownMenuSeparator />
-
 				<PermissionIntervention dataNft={row.original} disabled={!isManager} />
-				{/* <PermissionIntervention dataNft={row.original} disabled={!isManager || !haveAccessModule} /> */}
-
 				<DropdownMenuSeparator />
 
 				<DropdownMenuItem>Close</DropdownMenuItem>

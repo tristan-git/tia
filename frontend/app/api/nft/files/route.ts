@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
 		/////////////////////////////////////////////////////////
 
 		const metadata = {
-			name: 'Maison numéro 42', // TODO code RNB + TOKEN ID
+			name: `#${tokenId} - CODE RNB : ${rnbCode}`, // TODO code RNB + TOKEN ID
 			tokenId: tokenId,
 			description: 'Cette NFT représente un bâtiment réel dans notre projet immobilier.',
 			image: blob.url,

@@ -100,7 +100,7 @@ type ValidInterventionDialogProps = {
 
 const ValidInterventionDialog = ({ dataIntervention, disabled }: ValidInterventionDialogProps) => {
 	const [open, setOpen] = useState(false)
-
+	const [isSubmitting, setIsSubmitting] = useState(false)
 	const { address: currentAccount } = useAccount()
 	const { data: users } = useGetAllUsers()
 	const queryClient = useQueryClient()
@@ -142,6 +142,7 @@ const ValidInterventionDialog = ({ dataIntervention, disabled }: ValidInterventi
 
 	const onSubmit = async (_data: z.infer<typeof FormSchema>) => {
 		try {
+			setIsSubmitting(true)
 			const moduleName = 'InterventionManager'
 			const fnName = 'validateIntervention'
 			const encodedData = ethers.AbiCoder.defaultAbiCoder().encode(
@@ -158,6 +159,9 @@ const ValidInterventionDialog = ({ dataIntervention, disabled }: ValidInterventi
 			})
 		} catch (error) {
 			toast({ variant: 'destructive', title: 'Erreur', description: 'Une erreur est survenue.' })
+			form.reset()
+			setIsSubmitting(false)
+			setOpen(false)
 		}
 	}
 
@@ -197,6 +201,7 @@ const ValidInterventionDialog = ({ dataIntervention, disabled }: ValidInterventi
 					form.reset()
 					queryClient.invalidateQueries()
 					toast({ title: 'Intervention validé', description: 'Intervention est bien validé' })
+					setIsSubmitting(false)
 					setOpen(false)
 				}
 			}
@@ -208,12 +213,13 @@ const ValidInterventionDialog = ({ dataIntervention, disabled }: ValidInterventi
 				description: 'An error occurred while processing the transaction receipt.',
 			})
 			form.reset()
+			setIsSubmitting(false)
 			setOpen(false)
 		})
 	}, [isSuccess, hash, form, dataReceipt])
 
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
+		<Dialog open={open} onOpenChange={(newState) => !isSubmitting && setOpen(newState)}>
 			<DropdownMenuItem disabled={disabled} onClick={handleOpenDialog}>
 				Valider l'intervention
 			</DropdownMenuItem>
@@ -243,14 +249,14 @@ const ValidInterventionDialog = ({ dataIntervention, disabled }: ValidInterventi
 								)}
 							</div>
 
-							<Button type='submit' className='w-full' disabled={dataIntervention?.isValidated}>
-								{dataIntervention?.isValidated ? 'Intervention déjà validé' : 'valider'}
+							<Button type='submit' className='w-full' disabled={dataIntervention?.isValidated || isSubmitting}>
+								{isSubmitting ? 'En cours...' : dataIntervention?.isValidated ? 'Intervention déjà validé' : 'valider'}
 							</Button>
 						</form>
 					</Form>
 				</div>
 			</DialogContent>
-			<LoadingOverlay isActive={isPending && !isSuccess && open} />
+			<LoadingOverlay isActive={isSubmitting && open} />
 		</Dialog>
 	)
 }

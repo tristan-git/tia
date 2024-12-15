@@ -9,8 +9,6 @@ import { Input } from '@/components/ui/input'
 import { DataTableViewOptions } from '@/components/shared/dataTable/data-table-view-options'
 import { DataTableFacetedFilter } from '@/components/shared/dataTable/data-table-faceted-filter'
 
-import { statusVoteOptions } from '@/constants/statusVotes'
-
 interface DataTableToolbarProps<TData> {
 	table: Table<TData>
 }
@@ -27,7 +25,7 @@ export function DataTableToolbar<TData>({ table }: DataTableToolbarProps<TData>)
 					onChange={(event) => table.getColumn('title')?.setFilterValue(event.target.value)}
 					className='h-8 w-[150px] lg:w-[250px]'
 				/>
-
+				{/* 
 				{table.getColumn('workflowStatus') && (
 					<DataTableFacetedFilter column={table.getColumn('workflowStatus')} title='Status' options={statusVoteOptions} />
 				)}
@@ -37,7 +35,7 @@ export function DataTableToolbar<TData>({ table }: DataTableToolbarProps<TData>)
 						Reset
 						<Cross2Icon className='ml-2 h-4 w-4' />
 					</Button>
-				)}
+				)} */}
 			</div>
 			<DataTableViewOptions table={table} />
 		</div>

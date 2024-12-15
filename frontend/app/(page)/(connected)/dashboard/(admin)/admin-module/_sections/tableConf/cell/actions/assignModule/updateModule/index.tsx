@@ -32,6 +32,7 @@ type UpdateModuleProps = {
 const UpdateModule = ({ moduleData, contractAddress, managerAddress }: UpdateModuleProps) => {
 	const { address: currentAccount } = useAccount()
 	const queryClient = useQueryClient()
+	const [isSubmitting, setIsSubmitting] = useState(false)
 
 	const { deployContract, data: hashDeployed, isSuccess: isSuccessDeployed } = useDeployContract()
 	const { data: dataDeployedReceipt } = useTransactionReceipt({ hash: hashDeployed })
@@ -87,6 +88,7 @@ const UpdateModule = ({ moduleData, contractAddress, managerAddress }: UpdateMod
 		// seulement le module intervention existe
 		if (id == 1 && !haveModuleRegistered) {
 			try {
+				setIsSubmitting(true)
 				deployContract({
 					abi: InterventionManagerArtifact.abi,
 					args: [contractAddress, managerAddress],
@@ -128,6 +130,7 @@ const UpdateModule = ({ moduleData, contractAddress, managerAddress }: UpdateMod
 				title: 'Error',
 				description: 'An error occurred while processing the transaction receipt.',
 			})
+			setIsSubmitting(false)
 		})
 	}, [isSuccessDeployed, hashDeployed, form, dataDeployedReceipt, queryClient])
 
@@ -154,6 +157,7 @@ const UpdateModule = ({ moduleData, contractAddress, managerAddress }: UpdateMod
 
 					queryClient.invalidateQueries()
 					toast({ title: 'Module assigné', description: `MODULE: Intervention Manager` })
+					setIsSubmitting(false)
 				}
 			}
 		}
@@ -165,6 +169,7 @@ const UpdateModule = ({ moduleData, contractAddress, managerAddress }: UpdateMod
 				title: 'Error',
 				description: 'An error occurred while processing the transaction receipt.',
 			})
+			setIsSubmitting(false)
 		})
 	}, [isSuccessWrite, hashWriteContract, form, dataWriteReceipt, queryClient])
 
@@ -199,7 +204,7 @@ const UpdateModule = ({ moduleData, contractAddress, managerAddress }: UpdateMod
 					)}
 				/>
 			</form>
-			<LoadingOverlay isActive={isPending && !isSuccessWrite && open} />
+			<LoadingOverlay isActive={isSubmitting && open} />
 		</Form>
 	)
 }

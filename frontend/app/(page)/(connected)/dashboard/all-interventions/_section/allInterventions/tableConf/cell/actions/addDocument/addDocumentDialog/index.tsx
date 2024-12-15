@@ -86,6 +86,7 @@ type AddDocumentDialogProps = {
 
 const AddDocumentDialog = ({ dataIntervention, disabled }: AddDocumentDialogProps) => {
 	const [open, setOpen] = useState(false)
+	const [isSubmitting, setIsSubmitting] = useState(false)
 
 	const { address: currentAccount } = useAccount()
 	const queryClient = useQueryClient()
@@ -111,8 +112,7 @@ const AddDocumentDialog = ({ dataIntervention, disabled }: AddDocumentDialogProp
 
 	const onSubmit = async (data: z.infer<typeof FormSchema>) => {
 		try {
-			console.log('data?.file.length:', data?.file.length)
-			console.log('data?.file.name:', data?.file.name)
+			setIsSubmitting(true)
 			const formData = new FormData()
 			formData.append('idEstate', dataIntervention?.estateManagerId)
 			formData.append('tokenId', dataIntervention?.tokenId)
@@ -148,6 +148,9 @@ const AddDocumentDialog = ({ dataIntervention, disabled }: AddDocumentDialogProp
 			}
 		} catch (error) {
 			toast({ variant: 'destructive', title: 'Erreur', description: 'Une erreur est survenue.' })
+			form.reset()
+			setIsSubmitting(false)
+			setOpen(false)
 		}
 	}
 
@@ -186,6 +189,7 @@ const AddDocumentDialog = ({ dataIntervention, disabled }: AddDocumentDialogProp
 					queryClient.invalidateQueries()
 					toast({ title: 'Document ajouter', description: 'Le document est bien ajouté' })
 					setUrl({})
+					setIsSubmitting(false)
 					setOpen(false)
 				}
 			}
@@ -196,12 +200,15 @@ const AddDocumentDialog = ({ dataIntervention, disabled }: AddDocumentDialogProp
 				title: 'Error',
 				description: 'An error occurred while processing the transaction receipt.',
 			})
+			form.reset()
+			setIsSubmitting(false)
+			setOpen(false)
 		})
 	}, [isSuccess, hash, form, dataReceipt])
 
 	return (
 		<>
-			<Dialog open={open} onOpenChange={setOpen}>
+			<Dialog open={open} onOpenChange={(newState) => !isSubmitting && setOpen(newState)}>
 				<DropdownMenuItem disabled={disabled} onClick={handleOpenDialog}>
 					Ajouter un document
 				</DropdownMenuItem>
@@ -218,21 +225,26 @@ const AddDocumentDialog = ({ dataIntervention, disabled }: AddDocumentDialogProp
 									<div className='grid w-full items-center gap-4'>
 										<SelectFORM form={form} name='title' placeholder='Type de document' selectGroup={{ groups }} />
 									</div>
+									{!!form.getValues().file?.[0]?.name && (
+										<div
+											className='border-2 border-dashed border-gray-200 rounded-lg flex flex-col gap-1 p-6 items-center cursor-pointer'
+											onClick={() => document.getElementById('file')?.click()}
+										>
+											<FileIcon className='w-12 h-12' />
+											<span className='text-sm font-medium text-gray-500'>Cliquer pour importer un document</span>
+											<span className='text-xs text-gray-500'>PDF, image, video..</span>
 
-									<div
-										className='border-2 border-dashed border-gray-200 rounded-lg flex flex-col gap-1 p-6 items-center cursor-pointer'
-										onClick={() => document.getElementById('file')?.click()}
-									>
-										<FileIcon className='w-12 h-12' />
-										<span className='text-sm font-medium text-gray-500'>Cliquer pour importer un document</span>
-										<span className='text-xs text-gray-500'>PDF, image, video..</span>
-
-										<Input id='file' type='file' placeholder='File' {...form.register('file')} className='hidden' />
-									</div>
+											<Input id='file' type='file' placeholder='File' {...form.register('file')} className='hidden' />
+										</div>
+									)}
 								</div>
 
-								<Button type='submit' className='w-full'>
-									Ajouter
+								{form.getValues().file?.[0]?.name && (
+									<div className='text-xs bg-blue-50 rounded-sm p-2'>{form.getValues().file?.[0]?.name}</div>
+								)}
+
+								<Button type='submit' className='w-full' disabled={isSubmitting || !form.getValues().file?.[0]?.name}>
+									{isSubmitting ? 'En cours...' : 'Ajouter'}
 								</Button>
 							</form>
 						</Form>
@@ -240,7 +252,7 @@ const AddDocumentDialog = ({ dataIntervention, disabled }: AddDocumentDialogProp
 				</DialogContent>
 			</Dialog>
 
-			<LoadingOverlay isActive={isPending && !isSuccess && open} />
+			<LoadingOverlay isActive={isSubmitting && open} />
 		</>
 	)
 }

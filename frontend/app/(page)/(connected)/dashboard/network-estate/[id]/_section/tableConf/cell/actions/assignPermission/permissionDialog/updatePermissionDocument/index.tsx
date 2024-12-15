@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react'
 
-import { useAccount, useTransactionReceipt, useWriteContract } from 'wagmi'
+import { useTransactionReceipt, useWriteContract } from 'wagmi'
 import { useQueryClient } from '@tanstack/react-query'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { ethers } from 'ethers'
 import { z } from 'zod'
 
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, Form } from '@/components/ui/form'
+import { FormControl, FormField, FormItem, FormLabel, Form } from '@/components/ui/form'
 import { assignPrestatairePermission } from '@/actions/users/assignPrestatairePermission'
 import { useHaveAccessModule } from '@/hooks/role/usehaveAccessModule'
 import { EstateManagerArtifact } from '@/constants/artifacts/EstateManager'
@@ -30,7 +30,6 @@ type UpdatePermissionInterventionProps = {
 /////////////////////////////////////////////////////////
 
 const UpdatePermissionIntervention = ({ user, dataNft }: UpdatePermissionInterventionProps) => {
-	const { address: currentAccount } = useAccount()
 	const queryClient = useQueryClient()
 	const { writeContract, isPending, isSuccess, data: hash, error } = useWriteContract()
 	const { data: dataReceipt } = useTransactionReceipt({ hash })
@@ -172,9 +171,8 @@ const UpdatePermissionIntervention = ({ user, dataNft }: UpdatePermissionInterve
 								<span className='relative flex shrink-0 overflow-hidden rounded-full h-9 w-9'>
 									<img className='aspect-square h-full w-full' alt='Avatar' src='https://ui.shadcn.com/avatars/02.png' />
 								</span>
-								<div>
+								<div className='flex-col flex justify-center'>
 									<FormLabel className='text-base'>{`${firstName} ${lastName}`}</FormLabel>
-									<FormDescription>Receive emails about new products, features, and more.</FormDescription>
 								</div>
 							</div>
 							<FormControl>

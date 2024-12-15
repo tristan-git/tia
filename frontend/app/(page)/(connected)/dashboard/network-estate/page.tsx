@@ -7,6 +7,7 @@ import { DataTable } from '@/components/shared/dataTable/data-table'
 import { columns } from './_sections/tableConf/columns'
 import { BlockchainContext } from '@/components/provider/blockchainProvider'
 import { useGetAllEstateNetwork } from '@/hooks/queries/all-estate-network/useGetManagerEstate'
+import { useAccount } from 'wagmi'
 
 const config = {
 	DataTableToolbar: DataTableToolbar,
@@ -18,7 +19,8 @@ const config = {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 export default function ManageEstate() {
-	const { data } = useGetAllEstateNetwork()
+	const { address: currentAccount } = useAccount()
+	const { data } = useGetAllEstateNetwork(currentAccount)
 	const { userAccount }: any = useContext(BlockchainContext)
 
 	return (

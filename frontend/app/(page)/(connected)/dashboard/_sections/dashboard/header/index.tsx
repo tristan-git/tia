@@ -6,6 +6,8 @@ import { SidebarTrigger } from '@/components/ui/sidebar'
 import { ModeToggle } from '@/components/provider/theme-provider/ModeToogle'
 import { usePathname } from 'next/navigation'
 import React from 'react'
+import GuideModal from '@/components/shared/help'
+
 
 const pathToNameMap: Record<string, string> = {
 	'/dashboard': 'Dashboard',
@@ -48,8 +50,10 @@ const DashboardHeader = () => {
 						</BreadcrumbList>
 					</Breadcrumb>
 				</div>
-
-				<ModeToggle />
+				<div className='flex space-x-1'>
+					<GuideModal />
+					<ModeToggle />
+				</div>
 			</div>
 		</header>
 	)

@@ -142,10 +142,10 @@ type CreateCreateEstateNftDialogProps = {
 
 const CreateCreateEstateNftDialog = ({ idEstate, rnbCode, tokenId, disabled }: CreateCreateEstateNftDialogProps) => {
 	const [open, setOpen] = useState(false)
-
+	const [isSubmitting, setIsSubmitting] = useState(false)
 	const { address: currentAccount } = useAccount()
 	const queryClient = useQueryClient()
-	const { writeContract, isPending, isSuccess, data: hash, error } = useWriteContract()
+	const { writeContract, isPending, isSuccess, data: hash, error, } = useWriteContract()
 	const { data: dataReceipt } = useTransactionReceipt({ hash })
 	const [isProcessed, setIsProcessed] = useState(false)
 	const [url, setUrl] = useState({})
@@ -158,6 +158,7 @@ const CreateCreateEstateNftDialog = ({ idEstate, rnbCode, tokenId, disabled }: C
 
 	const onSubmit = async (data: z.infer<typeof FormSchema>) => {
 		try {
+			setIsSubmitting(true)
 			const formData = new FormData()
 
 			formData.append('idEstate', idEstate)
@@ -188,6 +189,9 @@ const CreateCreateEstateNftDialog = ({ idEstate, rnbCode, tokenId, disabled }: C
 			}
 		} catch (error) {
 			toast({ variant: 'destructive', title: 'Erreur', description: 'Une erreur est survenue.' })
+			form.reset()
+			setIsSubmitting(false)
+			setOpen(false)
 		}
 	}
 
@@ -213,6 +217,7 @@ const CreateCreateEstateNftDialog = ({ idEstate, rnbCode, tokenId, disabled }: C
 					queryClient.invalidateQueries()
 					toast({ title: 'Bâtiment ajouter', description: 'Le bâtiment est bien ajouté' })
 					setUrl({})
+					setIsSubmitting(false)
 					setOpen(false)
 				}
 			}
@@ -223,11 +228,14 @@ const CreateCreateEstateNftDialog = ({ idEstate, rnbCode, tokenId, disabled }: C
 				title: 'Error',
 				description: 'An error occurred while processing the transaction receipt.',
 			})
+			form.reset()
+			setIsSubmitting(false)
+			setOpen(false)
 		})
 	}, [isSuccess, hash, form, dataReceipt])
 
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
+		<Dialog open={open} onOpenChange={(newState) => !isSubmitting && setOpen(newState)}>
 			<DialogTrigger asChild disabled={disabled}>
 				<Button>Ajouter un batiment</Button>
 			</DialogTrigger>
@@ -250,26 +258,32 @@ const CreateCreateEstateNftDialog = ({ idEstate, rnbCode, tokenId, disabled }: C
 									<SelectFORM form={form} name='address' placeholder='Selectionner une addresse' selectGroup={{ groups: groupsAddress }} />
 								</div>
 
-								<div
-									className='border-2 border-dashed border-gray-200 rounded-lg flex flex-col gap-1 p-6 items-center cursor-pointer'
-									onClick={() => document.getElementById('file')?.click()}
-								>
-									<FileIcon className='w-12 h-12' />
-									<span className='text-sm font-medium text-gray-500'>Cliquer pour importer un la photos</span>
-									<span className='text-xs text-gray-500'>PDF, image, video..</span>
+								{!form.getValues().file?.[0]?.name && (
+									<div
+										className='border-2 border-dashed border-gray-200 rounded-lg flex flex-col gap-1 p-6 items-center cursor-pointer'
+										onClick={() => document.getElementById('file')?.click()}
+									>
+										<FileIcon className='w-12 h-12' />
+										<span className='text-sm font-medium text-gray-500'>Cliquer pour importer un la photos</span>
+										<span className='text-xs text-gray-500'>image uniquement</span>
 
-									<Input id='file' type='file' placeholder='File' {...form.register('file')} className='hidden' />
-								</div>
+										<Input id='file' type='file' placeholder='File' {...form.register('file')} className='hidden' />
+									</div>
+								)}
 							</div>
 
-							<Button type='submit' className='w-full'>
-								Ajouter
+							{form.getValues().file?.[0]?.name && (
+								<div className='text-xs bg-blue-50 rounded-sm p-2'>{form.getValues().file?.[0]?.name}</div>
+							)}
+
+							<Button type='submit' className='w-full' disabled={isSubmitting || !form.getValues().file?.[0]?.name}>
+								{isSubmitting ? 'En cours...' : 'Ajouter'}
 							</Button>
 						</form>
 					</Form>
 				</div>
 			</DialogContent>
-			<LoadingOverlay isActive={isPending && !isSuccess && open} />
+			<LoadingOverlay isActive={isSubmitting && open} />
 		</Dialog>
 	)
 }

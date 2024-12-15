@@ -37,14 +37,23 @@ const FormSchema = z.object({
 
 type UserAuthFormProps = React.HTMLAttributes<HTMLDivElement>
 
+const roleDescriptions: Record<string, string> = {
+	'1': 'Administrateur TIA : Responsable de la gestion globale du système.',
+	'2': 'Gestionnaire : En charge de la gestion des réseaux et des biens immobiliers.',
+	'3': 'Prestataire : Intervient sur les missions spécifiques liées aux biens.',
+	'4': 'Lecteur : Dispose uniquement d’un accès en lecture pour consulter les données.',
+}
+
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
-	const { address: currentAccount, status, isConnecting, isDisconnected, isReconnecting } = useAccount()
+	const { address: currentAccount } = useAccount()
 	const [isLoading, setIsLoading] = useState<boolean>(false)
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 		defaultValues: { firstName: '', lastName: '', walletAddress: currentAccount },
 	})
+
+	const selectedRole = form.watch('accountRoleId') // Surveille la valeur du rôle
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
 		setIsLoading(true)
@@ -65,6 +74,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 				<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-3'>
 					<InputFORM form={form} name='firstName' placeholder='Nom' className='w-full' />
 					<InputFORM form={form} name='lastName' placeholder='Prénom' className='w-full' />
+
 					<SelectFORM
 						form={form}
 						name='accountRoleId'
@@ -83,19 +93,25 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 						}}
 					/>
 
+					{/* Texte d'informations sur le rôle sélectionné */}
+					{selectedRole && roleDescriptions[selectedRole] && (
+						<p className='text-xs text-gray-500 mt-2 bg-sky-50 p-3 rounded-md'>{roleDescriptions[selectedRole]}</p>
+					)}
+
 					{currentAccount ? (
 						<InputFORM form={form} name='walletAddress' placeholder='wallet' className='w-full' disabled />
 					) : (
-						<ButtonWalletConnect />
+						<ButtonWalletConnect text='Connecter votre Wallet' />
 					)}
 
 					{currentAccount && (
-						<Button type='submit' className='w-full'>
+						<Button type='submit' variant='outline' className='w-full'>
 							{isLoading ? <Icons.spinner className='mr-2 h-4 w-4 animate-spin' /> : <></>}Créer mon compte
 						</Button>
 					)}
 				</form>
 			</Form>
+			<ButtonWalletConnect text='Login' />
 		</div>
 	)
 }

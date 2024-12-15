@@ -4,21 +4,23 @@ import { createContext, useEffect, useState } from 'react'
 import { useAccount } from 'wagmi'
 import { useRouter } from 'next/navigation'
 import { useIsFetching } from '@tanstack/react-query'
+import ReactDOM from 'react-dom'
 
 export const LoadingOverlay = ({ isActive }: { isActive: boolean }) => {
 	if (!isActive) return null
 
-	return (
-		<span
+	// Contenu de l'overlay
+	const overlay = (
+		<div
 			style={{
-				position: 'absolute', // Position absolue sur l'écran
+				position: 'fixed', // Position fixe pour couvrir toute la fenêtre
 				top: 0,
 				left: 0,
-				width: '100%', // Largeur de l'écran complet
-				height: '100%', // Hauteur de l'écran complet
-				backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fond noir avec opacité
-				zIndex: 97097, // Priorité maximale pour être devant tout le reste
-				display: 'flex', // Centre le contenu
+				width: '100%',
+				height: '100%',
+				backgroundColor: 'rgba(0, 0, 0, 0.5)',
+				zIndex: 2147483647, // Z-index très élevé pour passer au-dessus de tout
+				display: 'flex',
 				alignItems: 'center',
 				justifyContent: 'center',
 			}}
@@ -32,8 +34,10 @@ export const LoadingOverlay = ({ isActive }: { isActive: boolean }) => {
 			>
 				En cours...
 			</div>
-		</span>
+		</div>
 	)
+
+	return ReactDOM.createPortal(overlay, document.body)
 }
 
 /////////////////////////////////////////////////////////
@@ -103,6 +107,7 @@ const BlockchainProvider = ({
 						}
 					}
 				} else {
+					setUserAccount(null)
 					router.push('/signup')
 				}
 			} catch (error) {

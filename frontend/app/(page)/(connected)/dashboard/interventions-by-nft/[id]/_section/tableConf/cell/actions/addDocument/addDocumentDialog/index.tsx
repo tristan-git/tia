@@ -226,19 +226,25 @@ const AddDocumentDialog = ({ dataIntervention, disabled }: AddDocumentDialogProp
 										<SelectFORM form={form} name='title' placeholder='Type de document' selectGroup={{ groups }} />
 									</div>
 
-									<div
-										className='border-2 border-dashed border-gray-200 rounded-lg flex flex-col gap-1 p-6 items-center cursor-pointer'
-										onClick={() => document.getElementById('file')?.click()}
-									>
-										<FileIcon className='w-12 h-12' />
-										<span className='text-sm font-medium text-gray-500'>Cliquer pour importer un document</span>
-										<span className='text-xs text-gray-500'>PDF, image, video..</span>
+									{!!form.getValues().file?.[0]?.name && (
+										<div
+											className='border-2 border-dashed border-gray-200 rounded-lg flex flex-col gap-1 p-6 items-center cursor-pointer'
+											onClick={() => document.getElementById('file')?.click()}
+										>
+											<FileIcon className='w-12 h-12' />
+											<span className='text-sm font-medium text-gray-500'>Cliquer pour importer un document</span>
+											<span className='text-xs text-gray-500'>PDF, image, video..</span>
 
-										<Input id='file' type='file' placeholder='File' {...form.register('file')} className='hidden' />
-									</div>
+											<Input id='file' type='file' placeholder='File' {...form.register('file')} className='hidden' />
+										</div>
+									)}
 								</div>
 
-								<Button type='submit' className='w-full' disabled={isSubmitting}>
+								{form.getValues().file?.[0]?.name && (
+									<div className='text-xs bg-blue-50 rounded-sm p-2'>{form.getValues().file?.[0]?.name}</div>
+								)}
+
+								<Button type='submit' className='w-full' disabled={isSubmitting || !form.getValues().file?.[0]?.name}>
 									{isSubmitting ? 'En cours...' : 'Ajouter'}
 								</Button>
 							</form>

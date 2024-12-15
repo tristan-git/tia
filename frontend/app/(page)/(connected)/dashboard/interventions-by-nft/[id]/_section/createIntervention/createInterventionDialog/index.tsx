@@ -41,6 +41,7 @@ type CreateInterventionDialogProps = {
 
 const CreateInterventionDialog = ({ idEstate, tokenId, addressInterventionManager, disabled }: CreateInterventionDialogProps) => {
 	const [open, setOpen] = useState(false)
+	const [isSubmitting, setIsSubmitting] = useState(false)
 
 	const { address: currentAccount } = useAccount()
 	const queryClient = useQueryClient()
@@ -63,6 +64,7 @@ const CreateInterventionDialog = ({ idEstate, tokenId, addressInterventionManage
 
 	const onSubmit = async (data: z.infer<typeof FormSchema>) => {
 		try {
+			setIsSubmitting(true)
 			const { title } = data
 
 			const moduleName = 'InterventionManager'
@@ -78,6 +80,8 @@ const CreateInterventionDialog = ({ idEstate, tokenId, addressInterventionManage
 			})
 		} catch (error) {
 			toast({ variant: 'destructive', title: 'Erreur', description: 'Une erreur est survenue.' })
+			form.reset()
+			setOpen(false)
 		}
 	}
 
@@ -120,6 +124,7 @@ const CreateInterventionDialog = ({ idEstate, tokenId, addressInterventionManage
 					form.reset()
 					queryClient.invalidateQueries()
 					toast({ title: 'Intervention ajouter', description: 'Intervention est bien ajouté' })
+					setIsSubmitting(false)
 					setOpen(false)
 				}
 			}
@@ -130,76 +135,81 @@ const CreateInterventionDialog = ({ idEstate, tokenId, addressInterventionManage
 				title: 'Error',
 				description: 'An error occurred while processing the transaction receipt.',
 			})
+			form.reset()
+			setIsSubmitting(false)
+			setOpen(false)
 		})
 	}, [isSuccess, hash, form, dataReceipt])
 
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogTrigger asChild disabled={disabled}>
-				{disabled ? <Button disabled={disabled}>Creer une intervention</Button> : <Button>Creer une intervention</Button>}
-			</DialogTrigger>
-			<DialogContent className='sm:max-w-[425px]'>
-				<DialogHeader>
-					<DialogTitle>Créer une intervention</DialogTitle>
-					<DialogDescription>Entrer le type de l'intervention sur le bâtiment</DialogDescription>
-				</DialogHeader>
+		<>
+			<Dialog open={open} onOpenChange={(newState) => !isSubmitting && setOpen(newState)}>
+				<DialogTrigger asChild disabled={disabled}>
+					{disabled ? <Button disabled={disabled}>Creer une intervention</Button> : <Button>Creer une intervention</Button>}
+				</DialogTrigger>
+				<DialogContent className='sm:max-w-[425px]'>
+					<DialogHeader>
+						<DialogTitle>Créer une intervention</DialogTitle>
+						<DialogDescription>Entrer le type de l'intervention sur le bâtiment</DialogDescription>
+					</DialogHeader>
 
-				<div className='grid gap-4 py-0'>
-					<Form {...form}>
-						<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-							<div className='grid w-full items-center gap-4'>
-								<SelectFORM
-									form={form}
-									name='title'
-									placeholder="Type d'intervention"
-									selectGroup={{
-										groups: [
-											{
-												selectLabelText: 'Maintenance et Réparation',
-												values: [
-													{ value: 'Plomberie', text: 'Plomberie' },
-													{ value: 'Électricité', text: 'Électricité' },
-													{ value: 'Chauffage', text: 'Chauffage' },
-													{ value: 'Toiture', text: 'Toiture' },
-												],
-											},
-											{
-												selectLabelText: 'Service Client et Administration',
-												values: [
-													{ value: 'Gestion de contrat', text: 'Gestion de contrat' },
-													{ value: 'Réclamations', text: 'Réclamations' },
-													{ value: 'Demandes administratives', text: 'Demandes administratives' },
-												],
-											},
-											{
-												selectLabelText: 'Inspection et Audit',
-												values: [
-													{ value: 'Inspection technique', text: 'Inspection technique' },
-													{ value: 'Audit énergétique', text: 'Audit énergétique' },
-													{ value: 'Contrôle qualité', text: 'Contrôle qualité' },
-												],
-											},
-											{
-												selectLabelText: 'Nettoyage et Entretien',
-												values: [
-													{ value: 'Nettoyage régulier', text: 'Nettoyage régulier' },
-													{ value: 'Entretien des espaces verts', text: 'Entretien des espaces verts' },
-													{ value: 'Nettoyage après travaux', text: 'Nettoyage après travaux' },
-												],
-											},
-										],
-									}}
-								/>
-							</div>
-							<Button type='submit' className='w-full'>
-								Créer
-							</Button>
-						</form>
-					</Form>
-				</div>
-			</DialogContent>
-			<LoadingOverlay isActive={isPending && !isSuccess && open} />
-		</Dialog>
+					<div className='grid gap-4 py-0'>
+						<Form {...form}>
+							<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+								<div className='grid w-full items-center gap-4'>
+									<SelectFORM
+										form={form}
+										name='title'
+										placeholder="Type d'intervention"
+										selectGroup={{
+											groups: [
+												{
+													selectLabelText: 'Maintenance et Réparation',
+													values: [
+														{ value: 'Plomberie', text: 'Plomberie' },
+														{ value: 'Électricité', text: 'Électricité' },
+														{ value: 'Chauffage', text: 'Chauffage' },
+														{ value: 'Toiture', text: 'Toiture' },
+													],
+												},
+												{
+													selectLabelText: 'Service Client et Administration',
+													values: [
+														{ value: 'Gestion de contrat', text: 'Gestion de contrat' },
+														{ value: 'Réclamations', text: 'Réclamations' },
+														{ value: 'Demandes administratives', text: 'Demandes administratives' },
+													],
+												},
+												{
+													selectLabelText: 'Inspection et Audit',
+													values: [
+														{ value: 'Inspection technique', text: 'Inspection technique' },
+														{ value: 'Audit énergétique', text: 'Audit énergétique' },
+														{ value: 'Contrôle qualité', text: 'Contrôle qualité' },
+													],
+												},
+												{
+													selectLabelText: 'Nettoyage et Entretien',
+													values: [
+														{ value: 'Nettoyage régulier', text: 'Nettoyage régulier' },
+														{ value: 'Entretien des espaces verts', text: 'Entretien des espaces verts' },
+														{ value: 'Nettoyage après travaux', text: 'Nettoyage après travaux' },
+													],
+												},
+											],
+										}}
+									/>
+								</div>
+								<Button type='submit' className='w-full'>
+									Créer
+								</Button>
+							</form>
+						</Form>
+					</div>
+				</DialogContent>
+			</Dialog>
+			<LoadingOverlay isActive={isSubmitting && open} />
+		</>
 	)
 }
 

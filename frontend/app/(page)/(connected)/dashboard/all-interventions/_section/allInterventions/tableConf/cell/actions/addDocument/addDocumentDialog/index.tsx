@@ -86,6 +86,7 @@ type AddDocumentDialogProps = {
 
 const AddDocumentDialog = ({ dataIntervention, disabled }: AddDocumentDialogProps) => {
 	const [open, setOpen] = useState(false)
+	const [isSubmitting, setIsSubmitting] = useState(false)
 
 	const { address: currentAccount } = useAccount()
 	const queryClient = useQueryClient()
@@ -111,8 +112,7 @@ const AddDocumentDialog = ({ dataIntervention, disabled }: AddDocumentDialogProp
 
 	const onSubmit = async (data: z.infer<typeof FormSchema>) => {
 		try {
-			console.log('data?.file.length:', data?.file.length)
-			console.log('data?.file.name:', data?.file.name)
+			setIsSubmitting(true)
 			const formData = new FormData()
 			formData.append('idEstate', dataIntervention?.estateManagerId)
 			formData.append('tokenId', dataIntervention?.tokenId)
@@ -148,6 +148,9 @@ const AddDocumentDialog = ({ dataIntervention, disabled }: AddDocumentDialogProp
 			}
 		} catch (error) {
 			toast({ variant: 'destructive', title: 'Erreur', description: 'Une erreur est survenue.' })
+			form.reset()
+			setIsSubmitting(false)
+			setOpen(false)
 		}
 	}
 
@@ -186,6 +189,7 @@ const AddDocumentDialog = ({ dataIntervention, disabled }: AddDocumentDialogProp
 					queryClient.invalidateQueries()
 					toast({ title: 'Document ajouter', description: 'Le document est bien ajouté' })
 					setUrl({})
+					setIsSubmitting(false)
 					setOpen(false)
 				}
 			}
@@ -196,12 +200,15 @@ const AddDocumentDialog = ({ dataIntervention, disabled }: AddDocumentDialogProp
 				title: 'Error',
 				description: 'An error occurred while processing the transaction receipt.',
 			})
+			form.reset()
+			setIsSubmitting(false)
+			setOpen(false)
 		})
 	}, [isSuccess, hash, form, dataReceipt])
 
 	return (
 		<>
-			<Dialog open={open} onOpenChange={setOpen}>
+			<Dialog open={open} onOpenChange={(newState) => !isSubmitting && setOpen(newState)}>
 				<DropdownMenuItem disabled={disabled} onClick={handleOpenDialog}>
 					Ajouter un document
 				</DropdownMenuItem>
@@ -240,7 +247,7 @@ const AddDocumentDialog = ({ dataIntervention, disabled }: AddDocumentDialogProp
 				</DialogContent>
 			</Dialog>
 
-			<LoadingOverlay isActive={isPending && !isSuccess && open} />
+			<LoadingOverlay isActive={isSubmitting && open} />
 		</>
 	)
 }

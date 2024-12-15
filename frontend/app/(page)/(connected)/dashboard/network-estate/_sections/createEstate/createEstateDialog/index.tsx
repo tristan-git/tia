@@ -43,7 +43,7 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 	const { address } = useAccount()
 	const queryClient = useQueryClient()
 	const { data: hash, error, isPending, isSuccess, writeContract } = useWriteContract()
-
+	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [open, setOpen] = useState(false)
 
 	const form = useForm<z.infer<typeof FormSchema>>({
@@ -55,6 +55,7 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 	})
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
+		setIsSubmitting(true)
 		const { rnbCode } = data
 		writeContract({
 			address: addressEstateFactory,
@@ -93,18 +94,21 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 
 					toast({ title: 'Le réseau est ajouté', description: `code RNB : ${rnbCode}, type : ${networkTypes}` })
 
+					setIsSubmitting(false)
 					setOpen(false)
 				}
 			}
 		}
 
 		handleDeploymentReceipt().catch((err) => {
-			console.error('Error handling deployment receipt:', err)
 			toast({
 				variant: 'destructive',
 				title: 'Error',
 				description: 'An error occurred while processing the transaction receipt.',
 			})
+			form.reset()
+			setIsSubmitting(false)
+			setOpen(false)
 		})
 	}, [isSuccess, hash, form, dataReceipt, queryClient])
 
@@ -115,6 +119,9 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 				title: 'Uh oh! Something went wrong.',
 				description: error?.name ?? 'Undefined error',
 			})
+			form.reset()
+			setIsSubmitting(false)
+			setOpen(false)
 		}
 	}, [error])
 
@@ -126,7 +133,7 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 	}, [open])
 
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
+		<Dialog open={open} onOpenChange={(newState) => !isSubmitting && setOpen(newState)}>
 			<DialogTrigger asChild>
 				<Button>Créer un réseau immobilier</Button>
 			</DialogTrigger>
@@ -167,7 +174,7 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 					</Form>
 				</div>
 			</DialogContent>
-			<LoadingOverlay isActive={isPending && !isSuccess && open} />
+			<LoadingOverlay isActive={isSubmitting && open} />
 		</Dialog>
 	)
 }

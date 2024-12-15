@@ -42,7 +42,7 @@ type CreatePermissionDialogProps = { idEstate; rnbCode; tokenId }
 
 const CreatePermissionDialog = ({ idEstate, rnbCode, tokenId }: CreatePermissionDialogProps) => {
 	const [open, setOpen] = useState(false)
-
+	const [isSubmitting, setIsSubmitting] = useState(false)
 	const { address: currentAccount } = useAccount()
 	const queryClient = useQueryClient()
 	const { writeContract, isPending, isSuccess, data: hash, error } = useWriteContract()
@@ -63,6 +63,7 @@ const CreatePermissionDialog = ({ idEstate, rnbCode, tokenId }: CreatePermission
 
 	const onSubmit = async (data: z.infer<typeof FormSchema>) => {
 		try {
+			setIsSubmitting(true)
 			const formData = new FormData()
 
 			formData.append('idEstate', idEstate)
@@ -93,6 +94,9 @@ const CreatePermissionDialog = ({ idEstate, rnbCode, tokenId }: CreatePermission
 			}
 		} catch (error) {
 			toast({ variant: 'destructive', title: 'Erreur', description: 'Une erreur est survenue.' })
+			form.reset()
+			setIsSubmitting(false)
+			setOpen(false)
 		}
 	}
 
@@ -118,6 +122,7 @@ const CreatePermissionDialog = ({ idEstate, rnbCode, tokenId }: CreatePermission
 					queryClient.invalidateQueries()
 					toast({ title: 'Bâtiment ajouter', description: 'Le bâtiment est bien ajouté' })
 					setUrl({})
+					setIsSubmitting(false)
 					setOpen(false)
 				}
 			}
@@ -129,10 +134,13 @@ const CreatePermissionDialog = ({ idEstate, rnbCode, tokenId }: CreatePermission
 				description: 'An error occurred while processing the transaction receipt.',
 			})
 		})
+		form.reset()
+		setIsSubmitting(false)
+		setOpen(false)
 	}, [isSuccess, hash, form, dataReceipt])
 
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
+		<Dialog open={open} onOpenChange={(newState) => !isSubmitting && setOpen(newState)}>
 			<DialogTrigger asChild>
 				<Button variant='outline'>Permission</Button>
 			</DialogTrigger>
@@ -183,7 +191,7 @@ const CreatePermissionDialog = ({ idEstate, rnbCode, tokenId }: CreatePermission
 					</Form>
 				</div>
 			</DialogContent>
-			<LoadingOverlay isActive={isPending && !isSuccess && open} />
+			<LoadingOverlay isActive={isSubmitting && open} />
 		</Dialog>
 	)
 }

@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import UpdateModule from './updateModule'
-import { LoadingOverlay } from '@/components/provider/blockchainProvider'
 
 /////////////////////////////////////////////////////////
 // List module

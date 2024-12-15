@@ -32,6 +32,7 @@ type CreateVoteDialogProps = {}
 
 const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 	const queryClient = useQueryClient()
+	const [isSubmitting, setIsSubmitting] = useState(false)
 	const { data: hash, error, isPending, isSuccess, writeContract } = useWriteContract()
 
 	const [open, setOpen] = useState(false)
@@ -42,6 +43,7 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 	})
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
+		setIsSubmitting(true)
 		const { votingTitle } = data
 
 		writeContract({
@@ -80,7 +82,7 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 					queryClient.invalidateQueries()
 
 					toast({ title: 'Vote Successful', description: 'The vote was added successfully.' })
-
+					setIsSubmitting(false)
 					setOpen(false)
 				}
 			}
@@ -93,6 +95,9 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 				title: 'Error',
 				description: 'An error occurred while processing the transaction receipt.',
 			})
+			form.reset()
+			setIsSubmitting(false)
+			setOpen(false)
 		})
 	}, [isSuccess, hash, form, dataReceipt])
 
@@ -103,11 +108,14 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 				title: 'Uh oh! Something went wrong.',
 				description: error?.name ?? 'Undefined error',
 			})
+			form.reset()
+			setIsSubmitting(false)
+			setOpen(false)
 		}
 	}, [error])
 
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
+		<Dialog open={open} onOpenChange={(newState) => !isSubmitting && setOpen(newState)}>
 			<DialogTrigger asChild>
 				<Button>Create vote</Button>
 			</DialogTrigger>
@@ -128,7 +136,7 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 					</Form>
 				</div>
 			</DialogContent>
-			<LoadingOverlay isActive={isPending && !isSuccess && open} />
+			<LoadingOverlay isActive={isSubmitting && open} />
 		</Dialog>
 	)
 }

@@ -112,7 +112,5 @@ export async function getManagerEstateNft({ currentAccount, idEstate }) {
 	// Convertir les BigInt en string avant de retourner
 	const serializedData = serializeBigInt(nftsWithDetails)
 
-	console.log(serializedData)
-
 	return serializedData
 }

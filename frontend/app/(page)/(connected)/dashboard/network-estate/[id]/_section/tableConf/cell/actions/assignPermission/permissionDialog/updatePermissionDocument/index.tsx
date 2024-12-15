@@ -119,7 +119,6 @@ const UpdatePermissionIntervention = ({ user, dataNft }: UpdatePermissionInterve
 					if (dataReceipt?.logs) {
 						// On recupere l'event "ModuleRoleAssigned" || "ModuleRoleRevoked"
 						dataReceipt?.logs.forEach((log, _index) => {
-							console.log(log)
 							const iface = new ethers.Interface(EstateManagerArtifact.abi)
 							const decodedLog = new ethers.Interface(EstateManagerArtifact.abi).parseLog(log)
 							const parsedLog = iface.parseLog(log)

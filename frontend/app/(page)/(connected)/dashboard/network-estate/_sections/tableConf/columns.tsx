@@ -68,7 +68,6 @@ export const columns = [
 		accessorKey: 'createdAtTimestamp',
 		header: ({ column }) => <DataTableColumnHeader column={column} title='Creer le' />,
 		cell: ({ row }) => {
-			console.log(row.getValue('createdAtTimestamp'))
 			const date = new Date(row.getValue('createdAtTimestamp'))
 			return <div className='flex text-xs'>{date.toLocaleString()}</div>
 		},
@@ -77,7 +76,6 @@ export const columns = [
 	{
 		id: 'actions',
 		cell: ({ row }) => {
-			console.log(row.original)
 			return (
 				<Link href={`/dashboard/network-estate/${row.original.id}`} className='hover:underline underline-offset-4 '>
 					<Button variant='outline' size='icon'>

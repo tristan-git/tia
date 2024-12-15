@@ -59,8 +59,6 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 	useEffect(() => {
 		async function handleDeploymentReceipt() {
 			if (isSuccess && hash) {
-				console.log(dataReceipt)
-
 				if (dataReceipt && dataReceipt.logs[0]?.address) {
 					const deployment = {
 						blockHash: dataReceipt.blockHash,

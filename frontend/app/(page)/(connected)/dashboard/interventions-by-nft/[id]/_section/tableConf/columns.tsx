@@ -20,17 +20,17 @@ export const columns = [
 				</div>
 			)
 		},
-		enableSorting: false,
-		enableHiding: false,
+		// enableSorting: false,
+		// enableHiding: false,
 	},
 
-	{
-		accessorKey: 'tokenId',
-		header: ({ column }) => <DataTableColumnHeader column={column} title='Nft id' />,
-		cell: ({ row }) => {
-			return <div className=' text-xs'>{row.getValue('tokenId')}</div>
-		},
-	},
+	// {
+	// 	accessorKey: 'tokenId',
+	// 	header: ({ column }) => <DataTableColumnHeader column={column} title='Nft id' />,
+	// 	cell: ({ row }) => {
+	// 		return <div className=' text-xs'>{row.getValue('tokenId')}</div>
+	// 	},
+	// },
 
 	{
 		accessorKey: 'title',

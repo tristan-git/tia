@@ -129,8 +129,8 @@ const CreateCreateEstateDialog = ({}: CreateVoteDialogProps) => {
 						<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
 							<InputFORM form={form} name='votingTitle' placeholder='Subject vote' className='w-full' />
 
-							<Button type='submit' className='w-full'>
-								Submit
+							<Button type='submit' className='w-full' disabled={isSubmitting}>
+								{isSubmitting ? 'En cours...' : 'Ajouter'}
 							</Button>
 						</form>
 					</Form>

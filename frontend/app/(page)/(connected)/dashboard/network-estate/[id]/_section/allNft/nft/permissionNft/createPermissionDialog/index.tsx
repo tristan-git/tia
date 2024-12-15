@@ -184,8 +184,8 @@ const CreatePermissionDialog = ({ idEstate, rnbCode, tokenId }: CreatePermission
 								)}
 							/>
 
-							<Button type='submit' className='w-full'>
-								Assigner
+							<Button type='submit' className='w-full' disabled={isSubmitting}>
+								{isSubmitting ? 'En cours...' : 'Assigner'}
 							</Button>
 						</form>
 					</Form>

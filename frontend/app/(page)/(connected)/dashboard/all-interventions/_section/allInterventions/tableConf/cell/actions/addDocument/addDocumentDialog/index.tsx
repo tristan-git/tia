@@ -238,8 +238,8 @@ const AddDocumentDialog = ({ dataIntervention, disabled }: AddDocumentDialogProp
 									</div>
 								</div>
 
-								<Button type='submit' className='w-full'>
-									Ajouter
+								<Button type='submit' className='w-full' disabled={isSubmitting}>
+									{isSubmitting ? 'En cours...' : 'Ajouter'}
 								</Button>
 							</form>
 						</Form>

@@ -200,8 +200,9 @@ const CreateInterventionDialog = ({ idEstate, tokenId, addressInterventionManage
 										}}
 									/>
 								</div>
-								<Button type='submit' className='w-full'>
-									Créer
+
+								<Button type='submit' className='w-full' disabled={isSubmitting}>
+									{isSubmitting ? 'En cours...' : 'Créer'}
 								</Button>
 							</form>
 						</Form>

@@ -249,8 +249,8 @@ const ValidInterventionDialog = ({ dataIntervention, disabled }: ValidInterventi
 								)}
 							</div>
 
-							<Button type='submit' className='w-full' disabled={dataIntervention?.isValidated}>
-								{dataIntervention?.isValidated ? 'Intervention déjà validé' : 'valider'}
+							<Button type='submit' className='w-full' disabled={dataIntervention?.isValidated || isSubmitting}>
+								{isSubmitting ? 'En cours...' : dataIntervention?.isValidated ? 'Intervention déjà validé' : 'valider'}
 							</Button>
 						</form>
 					</Form>

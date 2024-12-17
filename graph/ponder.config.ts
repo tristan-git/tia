@@ -1,8 +1,6 @@
 import { createConfig } from "@ponder/core";
 import { parseAbiItem } from "abitype";
 import { http } from "viem";
-import { VotingFactoryAbi } from "./abis/VotingFactoryAbi";
-import { VotingAbi } from "./abis/VotingAbi";
 import { EstateManagerFactoryAbi } from "./abis/EstateManagerFactoryAbi";
 import { EstateManagerAbi } from "./abis/EstateManagerAbi";
 import { InterventionManagerAbi } from "./abis/InterventionManagerAbi";
@@ -12,8 +10,6 @@ export default createConfig({
   //   kind: "postgres",
   //   connectionString: process.env.DATABASE_URL,
   // },
-
-  
 
   networks: {
     skale: {

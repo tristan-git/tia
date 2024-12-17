@@ -105,6 +105,9 @@ const BlockchainProvider = ({
 							localStorage.setItem('targetRoute', targetRoute)
 							router.push(targetRoute)
 						}
+					} else {
+						setUserAccount(null)
+						router.push('/signup')
 					}
 				} else {
 					setUserAccount(null)

@@ -2,8 +2,6 @@
 
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { useAccount } from 'wagmi'
 import { useContext, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -14,7 +12,14 @@ import { Form } from '@/components/ui/form'
 import InputFORM from '@/components/shared/form/InputFORM'
 import SelectFORM from '@/components/shared/form/SelectFORM'
 import ButtonWalletConnect from './walletConnect'
-import { BlockchainContext } from '@/components/provider/blockchainProvider'
+import { BlockchainContext, LoadingOverlay } from '@/components/provider/blockchainProvider'
+
+const roles = [
+	{ value: '1', text: 'Administrateur TIA' },
+	{ value: '2', text: 'Gestionnaire' },
+	{ value: '3', text: 'Prestataire' },
+	{ value: '4', text: 'Lecteur' },
+]
 
 const roleDescriptions: Record<string, string> = {
 	'1': 'Administrateur TIA : Responsable de la gestion globale du système.',
@@ -41,7 +46,7 @@ const FormSchema = z.object({
 })
 
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
-	const { address: currentAccount, isConnected } = useAccount()
+	const { address: currentAccount, isConnected, isDisconnected } = useAccount()
 	const [isLoading, setIsLoading] = useState<boolean>(false)
 	const { userAccount } = useContext(BlockchainContext)
 
@@ -57,6 +62,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 		const { firstName, lastName, walletAddress, accountRoleId } = data
 		await createAccount({ firstName, lastName, walletAddress, accountRoleId })
 		setIsLoading(false)
+		location.reload()
 	}
 
 	useEffect(() => {
@@ -65,6 +71,14 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 		}
 	}, [currentAccount, form, isConnected])
 
+	useEffect(() => {
+		const account = form.getValues('accountRoleId')
+		if (account) {
+			const defaultLastName = roles?.filter(({ value }) => value == account)?.[0]?.text
+			form.setValue('lastName', defaultLastName)
+		}
+	}, [form.getValues('accountRoleId')])
+
 	return (
 		<Form {...form}>
 			<form className={cn('flex flex-col gap-6', className)} {...props} onSubmit={form.handleSubmit(onSubmit)}>
@@ -72,36 +86,18 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 					<h1 className='text-2xl font-bold'>Bienvenue sur TIA</h1>
 					<p className='text-balance text-sm text-muted-foreground'>Le carnet de santé digital de vos bâtiments</p>
 				</div>
+
 				<div className='grid gap-6'>
 					<div className='grid gap-2'>
-						<InputFORM form={form} name='firstName' placeholder='Nom' className='w-full' />
+						<InputFORM form={form} name='firstName' placeholder='Prénom' className='w-full' />
+						<InputFORM form={form} name='lastName' placeholder='Nom' className='w-full hidden' disabled />
+						<SelectFORM form={form} name='accountRoleId' placeholder='Type de compte' selectGroup={{ groups: [{ values: roles }] }} />
 
-						<InputFORM form={form} name='lastName' placeholder='Prénom' className='w-full' />
-
-						<SelectFORM
-							form={form}
-							name='accountRoleId'
-							placeholder='Type de compte'
-							selectGroup={{
-								groups: [
-									{
-										values: [
-											{ value: '1', text: 'Administrateur TIA' },
-											{ value: '2', text: 'Gestionnaire' },
-											{ value: '3', text: 'Prestataire' },
-											{ value: '4', text: 'Lecteur' },
-										],
-									},
-								],
-							}}
-						/>
-
-						{/* Texte d'informations sur le rôle sélectionné */}
 						{selectedRole && roleDescriptions[selectedRole] && (
 							<p className='text-xs text-gray-500 mt-2 bg-sky-50 p-3 rounded-md'>{roleDescriptions[selectedRole]}</p>
 						)}
 
-						<InputFORM form={form} name='walletAddress' placeholder='Address wallet' className='w-full hidden' disabled />
+						<InputFORM form={form} name='walletAddress' placeholder='Address wallet' className='w-full' disabled />
 
 						<div className='mt-0'>
 							<ButtonWalletConnect text='Connecté votre wallet' login={false} noAccount={false} />
@@ -119,6 +115,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 					<ButtonWalletConnect text='Connexion' login noAccount={!userAccount} />
 				</div>
 			</form>
+			<LoadingOverlay isActive={isLoading} />
 		</Form>
 	)
 }

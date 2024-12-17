@@ -75,7 +75,7 @@ const ViewDocumentDialog = ({ dataInter, disabled }: ViewDocumentDialogProps) =>
 	const [open, setOpen] = useState(false)
 	const { address: currentAccount } = useAccount()
 	const { data: users } = useGetAllUsers()
-	const walletPrestataire = users?.filter(({ accountRoleId }) => accountRoleId == dataInter?.createdBy)?.[0]?.walletAddress
+	const walletPrestataire = users?.filter(({ id }) => id == dataInter?.createdBy)?.[0]?.walletAddress
 
 	/////////////////////////////////////////////////////////
 	// Request Blockchain

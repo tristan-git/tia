@@ -34,12 +34,8 @@ export async function POST(request: Request): Promise<NextResponse> {
 			return NextResponse.json({ error: 'User not found' }, { status: 404 })
 		}
 
-		// 1 = Admin | 2 gestionnaire | 3 prestataire | 4 lecteur
-		const role = user?.[0].accountRoleId
-
 		const managerAlias = aliasedTable(usersTable, 'managerId')
 		const nfts = await db
-			// .selectDistinct({
 			.selectDistinctOn([mintedNFTsTable.id], {
 				nftId: mintedNFTsTable.id,
 				tokenId: mintedNFTsTable.tokenId,

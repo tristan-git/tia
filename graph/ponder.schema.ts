@@ -69,45 +69,86 @@ export const moduleInterventionManagersRelations = relations(moduleInterventionM
   }),
 }));
 
-// Table des interventions dans les modules
+// // Table des interventions dans les modules
+// export const interventions = onchainTable(
+//   "interventions",
+//   (t) => ({
+//     id: t.bigint(), // Identifiant unique de l'intervention
+//     moduleId: t.hex().notNull(), // Adresse du module
+//     tokenId: t.bigint().notNull(), // Identifiant du token concerné
+//     interventionHash: t.text().notNull(), // Hash de l'intervention
+//     isValidated: t.boolean().default(false), // Validation de l'intervention
+//     validateFrom: t.hex(), // address de qui valide intervention
+//     createdAtTimestamp: t.bigint().notNull(), // Timestamp de création
+//     createdBy: t.hex().notNull(), // Adresse de l'utilisateur qui a créé l'intervention
+//   }),
+//   (table) => ({ pk: primaryKey({ columns: [table.id, table.moduleId, table.tokenId] }) })
+// );
+
 export const interventions = onchainTable(
   "interventions",
   (t) => ({
-    id: t.bigint(), // Identifiant unique de l'intervention
-    moduleId: t.hex().notNull(), // Adresse du module
-    tokenId: t.bigint().notNull(), // Identifiant du token concerné
-    interventionHash: t.text().notNull(), // Hash de l'intervention
-    isValidated: t.boolean().default(false), // Validation de l'intervention
-    validateFrom: t.hex(), // address de qui valide intervention
-    createdAtTimestamp: t.bigint().notNull(), // Timestamp de création
-    createdBy: t.hex().notNull(), // Adresse de l'utilisateur qui a créé l'intervention
+    id: t.bigint(),
+    moduleId: t.hex().notNull(),
+    tokenId: t.bigint().notNull(),
+    interventionHash: t.text(), // Peut être omis si non utilisé dans le contrat
+    title: t.text().notNull(), // Ajout du titre de l'intervention
+    isValidated: t.boolean().default(false),
+    validateFrom: t.hex(),
+    createdAtTimestamp: t.bigint().notNull(),
+    createdBy: t.hex().notNull(),
   }),
   (table) => ({ pk: primaryKey({ columns: [table.id, table.moduleId, table.tokenId] }) })
 );
 
-// Relations pour les interventions
+// // Relations pour les interventions
+// export const interventionsRelations = relations(interventions, ({ one, many }) => ({
+//   module: one(modules, { fields: [interventions.moduleId], references: [modules.id] }),
+//   documents: many(documents),
+//   creator: one(users, { fields: [interventions.createdBy], references: [users.id] }),
+// }));
+
 export const interventionsRelations = relations(interventions, ({ one, many }) => ({
   module: one(modules, { fields: [interventions.moduleId], references: [modules.id] }),
   documents: many(documents),
   creator: one(users, { fields: [interventions.createdBy], references: [users.id] }),
+  validator: one(users, { fields: [interventions.validateFrom], references: [users.id] }), // Nouveau champ
 }));
 
-// Table des documents liés aux interventions
+// // Table des documents liés aux interventions
+// export const documents = onchainTable(
+//   "documents",
+//   (t) => ({
+//     id: t.bigint(), // Identifiant unique du document
+//     interventionId: t.bigint().notNull(), // Identifiant de l'intervention
+//     moduleId: t.hex().notNull(), // Adresse du module
+//     documentHash: t.text().notNull(), // Hash du document
+//     createdBy: t.hex().notNull(), // Adresse de l'utilisateur qui a ajouté le document
+//   }),
+//   (table) => ({ pk: primaryKey({ columns: [table.id, table.interventionId, table.moduleId] }) })
+// );
+
 export const documents = onchainTable(
   "documents",
   (t) => ({
-    id: t.bigint(), // Identifiant unique du document
-    interventionId: t.bigint().notNull(), // Identifiant de l'intervention
-    moduleId: t.hex().notNull(), // Adresse du module
-    documentHash: t.text().notNull(), // Hash du document
-    createdBy: t.hex().notNull(), // Adresse de l'utilisateur qui a ajouté le document
+    id: t.bigint(),
+    interventionId: t.bigint().notNull(),
+    moduleId: t.hex().notNull(),
+    documentHash: t.text().notNull(),
+    title: t.text().notNull(), // Ajout du titre du document
+    createdBy: t.hex().notNull(),
   }),
   (table) => ({ pk: primaryKey({ columns: [table.id, table.interventionId, table.moduleId] }) })
 );
 
 // Relations pour les documents
+// export const documentsRelations = relations(documents, ({ one }) => ({
+//   intervention: one(interventions, { fields: [documents.interventionId], references: [interventions.id] }),
+// }));
+
 export const documentsRelations = relations(documents, ({ one }) => ({
   intervention: one(interventions, { fields: [documents.interventionId], references: [interventions.id] }),
+  creator: one(users, { fields: [documents.createdBy], references: [users.id] }),
 }));
 
 export const userInterventionAccess = onchainTable(
@@ -144,12 +185,20 @@ export const interventionAccessChanges = onchainTable(
   (table) => ({ pk: primaryKey({ columns: [table.id, table.interventionId, table.changedAtTimestamp] }) })
 );
 
-// Relations pour les changements d'accès aux interventions
+// // Relations pour les changements d'accès aux interventions
+// export const interventionAccessChangesRelations = relations(interventionAccessChanges, ({ one }) => ({
+//   intervention: one(interventions, {
+//     fields: [interventionAccessChanges.interventionId],
+//     references: [interventions.id],
+//   }),
+// }));
+
 export const interventionAccessChangesRelations = relations(interventionAccessChanges, ({ one }) => ({
   intervention: one(interventions, {
     fields: [interventionAccessChanges.interventionId],
     references: [interventions.id],
   }),
+  changer: one(users, { fields: [interventionAccessChanges.changedBy], references: [users.id] }), // Ajout relation changedBy
 }));
 
 export const userModuleAccess = onchainTable(
@@ -165,7 +214,12 @@ export const userModuleAccess = onchainTable(
   (table) => ({ pk: primaryKey({ columns: [table.id, table.authorizedAddress, table.moduleName, table.tokenId] }) })
 );
 
-// Relations pour les `UserModuleAccess`
+// // Relations pour les `UserModuleAccess`
+// export const userModuleAccessRelations = relations(userModuleAccess, ({ one }) => ({
+//   module: one(modules, { fields: [userModuleAccess.moduleName], references: [modules.moduleName] }),
+//   user: one(users, { fields: [userModuleAccess.authorizedAddress], references: [users.id] }),
+// }));
+
 export const userModuleAccessRelations = relations(userModuleAccess, ({ one }) => ({
   module: one(modules, { fields: [userModuleAccess.moduleName], references: [modules.moduleName] }),
   user: one(users, { fields: [userModuleAccess.authorizedAddress], references: [users.id] }),

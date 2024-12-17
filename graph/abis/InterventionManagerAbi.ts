@@ -6,6 +6,11 @@ export const InterventionManagerAbi = [
         name: "_realEstateNFTContract",
         type: "address",
       },
+      {
+        internalType: "address",
+        name: "_manager",
+        type: "address",
+      },
     ],
     stateMutability: "nonpayable",
     type: "constructor",
@@ -30,6 +35,12 @@ export const InterventionManagerAbi = [
         internalType: "bytes32",
         name: "documentHash",
         type: "bytes32",
+      },
+      {
+        indexed: false,
+        internalType: "string",
+        name: "title",
+        type: "string",
       },
       {
         indexed: false,
@@ -89,9 +100,9 @@ export const InterventionManagerAbi = [
       },
       {
         indexed: false,
-        internalType: "bytes32",
-        name: "interventionHash",
-        type: "bytes32",
+        internalType: "string",
+        name: "title",
+        type: "string",
       },
       {
         indexed: false,
@@ -229,6 +240,11 @@ export const InterventionManagerAbi = [
       {
         components: [
           {
+            internalType: "string",
+            name: "title",
+            type: "string",
+          },
+          {
             internalType: "bytes32",
             name: "documentHash",
             type: "bytes32",
@@ -260,12 +276,17 @@ export const InterventionManagerAbi = [
       {
         components: [
           {
-            internalType: "bytes32",
-            name: "interventionHash",
-            type: "bytes32",
+            internalType: "string",
+            name: "title",
+            type: "string",
           },
           {
             components: [
+              {
+                internalType: "string",
+                name: "title",
+                type: "string",
+              },
               {
                 internalType: "bytes32",
                 name: "documentHash",

@@ -104,7 +104,7 @@ ponder.on("InterventionManager:InterventionManagerInitialized", async ({ event, 
 
 // Event: InterventionAdded
 ponder.on("InterventionManager:InterventionAdded", async ({ event, context }) => {
-  const { tokenId, interventionHash, timestamp, from, interventionIndex } = event.args;
+  const { tokenId, _title, timestamp, from, interventionIndex } = event.args;
 
   // Enregistrer l'intervention dans la base
   await context.db.insert(interventions).values({
@@ -120,18 +120,17 @@ ponder.on("InterventionManager:InterventionAdded", async ({ event, context }) =>
 
 // // Event: DocumentAdded
 // ponder.on("InterventionManager:DocumentAdded", async ({ event, context }) => {
-//   const { tokenId, interventionIndex, documentHash, from } = event.args;
+//   const { tokenId, interventionIndex, documentHash, title, from } = event.args;
 
-//   // // Enregistrer le document lié à l'intervention
-//   // await context.db.insert(documents).values({
-//   //   id: documentHash,
-//   //   interventionId: interventionIndex,
-//   //   moduleId: event.log.address,
-//   //   documentHash,
-//   //   createdBy: from,
-//   // });
-
-//   //  .set({ voteCount: sql`${proposals.voteCount} + 1` })
+//   // Enregistrer le document lié à l'intervention
+//   await context.db.insert(documents).values({
+//     id: documentHash,
+//     interventionId: interventionIndex,
+//     moduleId: event.log.address,
+//     documentHash,
+//     title,
+//     createdBy: from,
+//   });
 // });
 
 // Event: InterventionValidated
@@ -152,13 +151,13 @@ ponder.on("InterventionManager:InterventionAccessChanged", async ({ event, conte
   const { tokenId, interventionIndex, account, from, granted } = event.args;
 
   await context.db.insert(interventionAccessChanges).values({
-    id: BigInt(interventionIndex), // Utilisez interventionIndex comme ID
-    interventionId: BigInt(interventionIndex), // Associez à l'intervention
-    moduleId: event.log.address, // Adresse du module émettant l'événement
-    account, // Adresse de l'utilisateur concerné
-    hasAccess: granted, // Booléen indiquant si l'accès est accordé ou révoqué
-    changedAtTimestamp: BigInt(event.block.timestamp), // Timestamp du changement
-    changedBy: from, // Adresse de l'utilisateur ayant effectué le changement
+    id: BigInt(interventionIndex),
+    interventionId: BigInt(interventionIndex),
+    moduleId: event.log.address,
+    account,
+    hasAccess: granted,
+    changedAtTimestamp: BigInt(event.block.timestamp),
+    changedBy: from,
     tokenId,
   });
 

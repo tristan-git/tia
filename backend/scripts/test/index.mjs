@@ -12,18 +12,7 @@ const generateChoice = (fileName) => ({
 	value: `test/${fileName}`,
 })
 
-const choices = [
-	// generateChoice('Lock.ts'), // = npx hardhat test Lock.ts
-	// generateChoice('Lock2.ts'), // = npx hardhat test Lock2.ts
-	// generateChoice('toto/totoTest.ts'), // = npx hardhat test toto/totoTest.ts
-	generateChoice('BuildingManager.ts'),
-	generateChoice('Tia.ts'),
-
-	// generateChoice("Lock2"),
-	// generateChoice("Lock2"),
-	// generateChoice("Lock2"),
-	// generateChoice("Lock2"),
-]
+const choices = [generateChoice('BuildingManager.ts'), generateChoice('Tia.ts')]
 
 // //////////////////////////////////////////////////////////////////////
 //  choose Tests

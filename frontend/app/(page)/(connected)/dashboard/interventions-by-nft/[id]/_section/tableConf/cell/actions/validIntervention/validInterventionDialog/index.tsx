@@ -106,7 +106,7 @@ const ValidInterventionDialog = ({ dataIntervention, disabled }: ValidInterventi
 	const queryClient = useQueryClient()
 	const { writeContract, isPending, isSuccess, data: hash, error, failureReason } = useWriteContract()
 	const { data: dataReceipt } = useTransactionReceipt({ hash })
-	const walletPrestataire = users?.filter(({ accountRoleId }) => accountRoleId == dataIntervention?.createdBy)?.[0]?.walletAddress
+	const walletPrestataire = users?.filter(({ id }) => id == dataIntervention?.createdBy)?.[0]?.walletAddress
 
 	const handleOpenDialog = (e: React.MouseEvent) => {
 		e.preventDefault()

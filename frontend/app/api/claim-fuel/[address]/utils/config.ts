@@ -1,6 +1,6 @@
 import { parseEther } from 'ethers'
 
-const DISTRIBUTION_VALUE = parseEther('0.001')
+const DISTRIBUTION_VALUE = parseEther('0.01')
 const PRIVATE_KEY: string | undefined = process.env.PRIVATE_KEY
 const RPC_URL: string | undefined = process.env.RPC_URL
 

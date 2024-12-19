@@ -1,49 +1,8 @@
 import { ignition, ethers } from 'hardhat'
 import { expect } from 'chai'
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers'
-import { buildingManagerModule } from '../ignition/modules/tia/buildingManager'
 
 describe('Building Manager Contracts', function () {
-	const metadata = {
-		name: 'Building ID',
-		description: 'A beautiful office building located downtown.',
-		image: 'ipfs://Qm.../building.png',
-		attributes: [
-			{
-				trait_type: 'Location',
-				value: 'Downtown',
-			},
-			{
-				trait_type: 'Size',
-				value: '5000 sq ft',
-			},
-		],
-		moduleInterventions: [
-			{
-				details: 'Nettoyage façade',
-				provider: '0xAnotherProviderAddress',
-				timestamp: 1638029200,
-				documents: [
-					{
-						name: 'rapport_intervention.pdf',
-						url: 'https://blob.service.com/doc1.pdf',
-						hash: '86c703c2f75f4cb8082e6f2986ff9d75b8c15279beb483554adc0b6eaa4de9b4',
-						restricted: true,
-					},
-					{
-						name: 'rapport_intervention.pdf',
-						url: 'https://blob.service.com/doc1.pdf',
-						hash: '86c703c2f75f4cb8082e6f2986ff9d75b8c15279beb483554adc0b6eaa4de9b4',
-						restricted: true,
-					},
-				],
-			},
-		],
-		moduleEspaceVert: [
-			// ...autreData
-		],
-	}
-
 	// ////////////////////////////////////////////////////////////////////
 	// Fixtures
 	// ////////////////////////////////////////////////////////////////////
@@ -200,7 +159,7 @@ describe('Building Manager Contracts', function () {
 			expect(await EstateManager.ownerOf(1)).to.equal(manager.address)
 		})
 
-		it.only('Should interact with InterventionManager through EstateManager', async function () {
+		it('Should interact with InterventionManager through EstateManager', async function () {
 			const { EstateManager, InterventionManager, tiaAdmin, manager } = await loadFixture(deployBuildingManagerFixture)
 
 			// Mint un NFT

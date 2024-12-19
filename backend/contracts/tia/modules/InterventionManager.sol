@@ -21,10 +21,10 @@ contract InterventionManager {
 		bool isValidated;
 	}
 
-	mapping(uint256 => mapping(address => Intervention[])) private interventions; // Interventions par tokenId -> address -> [interventions]
+	// Mapping: tokenId -> user address -> array of interventions
+	mapping(uint256 => mapping(address => Intervention[])) private interventions;
 
-	// Mapping pour contrôler l'accès (tokenId -> interventionIndex -> _account -> isAuthorized)
-	// permet detre utiliser comme role d'acces sur la dapp pour savoir qui peut voir lintervention et ses document
+	// Access control mapping: tokenId -> interventionIndex -> account -> isAuthorized
 	mapping(uint256 => mapping(uint256 => mapping(address => bool))) private interventionAccess;
 
 	event InterventionManagerInitialized(address indexed estateManagerContract, address indexed from, uint256 timestamp);
@@ -52,7 +52,13 @@ contract InterventionManager {
 	// EXECUTE
 	// ////////////////////////////////////////////////////////////////////
 
-	// Choisir une fonction à exécuter en fonction de fnName
+	/**
+	 * @dev Executes the specified function based on its name and input data.
+	 * @param _tokenId The ID of the token associated with the intervention.
+	 * @param _fnName The name of the function to execute.
+	 * @param _data Encoded function parameters.
+	 * @param _from Address of the caller.
+	 */
 	function execute(uint256 _tokenId, string calldata _fnName, bytes calldata _data, address _from) external {
 		require(msg.sender == estateManagerContract, 'Unauthorized caller');
 
@@ -75,7 +81,12 @@ contract InterventionManager {
 	// EXECUTE FUNCTION
 	// ////////////////////////////////////////////////////////////////////
 
-	// Ajouter une intervention
+	/**
+	 * @dev Adds a new intervention to the specified token and address.
+	 * @param _tokenId The ID of the token.
+	 * @param _from The address initiating the addition.
+	 * @param _data Encoded data containing the title of the intervention.
+	 */
 	function _addIntervention(uint256 _tokenId, address _from, bytes calldata _data) internal {
 		string memory _title = abi.decode(_data, (string));
 
@@ -86,18 +97,21 @@ contract InterventionManager {
 		emit InterventionAdded(_tokenId, _title, block.timestamp, _from, newIndex);
 	}
 
-	// Ajouter un document à une intervention spécifique
+	/**
+	 * @dev Adds a document to an existing intervention.
+	 * @param _tokenId The ID of the token.
+	 * @param _from The address initiating the addition.
+	 * @param _data Encoded data containing the intervention index, document title, and hash.
+	 */
 	function _addDocument(uint256 _tokenId, address _from, bytes calldata _data) internal {
 		(uint256 _interventionIndex, string memory _title, bytes32 _documentHash) = abi.decode(_data, (uint256, string, bytes32));
 
 		require(_documentHash != bytes32(0), 'Hash document invalide');
-
 		require(_interventionIndex < interventions[_tokenId][_from].length, 'Invalid intervention index');
 		require(!interventions[_tokenId][_from][_interventionIndex].isValidated, 'Intervention already validated');
 
 		interventions[_tokenId][_from][_interventionIndex].documents.push(Document({documentHash: _documentHash, title: _title}));
 
-		// donne acces a la lecture au manager et prestataire
 		interventionAccess[_tokenId][_interventionIndex][_from] = true;
 		interventionAccess[_tokenId][_interventionIndex][manager] = true;
 
@@ -106,12 +120,14 @@ contract InterventionManager {
 		emit DocumentAdded(_tokenId, _interventionIndex, _documentHash, _title, _from);
 	}
 
-	// Valider une intervention par le propriétaire
+	/**
+	 * @dev Validates an intervention for a given token and creator.
+	 * @param _tokenId The ID of the token.
+	 * @param _from The address of the manager initiating the validation.
+	 * @param _data Encoded data containing the intervention index and creator's address.
+	 */
 	function _validateIntervention(uint256 _tokenId, address _from, bytes calldata _data) internal {
-		// Vérifie si l'utilisateur a MANAGER_ROLE dans estateManagerContract
 		require(IAccessControl(estateManagerContract).hasRole(ESTATE_MANAGER_ROLE, _from), 'Only a manager can validate');
-
-		// uint256 _interventionIndex = abi.decode(_data, (uint256));
 
 		(uint256 _interventionIndex, address _createdBy) = abi.decode(_data, (uint256, address));
 
@@ -123,6 +139,12 @@ contract InterventionManager {
 		emit InterventionValidated(_tokenId, _interventionIndex, _from);
 	}
 
+	/**
+	 * @dev Grants access to a specific intervention for a given account.
+	 * @param _tokenId The ID of the token.
+	 * @param _from The address of the manager initiating the access grant.
+	 * @param _data Encoded data containing the intervention index and the account to grant access to.
+	 */
 	function _grantInterventionAccess(uint256 _tokenId, address _from, bytes calldata _data) internal {
 		(uint256 _interventionIndex, address _account) = abi.decode(_data, (uint256, address));
 
@@ -133,6 +155,12 @@ contract InterventionManager {
 		emit InterventionAccessChanged(_tokenId, _interventionIndex, _account, _from, true);
 	}
 
+	/**
+	 * @dev Revokes access to a specific intervention for a given account.
+	 * @param _tokenId The ID of the token.
+	 * @param _from The address of the manager initiating the access revocation.
+	 * @param _data Encoded data containing the intervention index and the account to revoke access from.
+	 */
 	function _revokeInterventionAccess(uint256 _tokenId, address _from, bytes calldata _data) internal {
 		(uint256 _interventionIndex, address _account) = abi.decode(_data, (uint256, address));
 
@@ -144,15 +172,26 @@ contract InterventionManager {
 	}
 
 	// ////////////////////////////////////////////////////////////////////
-	// GET FUNCTION
+	// GETTERS
 	// ////////////////////////////////////////////////////////////////////
 
-	// Récupérer les interventions associées à un tokenId
+	/**
+	 * @dev Retrieves all interventions associated with a token and user.
+	 * @param _tokenId The ID of the token.
+	 * @param _account The address of the user.
+	 * @return An array of `Intervention` structs.
+	 */
 	function getInterventions(uint256 _tokenId, address _account) external view returns (Intervention[] memory) {
 		return interventions[_tokenId][_account];
 	}
 
-	// Récupérer les documents d'une intervention
+	/**
+	 * @dev Retrieves the documents for a specific intervention.
+	 * @param _tokenId The ID of the token.
+	 * @param _interventionIndex The index of the intervention.
+	 * @param _account The address of the user.
+	 * @return An array of `Document` structs.
+	 */
 	function getDocuments(
 		uint256 _tokenId,
 		uint256 _interventionIndex,
@@ -162,7 +201,14 @@ contract InterventionManager {
 		return interventions[_tokenId][_account][_interventionIndex].documents;
 	}
 
-	function hasInterventionAccess(uint256 _tokenId, uint256 _interventionIndex, address _account) public view returns (bool) {
+	/**
+	 * @dev Checks whether an address has access to a specific intervention.
+	 * @param _tokenId The ID of the token.
+	 * @param _interventionIndex The index of the intervention.
+	 * @param _account The address to check.
+	 * @return `true` if the account has access, otherwise `false`.
+	 */
+	function hasInterventionAccess(uint256 _tokenId, uint256 _interventionIndex, address _account) external view returns (bool) {
 		return interventionAccess[_tokenId][_interventionIndex][_account];
 	}
 }

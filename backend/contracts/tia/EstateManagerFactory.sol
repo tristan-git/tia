@@ -3,55 +3,58 @@ pragma solidity 0.8.28;
 
 import './EstateManager.sol';
 
+error AdminAddressZero();
+error ManagerAddressZero();
+error EstateManagerAddressZero();
+error ModuleAddressZero();
+error InvalidRnbCode();
+error ModuleNameRequired();
+
 contract EstateManagerFactory {
 	address[] public deployedManagers;
 
-	event FactoryDeployed(address factoryAddress);
-	event EstateManagerCreated(address indexed admin, address indexed manager, address estateManager, bytes32 rnbCode);
-	event ModuleRegisteredInManager(address indexed estateManager, string name, address moduleAddress);
+	event FactoryDeployed(address indexed factoryAddress);
+	event EstateManagerCreated(address indexed admin, address indexed manager, address indexed estateManager, bytes32 rnbCode);
+	event ModuleRegisteredInManager(address indexed estateManager, string moduleName, address moduleAddress);
 
 	constructor() {
 		emit FactoryDeployed(address(this));
 	}
 
 	/**
-	 * @dev Crée un nouveau EstateManager sans enregistrer de module.
-	 * @param admin Adresse de l'administrateur.
-	 * @param manager Adresse du gestionnaire.
-	 * @param rnbCode Code RNB unique.
-	 * @return address du nouveau contrat EstateManager.
+	 * @notice Creates a new `EstateManager` contract.
+	 * @param _admin Address of the administrator of the new contract.
+	 * @param _manager Address of the manager of the new contract.
+	 * @param _rnbCode RNB code to identify the collection of buildings.
 	 */
-	function createEstateManager(address admin, address manager, string memory rnbCode) external returns (address) {
-		// Déployer une nouvelle instance d'EstateManager
-		EstateManager newManager = new EstateManager(admin, manager, address(this), rnbCode);
+	function createEstateManager(address _admin, address _manager, string memory _rnbCode) external {
+		if (_admin == address(0)) revert AdminAddressZero();
+		if (_manager == address(0)) revert ManagerAddressZero();
+		if (bytes(_rnbCode).length == 0 || bytes(_rnbCode).length > 32) revert InvalidRnbCode();
 
-		// Ajouter l'adresse de l'instance déployée à la liste
+		// Deploy a new instance of EstateManager
+		EstateManager newManager = new EstateManager(_admin, _manager, address(this), _rnbCode);
+
+		// Add the address of the deployed instance to the list
 		deployedManagers.push(address(newManager));
 
-		// Émettre un événement pour signaler la création
-		emit EstateManagerCreated(admin, manager, address(newManager), bytes32(abi.encodePacked(rnbCode)));
-
-		return address(newManager);
+		emit EstateManagerCreated(_admin, _manager, address(newManager), bytes32(abi.encodePacked(_rnbCode)));
 	}
 
 	/**
-	 * @dev Enregistre un module dans un EstateManager existant.
-	 * @param estateManager Adresse du contrat EstateManager.
-	 * @param moduleName Nom du module à enregistrer.
-	 * @param moduleAddress Adresse du module.
+	 * @notice Registers a module in an existing `EstateManager` contract.
+	 * @param _estateManager Address of the `EstateManager` contract.
+	 * @param _moduleName Name of the module to register.
+	 * @param _moduleAddress Address of the module to register.
 	 */
-	function registerModuleInManager(address estateManager, string memory moduleName, address moduleAddress) external {
-		require(estateManager != address(0), 'Invalid EstateManager address');
-		require(moduleAddress != address(0), 'Invalid module address');
+	function registerModuleInManager(address _estateManager, string memory _moduleName, address _moduleAddress) external {
+		if (_estateManager == address(0)) revert EstateManagerAddressZero();
+		if (_moduleAddress == address(0)) revert ModuleAddressZero();
+		if (bytes(_moduleName).length == 0) revert ModuleNameRequired();
 
-		// Appeler la fonction registerModule de l'EstateManager
-		EstateManager(estateManager).registerModule(moduleName, moduleAddress);
+		// Register the module in the EstateManager contract
+		EstateManager(_estateManager).registerModule(_moduleName, _moduleAddress);
 
-		// Émettre un événement pour signaler l'enregistrement du module
-		emit ModuleRegisteredInManager(estateManager, moduleName, moduleAddress);
-	}
-
-	function getDeployedManagers() external view returns (address[] memory) {
-		return deployedManagers;
+		emit ModuleRegisteredInManager(_estateManager, _moduleName, _moduleAddress);
 	}
 }

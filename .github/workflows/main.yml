@@ -23,4 +23,4 @@ jobs:
 
       - name: Run Tests
         working-directory: backend
-        run: npm run test
+        run: npx hardhat test

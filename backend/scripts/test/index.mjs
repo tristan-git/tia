@@ -26,7 +26,7 @@ async function chooseTest() {
 			message: "Quel test souhaitez-vous lancer ? (Utilisez 'Quitter' pour quitter)",
 			choices: [
 				{ name: 'ALL TESTS', value: 'all' },
-				...choices.map(({ name, value }) => ({ name, value })),
+				// ...choices.map(({ name, value }) => ({ name, value })),
 				{ name: 'CANCEL', value: null },
 			],
 			pageSize: 6,
